@@ -1,4 +1,4 @@
-#include "player_state.hpp"
+#include "user_state.hpp"
 
 #include <unistd.h>
 
@@ -7,12 +7,12 @@
 
 #include "common/common.hpp"
 
-PlayerState::PlayerState(std::string &hostname, std::string &port) {
+UserState::UserState(std::string &hostname, std::string &port) {
   this->setupSockets();
   this->resolveServerAddress(hostname, port);
 }
 
-PlayerState::~PlayerState() {
+UserState::~UserState() {
   if (this->udp_socket_fd != -1) {
     close(this->udp_socket_fd);
   }
@@ -28,6 +28,7 @@ PlayerState::~PlayerState() {
   delete this->game;
 }
 
+/*
 bool PlayerState::hasActiveGame() {
   return hasGame() && this->game->isOnGoing();
 }
@@ -42,15 +43,16 @@ void PlayerState::startGame(ClientGame *__game) {
   }
   this->game = __game;
 }
+*/
 
-void PlayerState::setupSockets() {
+void UserState::setupSockets() {
   // Create a UDP socket
   if ((this->udp_socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
     throw UnrecoverableError("Failed to create a UDP socket", errno);
   }
 }
 
-void PlayerState::resolveServerAddress(std::string &hostname,
+void UserState::resolveServerAddress(std::string &hostname,
                                        std::string &port) {
   struct addrinfo hints;
   int addr_res;
@@ -80,7 +82,7 @@ void PlayerState::resolveServerAddress(std::string &hostname,
   }
 }
 
-void PlayerState::sendUdpPacketAndWaitForReply(UdpPacket &out_packet,
+void UserState::sendUdpPacketAndWaitForReply(UdpPacket &out_packet,
                                                UdpPacket &in_packet) {
   int triesLeft = UDP_RESEND_TRIES;
   while (triesLeft > 0) {
@@ -97,16 +99,16 @@ void PlayerState::sendUdpPacketAndWaitForReply(UdpPacket &out_packet,
   }
 }
 
-void PlayerState::sendUdpPacket(UdpPacket &packet) {
+void UserState::sendUdpPacket(UdpPacket &packet) {
   send_packet(packet, udp_socket_fd, server_udp_addr->ai_addr,
               server_udp_addr->ai_addrlen);
 }
 
-void PlayerState::waitForUdpPacket(UdpPacket &packet) {
+void UserState::waitForUdpPacket(UdpPacket &packet) {
   wait_for_packet(packet, udp_socket_fd);
 }
 
-void PlayerState::sendTcpPacketAndWaitForReply(TcpPacket &out_packet,
+void UserState::sendTcpPacketAndWaitForReply(TcpPacket &out_packet,
                                                TcpPacket &in_packet) {
   try {
     openTcpSocket();
@@ -119,7 +121,7 @@ void PlayerState::sendTcpPacketAndWaitForReply(TcpPacket &out_packet,
   closeTcpSocket();
 };
 
-void PlayerState::sendTcpPacket(TcpPacket &packet) {
+void UserState::sendTcpPacket(TcpPacket &packet) {
   if (connect(tcp_socket_fd, server_tcp_addr->ai_addr,
               server_tcp_addr->ai_addrlen) != 0) {
     throw ConnectionTimeoutException();
@@ -127,11 +129,11 @@ void PlayerState::sendTcpPacket(TcpPacket &packet) {
   packet.send(tcp_socket_fd);
 }
 
-void PlayerState::waitForTcpPacket(TcpPacket &packet) {
+void UserState::waitForTcpPacket(TcpPacket &packet) {
   packet.receive(tcp_socket_fd);
 }
 
-void PlayerState::openTcpSocket() {
+void UserState::openTcpSocket() {
   if ((this->tcp_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
     throw UnrecoverableError("Failed to create a TCP socket", errno);
   }
@@ -153,7 +155,7 @@ void PlayerState::openTcpSocket() {
   }
 }
 
-void PlayerState::closeTcpSocket() {
+void UserState::closeTcpSocket() {
   if (close(this->tcp_socket_fd) != 0) {
     if (errno == EBADF) {
       // was already closed
