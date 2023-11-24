@@ -823,7 +823,7 @@ void wait_for_packet(UdpPacket &packet, int socket) {
 }
 
 void write_user_id(std::stringstream &buffer, const uint32_t user_id) {
-  buffer << std::setfill('0') << std::setw(PLAYER_ID_MAX_LEN) << user_id;
+  buffer << std::setfill('0') << std::setw(USER_ID_MAX_LEN) << user_id;
   buffer.copyfmt(std::ios(NULL));  // reset formatting
 }
 
@@ -838,7 +838,7 @@ uint32_t parse_packet_user_id(std::string &id_str) {
   }
   try {
     int i = std::stoi(id_str);
-    if (i < 0 || i > (int)PLAYER_ID_MAX) {
+    if (i < 0 || i > (int)USER_ID_MAX) {
       throw InvalidPacketException();
     }
     return (uint32_t)i;
