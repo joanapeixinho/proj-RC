@@ -3,7 +3,7 @@
 
 #include <netdb.h>
 
-#include "client_game.hpp"
+// #include "client_game.hpp"
 #include "common/protocol.hpp"
 
 class UserState {
