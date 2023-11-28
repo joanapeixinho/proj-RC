@@ -13,12 +13,12 @@ extern bool is_shutting_down;
 
 int main(int argc, char *argv[]) {
   try {
-    AuctionServer config(argc, argv);
+    Server config(argc, argv);
     if (config.help) {
       config.printHelp(std::cout);
       return EXIT_SUCCESS;
     }
-    GameServerState state(config.wordFilePath, config.port, config.verbose,
+    AuctionServerState state(config.wordFilePath, config.port, config.verbose,
                           config.random);
     state.registerPacketHandlers();
 
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
-void main_tcp(GameServerState &state) {
+void main_tcp(AuctionServerState &state) {
   WorkerPool worker_pool(state);
 
   if (listen(state.tcp_socket_fd, TCP_MAX_QUEUE_SIZE) < 0) {
@@ -113,7 +113,7 @@ void main_tcp(GameServerState &state) {
             << std::endl;
 }
 
-void wait_for_udp_packet(GameServerState &server_state) {
+void wait_for_udp_packet(AuctionServerState &server_state) {
   Address addr_from;
   std::stringstream stream;
   char buffer[SOCKET_BUFFER_LEN];
@@ -143,7 +143,7 @@ void wait_for_udp_packet(GameServerState &server_state) {
 }
 
 void handle_packet(std::stringstream &buffer, Address &addr_from,
-                   GameServerState &server_state) {
+                   AuctionServerState &server_state) {
   try {
     char packet_id[PACKET_ID_LEN + 1];
     buffer >> packet_id;
@@ -172,7 +172,7 @@ void handle_packet(std::stringstream &buffer, Address &addr_from,
   }
 }
 
-void wait_for_tcp_packet(GameServerState &server_state, WorkerPool &pool) {
+void wait_for_tcp_packet(AuctionServerState &server_state, WorkerPool &pool) {
   Address addr_from;
 
   addr_from.size = sizeof(addr_from.addr);
@@ -213,24 +213,17 @@ void wait_for_tcp_packet(GameServerState &server_state, WorkerPool &pool) {
   }
 }
 
-AuctionServer::AuctionServer(int argc, char *argv[]) {
+Server::Server(int argc, char *argv[]) {
   programPath = argv[0];
   int opt;
 
-  while ((opt = getopt(argc, argv, "-p:vhr")) != -1) {
+  while ((opt = getopt(argc, argv, "-p:v")) != -1) {
     switch (opt) {
       case 'p':
         port = std::string(optarg);
         break;
-      case 'h':
-        help = true;
-        return;
-        break;
       case 'v':
         verbose = true;
-        break;
-      case 'r':
-        random = true;
         break;
       case 1:
         // The `-` flag in `getopt` makes non-options behave as if they
@@ -258,12 +251,12 @@ AuctionServer::AuctionServer(int argc, char *argv[]) {
   validate_port_number(port);
 }
 
-void AuctionServer::printHelp(std::ostream &stream) {
+void Server::printHelp(std::ostream &stream) {
   stream << "Usage: " << programPath << " word_file [-p GSport] [-v] [-t]"
          << std::endl;
   stream << "Available options:" << std::endl;
   stream << "word_file\tPath to the word file" << std::endl;
-  stream << "-p GSport\tSet port of Game Server. Default: " << DEFAULT_PORT
+  stream << "-p GSport\tSet port of Auction Server. Default: " << DEFAULT_PORT
          << std::endl;
   stream << "-h\t\tEnable verbose mode." << std::endl;
   stream << "-r\t\tEnable random mode. Words will be selected randomly."

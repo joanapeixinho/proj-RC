@@ -1,7 +1,7 @@
 #ifndef USER_H
 #define USER_H
 
-#include "common/game.hpp"
+#include "common/Auction.hpp"
 
 class User { // User class
 private:

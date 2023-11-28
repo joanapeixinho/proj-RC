@@ -19,7 +19,7 @@ class UnexpectedPacketException : public std::runtime_error {
   UnexpectedPacketException()
       : std::runtime_error(
             "The server did not reply with the expected response, so it was "
-            "ignored. Please try again or connect to a different game "
+            "ignored. Please try again or connect to a different Auction "
             "server.") {}
 };
 
@@ -29,7 +29,7 @@ class InvalidPacketException : public std::runtime_error {
   InvalidPacketException()
       : std::runtime_error(
             "The response given by the server is not correctly structured, so "
-            "it was ignored. Please try again or connect to a different game "
+            "it was ignored. Please try again or connect to a different Auction "
             "server.") {}
 };
 
@@ -48,7 +48,7 @@ class ConnectionTimeoutException : public std::runtime_error {
  public:
   ConnectionTimeoutException()
       : std::runtime_error(
-            "Could not connect to the game server, please check your internet "
+            "Could not connect to the Auction server, please check your internet "
             "connection and try again.") {}
 };
 
@@ -89,20 +89,20 @@ class UdpPacket {
 
   virtual ~UdpPacket() = default;
 };
-/*
 
-// Start New Game Packet (SNG)
-class StartGameServerbound : public UdpPacket {
+
+// Start New Auction Packet (LIN)
+class StartAuctionServerbound : public UdpPacket {
  public:
-  static constexpr const char *ID = "SNG";
-  uint32_t player_id;
+  static constexpr const char *ID = "LIN";
+  uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-// Reply to Start Game Packet (RSG)
-class ReplyStartGameClientbound : public UdpPacket {
+// Reply to Start Auction Packet (RSG)
+class ReplyStartAuctionClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RSG";
@@ -117,7 +117,7 @@ class ReplyStartGameClientbound : public UdpPacket {
 class GuessLetterServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "PLG";
-  uint32_t player_id;
+  uint32_t user_id;
   char guess;
   uint32_t trial;
 
@@ -140,7 +140,7 @@ class GuessLetterClientbound : public UdpPacket {
 class GuessWordServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "PWG";
-  uint32_t player_id;
+  uint32_t user_id;
   std::string guess;
   uint32_t trial;
 
@@ -159,16 +159,16 @@ class GuessWordClientbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-class QuitGameServerbound : public UdpPacket {
+class QuitAuctionServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "QUT";
-  uint32_t player_id;
+  uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class QuitGameClientbound : public UdpPacket {
+class QuitAuctionClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RQT";
@@ -181,7 +181,7 @@ class QuitGameClientbound : public UdpPacket {
 class RevealWordServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "REV";
-  uint32_t player_id;
+  uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -229,7 +229,7 @@ class TcpPacket {
 
   virtual ~TcpPacket() = default;
 };
-/*
+
 
 class ScoreboardServerbound : public TcpPacket {
  public:
@@ -254,7 +254,7 @@ class ScoreboardClientbound : public TcpPacket {
 class HintServerbound : public TcpPacket {
  public:
   static constexpr const char *ID = "GHL";
-  uint32_t player_id;
+  uint32_t user_id;
 
   void send(int fd);
   void receive(int fd);
@@ -263,7 +263,7 @@ class HintServerbound : public TcpPacket {
 class StateServerbound : public TcpPacket {
  public:
   static constexpr const char *ID = "STA";
-  uint32_t player_id;
+  uint32_t user_id;
 
   void send(int fd);
   void receive(int fd);
@@ -292,7 +292,7 @@ class HintClientbound : public TcpPacket {
   void send(int fd);
   void receive(int fd);
 };
-*/
+
 
 class ErrorTcpPacket : public TcpPacket {
  public:

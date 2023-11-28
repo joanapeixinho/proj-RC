@@ -11,7 +11,7 @@
 #include "common/protocol.hpp"
 #include "packet_handlers.hpp"
 
-GameServerState::GameServerState(std::string &__word_file_path,
+AuctionServerState::AuctionServerState(std::string &__word_file_path,
                                  std::string &port, bool __verbose,
                                  bool __select_randomly)
     : select_randomly{__select_randomly}, cdebug{DebugStream(__verbose)} {
@@ -22,7 +22,7 @@ GameServerState::GameServerState(std::string &__word_file_path,
   srand((uint32_t)time(NULL));  // Initialize rand seed
 }
 
-GameServerState::~GameServerState() {
+AuctionServerState::~AuctionServerState() {
   if (this->udp_socket_fd != -1) {
     close(this->udp_socket_fd);
   }
@@ -37,12 +37,12 @@ GameServerState::~GameServerState() {
   }
 }
 
-void GameServerState::registerPacketHandlers() {
+void AuctionServerState::registerPacketHandlers() {
   // UDP
-  udp_packet_handlers.insert({StartGameServerbound::ID, handle_start_game});
+  udp_packet_handlers.insert({StartAuctionServerbound::ID, handle_start_Auction});
   udp_packet_handlers.insert({GuessLetterServerbound::ID, handle_guess_letter});
   udp_packet_handlers.insert({GuessWordServerbound::ID, handle_guess_word});
-  udp_packet_handlers.insert({QuitGameServerbound::ID, handle_quit_game});
+  udp_packet_handlers.insert({QuitAuctionServerbound::ID, handle_quit_Auction});
   udp_packet_handlers.insert({RevealWordServerbound::ID, handle_reveal_word});
 
   // TCP
@@ -51,7 +51,7 @@ void GameServerState::registerPacketHandlers() {
   tcp_packet_handlers.insert({StateServerbound::ID, handle_state});
 }
 
-void GameServerState::setup_sockets() {
+void AuctionServerState::setup_sockets() {
   // Create a UDP socket
   if ((this->udp_socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
     throw UnrecoverableError("Failed to create a UDP socket", errno);
@@ -93,7 +93,7 @@ void GameServerState::setup_sockets() {
   }
 }
 
-void GameServerState::resolveServerAddress(std::string &port) {
+void AuctionServerState::resolveServerAddress(std::string &port) {
   struct addrinfo hints;
   int addr_res;
   const char *port_str = port.c_str();
@@ -134,7 +134,7 @@ void GameServerState::resolveServerAddress(std::string &port) {
   std::cout << "Listening for connections on port " << port << std::endl;
 }
 
-void GameServerState::registerWords(std::string &__word_file_path) {
+void AuctionServerState::registerWords(std::string &__word_file_path) {
   try {
     std::filesystem::path word_file_path(std::filesystem::current_path());
     word_file_path.append(__word_file_path);
@@ -195,7 +195,7 @@ void GameServerState::registerWords(std::string &__word_file_path) {
   }
 }
 
-Word &GameServerState::selectRandomWord() {
+Word &AuctionServerState::selectRandomWord() {
   uint32_t index;
   if (select_randomly) {
     index = (uint32_t)rand() % (uint32_t)this->words.size();
@@ -206,7 +206,7 @@ Word &GameServerState::selectRandomWord() {
   return this->words[index];
 }
 
-void GameServerState::callUdpPacketHandler(std::string packet_id,
+void AuctionServerState::callUdpPacketHandler(std::string packet_id,
                                            std::stringstream &stream,
                                            Address &addr_from) {
   auto handler = this->udp_packet_handlers.find(packet_id);
@@ -218,7 +218,7 @@ void GameServerState::callUdpPacketHandler(std::string packet_id,
   handler->second(stream, addr_from, *this);
 }
 
-void GameServerState::callTcpPacketHandler(std::string packet_id,
+void AuctionServerState::callTcpPacketHandler(std::string packet_id,
                                            int connection_fd) {
   auto handler = this->tcp_packet_handlers.find(packet_id);
   if (handler == this->tcp_packet_handlers.end()) {
@@ -229,65 +229,65 @@ void GameServerState::callTcpPacketHandler(std::string packet_id,
   handler->second(connection_fd, *this);
 }
 
-ServerGameSync GameServerState::createGame(uint32_t player_id) {
-  std::scoped_lock<std::mutex> g_lock(gamesLock);
+AuctionServerSync AuctionServerState::createAuction(uint32_t user_id) {
+  std::scoped_lock<std::mutex> g_lock(AuctionsLock);
 
-  auto game = games.find(player_id);
-  if (game != games.end()) {
+  auto Auction = Auctions.find(user_id);
+  if (Auction != Auctions.end()) {
     {
-      ServerGameSync game_sync = ServerGameSync(game->second);
-      if (game_sync->isOnGoing()) {
-        if (game_sync->hasStarted()) {
-          throw GameAlreadyStartedException();
+      AuctionServerSync Auction_sync = AuctionServerSync(Auction->second);
+      if (Auction_sync->isOnGoing()) {
+        if (Auction_sync->hasStarted()) {
+          throw AuctionAlreadyStartedException();
         }
-        return game_sync;
+        return Auction_sync;
       }
     }
 
-    std::cout << "Deleting game" << std::endl;
-    // Delete existing game, so we can create a new one below
-    games.erase(game);
+    std::cout << "Deleting Auction" << std::endl;
+    // Delete existing Auction, so we can create a new one below
+    Auctions.erase(Auction);
   }
 
   Word &word = this->selectRandomWord();
   // Some C++ magic to create an instance of the class inside the map, without
   // moving it, since mutexes can't be moved
-  auto inserted = games.emplace(
-      std::piecewise_construct, std::forward_as_tuple(player_id),
-      std::forward_as_tuple(player_id, word.word, word.hint_path));
+  auto inserted = Auctions.emplace(
+      std::piecewise_construct, std::forward_as_tuple(user_id),
+      std::forward_as_tuple(user_id, word.word, word.hint_path));
 
   if (inserted.first->second.loadFromFile(true)) {
     // Loaded from file successfully, recheck if it has started
     if (inserted.first->second.hasStarted()) {
-      throw GameAlreadyStartedException();
+      throw AuctionAlreadyStartedException();
     }
-    return ServerGameSync(inserted.first->second);
+    return AuctionServerSync(inserted.first->second);
   }
 
-  return ServerGameSync(games.at(player_id));
+  return AuctionServerSync(Auctions.at(user_id));
 }
 
-ServerGameSync GameServerState::getGame(uint32_t player_id) {
-  std::scoped_lock<std::mutex> g_lock(gamesLock);
+AuctionServerSync AuctionServerState::getAuction(uint32_t user_id) {
+  std::scoped_lock<std::mutex> g_lock(AuctionsLock);
 
-  auto game = games.find(player_id);
-  if (game == games.end()) {
+  auto Auction = Auctions.find(user_id);
+  if (Auction == Auctions.end()) {
     // Try to load from disk
 
     // Some C++ magic to create an instance of the class inside the map, without
     // moving it, since mutexes can't be moved
-    auto inserted = games.emplace(
-        std::piecewise_construct, std::forward_as_tuple(player_id),
-        std::forward_as_tuple(player_id, std::string(), std::nullopt));
+    auto inserted = Auctions.emplace(
+        std::piecewise_construct, std::forward_as_tuple(user_id),
+        std::forward_as_tuple(user_id, std::string(), std::nullopt));
 
     if (!inserted.first->second.loadFromFile(false)) {
       // Failed to load, throw exception
-      games.erase(inserted.first);
-      throw NoGameFoundException();
+      Auctions.erase(inserted.first);
+      throw NoAuctionFoundException();
     }
 
-    return ServerGameSync(inserted.first->second);
+    return AuctionServerSync(inserted.first->second);
   }
 
-  return ServerGameSync(game->second);
+  return AuctionServerSync(Auction->second);
 }

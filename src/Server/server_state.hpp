@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 #include "scoreboard.hpp"
-#include "server_game.hpp"
+#include "auction_server.hpp"
 
 class Address {
  public:
@@ -60,18 +60,18 @@ class DebugStream {
   }
 };
 
-class GameServerState;
+class AuctionServerState;
 
 typedef void (*UdpPacketHandler)(std::stringstream&, Address&,
-                                 GameServerState&);
-typedef void (*TcpPacketHandler)(int connection_fd, GameServerState&);
+                                 AuctionServerState&);
+typedef void (*TcpPacketHandler)(int connection_fd, AuctionServerState&);
 
-class GameServerState {
+class AuctionServerState {
   std::unordered_map<std::string, UdpPacketHandler> udp_packet_handlers;
   std::unordered_map<std::string, TcpPacketHandler> tcp_packet_handlers;
-  std::unordered_map<uint32_t, ServerGame> games;
+  std::unordered_map<uint32_t, AuctionServer> Auctions;
   std::vector<Word> words;
-  std::mutex gamesLock;
+  std::mutex AuctionsLock;
   std::string word_file_dir;
   uint32_t current_word_index = 0;
   bool select_randomly;
@@ -85,9 +85,9 @@ class GameServerState {
   Scoreboard scoreboard;
   DebugStream cdebug;
 
-  GameServerState(std::string& __word_file_path, std::string& port,
+  AuctionServerState(std::string& __word_file_path, std::string& port,
                   bool __verbose, bool __select_randomly);
-  ~GameServerState();
+  ~AuctionServerState();
   void resolveServerAddress(std::string& port);
   void registerPacketHandlers();
   void registerWords(std::string& __word_file_path);
@@ -95,25 +95,25 @@ class GameServerState {
   void callUdpPacketHandler(std::string packet_id, std::stringstream& stream,
                             Address& addr_from);
   void callTcpPacketHandler(std::string packet_id, int connection_fd);
-  ServerGameSync getGame(uint32_t player_id);
-  ServerGameSync createGame(uint32_t player_id);
+  AuctionServerSync getAuction(uint32_t user_id);
+  AuctionServerSync createAuction(uint32_t user_id);
 };
 
 /** Exceptions **/
 
-// There is an on-going game with a player ID
-class GameAlreadyStartedException : public std::runtime_error {
+// There is an on-going Auction with a user ID
+class AuctionAlreadyStartedException : public std::runtime_error {
  public:
-  GameAlreadyStartedException()
+  AuctionAlreadyStartedException()
       : std::runtime_error(
-            "There is already an on-going game with this player ID.") {}
+            "There is already an on-going Auction with this user ID.") {}
 };
 
-// There is no on-going game with a player ID
-class NoGameFoundException : public std::runtime_error {
+// There is no on-going Auction with a user ID
+class NoAuctionFoundException : public std::runtime_error {
  public:
-  NoGameFoundException()
-      : std::runtime_error("There is no on-going game with this player ID.") {}
+  NoAuctionFoundException()
+      : std::runtime_error("There is no on-going Auction with this user ID.") {}
 };
 
 #endif

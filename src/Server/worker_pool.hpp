@@ -34,9 +34,9 @@ class WorkerPool {
   std::mutex busy_threads_lock;
 
  public:
-  GameServerState &server_state;
+  AuctionServerState &server_state;
 
-  WorkerPool(GameServerState &__server_state);
+  WorkerPool(AuctionServerState &__server_state);
   void delegateConnection(int connection_fd);
   void freeWorker(uint32_t worker_id);
 };

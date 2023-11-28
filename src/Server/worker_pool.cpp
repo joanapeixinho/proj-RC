@@ -59,7 +59,7 @@ void Worker::execute() {
   }
 }
 
-WorkerPool::WorkerPool(GameServerState &__server_state)
+WorkerPool::WorkerPool(AuctionServerState &__server_state)
     : server_state{__server_state} {
   for (uint32_t i = 0; i < TCP_WORKER_POOL_SIZE; ++i) {
     busy_threads[i] = false;

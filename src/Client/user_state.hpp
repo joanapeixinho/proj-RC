@@ -3,7 +3,7 @@
 
 #include <netdb.h>
 
-// #include "client_game.hpp"
+// #include "client_Auction.hpp"
 #include "common/protocol.hpp"
 
 class UserState {
@@ -22,13 +22,13 @@ class UserState {
   void closeTcpSocket();
 
  public:
-  // ClientGame* game = NULL;
+  // ClientAuction* Auction = NULL;
 
   UserState(std::string& hostname, std::string& port);
   ~UserState();
-  // bool hasActiveGame();
-  // bool hasGame();
-  // void startGame(ClientGame* game);
+  // bool hasActiveAuction();
+  // bool hasAuction();
+  // void startAuction(ClientAuction* Auction);
   void sendUdpPacketAndWaitForReply(UdpPacket& out_packet,
                                     UdpPacket& in_packet);
   void sendTcpPacketAndWaitForReply(TcpPacket& out_packet,

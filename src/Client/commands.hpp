@@ -41,14 +41,14 @@ class CommandHandler {
 };
 /*
 class StartCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
-  StartCommand() : CommandHandler("start", "sg", "PLID", "Start a new game") {}
+  StartCommand() : CommandHandler("start", "sg", "UID", "Start a new Auction") {}
 };
 
 class GuessLetterCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   GuessLetterCommand()
@@ -56,14 +56,14 @@ class GuessLetterCommand : public CommandHandler {
 };
 
 class GuessWordCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   GuessWordCommand() : CommandHandler("guess", "gw", "word", "Guess a word") {}
 };
 
 class ScoreboardCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   ScoreboardCommand()
@@ -72,7 +72,7 @@ class ScoreboardCommand : public CommandHandler {
 };
 
 class HintCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   HintCommand()
@@ -81,22 +81,22 @@ class HintCommand : public CommandHandler {
 };
 
 class StateCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   StateCommand() : CommandHandler("state", "st", std::nullopt, "Show state") {}
 };
 
 class QuitCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   QuitCommand()
-      : CommandHandler("quit", std::nullopt, std::nullopt, "Quit game") {}
+      : CommandHandler("quit", std::nullopt, std::nullopt, "Quit Auction") {}
 };
 
 class ExitCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   ExitCommand()
@@ -105,7 +105,7 @@ class ExitCommand : public CommandHandler {
 };
 
 class RevealCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
   RevealCommand()
@@ -113,7 +113,7 @@ class RevealCommand : public CommandHandler {
 };
 
 class HelpCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
   CommandManager& manager;
 
  public:
@@ -123,17 +123,17 @@ class HelpCommand : public CommandHandler {
 };
 
 class KillCommand : public CommandHandler {
-  void handle(std::string args, PlayerState& state);
+  void handle(std::string args, userState& state);
 
  public:
-  KillCommand() : CommandHandler("kill", "kl", "PLID", "Kill game on server") {}
+  KillCommand() : CommandHandler("kill", "kl", "UID", "Kill Auction on server") {}
 };
 */
 // void write_word(std::ostream& stream, char* word, uint32_t word_len);
 
-// bool is_game_active(PlayerState& state);
+// bool is_Auction_active(userState& state);
 
-// void print_game_progress(PlayerState& state);
+// void print_Auction_progress(userState& state);
 
 uint32_t parse_user_id(std::string& args);
 
