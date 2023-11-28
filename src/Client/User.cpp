@@ -8,61 +8,93 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#include "User.hpp"
+#include "common/common.hpp"
 
-#define PORT__TEST "58011"
-#define PORT "58037"
-
-std::string ASIP = "localhost"; // default value
-std::string ASport = "58000"; // default value
-int fd, errcode;
-ssize_t n;
-socklen_t addrlen; // Tamanho do endereço
-/*
-hints - Estrutura que contém informações sobre o tipo de conexão que será estabelecida.
-        Podem-se considerar, literalmente, dicas para o sistema operacional sobre como
-        deve ser feita a conexão, de forma a facilitar a aquisição ou preencher dados.
-
-res - Localização onde a função getaddrinfo() armazenará informações sobre o endereço.
-*/
-struct addrinfo hints, *res;
-struct sockaddr_in addr;
-
-class UserApplication {
-public:
-    // Implement necessary functions for user actions
-    void login();
-    void openAuction();
-    // Add other functions based on your specifications
-};
+extern bool is_shutting_down;
 
 int main(int argc, char *argv[]) {
-    // Implement the main loop for the User Application
-    UserApplication userApp;
-    int opt;
+    try {
+        setup_signal_handlers();
 
-    while ((opt = getopt(argc, argv, "n:p:")) != -1) {
-        switch (opt) {
-        case 'n':
-            ASIP = optarg;
-            break;
-        case 'p':
-            ASport = optarg;
-            break;
-        default:
-            std::cerr << "Usage: " << argv[0] << " [-n ASIP] [-p ASport]\n";
-            return 1;
+        ClientConfig config(argc, argv);
+        UserState state(config.host, config.port);
+
+        CommandManager commandManager;
+        registerCommands(commandManager);
+
+        commandManager.printHelp();
+
+        while (!std::cin.eof() && !is_shutting_down) {
+            commandManager.waitForCommand(state);
         }
+
+        std::cout << std::endl
+                << "Shutting down... Press CTRL + C (again) to forcefully close "
+                    "the application."
+                << std::endl;
+
+    } catch (std::exception &e) {
+        std::cerr << "Encountered unrecoverable error while running the "
+                 "application. Shutting down..."
+              << std::endl
+              << e.what() << std::endl;
+        return EXIT_FAILURE;
+    } catch (...) {
+        std::cerr << "Encountered unrecoverable error while running the "
+                 "application. Shutting down..."
+              << std::endl;
+        return EXIT_FAILURE;
     }
-
-
-    // Handle user input and send requests to the Auction Server
-    return 0;
+  return EXIT_SUCCESS;
 }
 
-int login() {
-    /* login UID password – following this command the User application sends 
-a message to the AS, using the UDP protocol, confirm the ID, UID, and 
-password of this user, or register it if this UID is not present in the AS
-database */
 
+void registerCommands(CommandManager &manager) {
+  manager.registerCommand(std::make_shared<LoginCommand>());        // UDP
+  manager.registerCommand(std::make_shared<LogoutCommand>());       // UDP
+  manager.registerCommand(std::make_shared<UnRegisterCommand>());   // UDP
+  manager.registerCommand(std::make_shared<ExitCommand>());
+  manager.registerCommand(std::make_shared<OpenAuctionCommand>());  // TCP
+  manager.registerCommand(std::make_shared<CloseAuctionCommand>()); // TCP
+  manager.registerCommand(std::make_shared<MyAuctionsCommand>());   // UDP
+  manager.registerCommand(std::make_shared<MyBidsCommand>());       // UDP
+  manager.registerCommand(std::make_shared<ListAuctionsCommand>()); // UDP
+  manager.registerCommand(std::make_shared<ShowAssetCommand>());    // TCP
+  manager.registerCommand(std::make_shared<BidCommand>());          // TCP
+  manager.registerCommand(std::make_shared<ShowRecordCommand>());   // TCP
+  manager.registerCommand(std::make_shared<HelpCommand>(manager));
+}
+
+ClientConfig::ClientConfig(int argc, char *argv[]) {
+  program_path = argv[0];
+  int opt;
+
+  while ((opt = getopt(argc, argv, "n:p:")) != -1) {
+    switch (opt) {
+      case 'n':
+        host = std::string(optarg);
+        break;
+      case 'p':
+        port = std::string(optarg);
+        break;
+      default:
+        std::cerr << std::endl;
+        printHelp(std::cerr);
+        exit(EXIT_FAILURE);
+    }
+  }
+
+  validate_port_number(port);
+}
+
+void ClientConfig::printHelp(std::ostream &stream) {
+  stream << "Usage: " << program_path << " [-n GSIP] [-p GSport] [-h]"
+         << std::endl;
+  stream << "Available options:" << std::endl;
+  stream << "-n GSIP\t\tSet hostname of Game Server. Default: "
+         << DEFAULT_HOSTNAME << std::endl;
+  stream << "-p GSport\tSet port of Game Server. Default: " << DEFAULT_PORT
+         << std::endl;
+  stream << "-h\t\tPrint this menu." << std::endl;
 }

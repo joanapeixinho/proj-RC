@@ -31,7 +31,7 @@ void CommandManager::printHelp() {
   }
   std::cout << std::endl << std::resetiosflags(std::ios_base::basefield);
 }
-/*
+
 void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
   this->handlerList.push_back(handler);
   this->handlers.insert({handler->name, handler});
@@ -40,8 +40,7 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
   }
 }
 
-void CommandManager::waitForCommand(PlayerState& state) {
-  print_game_progress(state);
+void CommandManager::waitForCommand(UserState& state) {
   std::cout << "> ";
 
   std::string line;
@@ -54,7 +53,7 @@ void CommandManager::waitForCommand(PlayerState& state) {
   auto splitIndex = line.find(' ');
 
   std::string commandName;
-  if (splitIndex == std::string::npos) {
+  if (splitIndex == std::string::npos) { // In case there is no space
     commandName = line;
     line = "";
   } else {
@@ -73,6 +72,7 @@ void CommandManager::waitForCommand(PlayerState& state) {
   }
 
   try {
+    // "handler" is an iterator & "handler->second" is a pointer to the handler instance
     handler->second->handle(line, state);
   } catch (std::exception& e) {
     std::cout << "[ERROR] " << e.what() << std::endl;
@@ -80,17 +80,16 @@ void CommandManager::waitForCommand(PlayerState& state) {
     std::cout << "[ERROR] An unknown error occurred." << std::endl;
   }
 }
-*/
+
 /* Command handlers */
-/*
-void StartCommand::handle(std::string args, PlayerState& state) {
+void LoginCommand::handle(std::string args, UserState& state) {
   uint32_t player_id;
   // Argument parsing
   try {
-    player_id = parse_player_id(args);
+    user_id = parse_user_id(args);
   } catch (...) {
-    std::cout << "Invalid player ID. It must be a positive number up to "
-              << PLAYER_ID_MAX_LEN << " digits" << std::endl;
+    std::cout << "Invalid user ID. It must be a positive number up to "
+              << USER_ID_MAX_LEN << " digits" << std::endl;
     return;
   }
 
@@ -126,6 +125,7 @@ void StartCommand::handle(std::string args, PlayerState& state) {
   }
 }
 
+/*
 void GuessLetterCommand::handle(std::string args, PlayerState& state) {
   // Check if there is a game running
   if (!is_game_active(state)) {

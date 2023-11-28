@@ -1,3 +1,5 @@
+/*
+
 #include "game.hpp"
 
 #include <cstring>
@@ -35,3 +37,4 @@ bool Game::isOnGoing() {
 void Game::finishGame() {
   onGoing = false;
 }
+*/

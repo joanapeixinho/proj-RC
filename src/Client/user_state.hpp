@@ -23,10 +23,12 @@ class UserState {
 
  public:
   // ClientGame* game = NULL;
+  bool logged_in = false;
 
   UserState(std::string& hostname, std::string& port);
   ~UserState();
   // bool hasActiveGame();
+  bool isLoggedIn();
   // bool hasGame();
   // void startGame(ClientGame* game);
   void sendUdpPacketAndWaitForReply(UdpPacket& out_packet,

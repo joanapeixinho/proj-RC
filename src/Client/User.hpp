@@ -1,25 +1,27 @@
 #ifndef USER_H
 #define USER_H
 
-#include "common/game.hpp"
+// #include "common/game.hpp"
 
-class User { // User class
-private:
-    std::string username;
-    std::string password;
-    std::vector<Auction> auctions;
-    std::vector<Bid> bids;
+#include <csignal>
 
-public:
-    User(std::string username, std::string password);
-    std::string getUsername();
-    std::string getPassword();
-    std::vector<Auction> getAuctions();
-    std::vector<Bid> getBids();
-    void addAuction(Auction auction);
-    void addBid(Bid bid);
+#include "commands.hpp"
+#include "common/constants.hpp"
+#include "common/protocol.hpp"
+#include "user_state.hpp"
+
+class ClientConfig {
+ public:
+  char* program_path;
+  std::string host = DEFAULT_HOSTNAME;
+  std::string port = DEFAULT_PORT;
+  bool help = false;
+
+  ClientConfig(int argc, char* argv[]);
+  void printHelp(std::ostream& stream);
 };
 
+void registerCommands(CommandManager& manager);
 
 
 #endif
