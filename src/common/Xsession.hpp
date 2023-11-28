@@ -14,14 +14,14 @@ class Session {
   uint32_t maxErrors;
 
  public:
-  uint32_t getPlayerId();
+  uint32_t getuserId();
   uint32_t getWordLen();
   uint32_t getMaxErrors();
   uint32_t getCurrentTrial();
   uint32_t getGoodTrials();
   uint32_t getNumErrors();
   bool isOnGoing();
-  void finishGame();  // setOnGoing(false)
+  void finishAuction();  // setOnGoing(false)
 };
 
 #endif

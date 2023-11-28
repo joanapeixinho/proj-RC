@@ -25,23 +25,23 @@ UserState::~UserState() {
   if (this->server_tcp_addr != NULL) {
     freeaddrinfo(this->server_tcp_addr);
   }
-  delete this->game;
+  delete this->Auction;
 }
 
 /*
-bool PlayerState::hasActiveGame() {
-  return hasGame() && this->game->isOnGoing();
+bool userState::hasActiveAuction() {
+  return hasAuction() && this->Auction->isOnGoing();
 }
 
-bool PlayerState::hasGame() {
-  return this->game != NULL;
+bool userState::hasAuction() {
+  return this->Auction != NULL;
 }
 
-void PlayerState::startGame(ClientGame *__game) {
-  if (this->game != __game) {
-    delete this->game;
+void userState::startAuction(ClientAuction *__Auction) {
+  if (this->Auction != __Auction) {
+    delete this->Auction;
   }
-  this->game = __game;
+  this->Auction = __Auction;
 }
 */
 

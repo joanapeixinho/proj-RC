@@ -29,12 +29,12 @@
 #define TRIAL_MIN (1)
 #define TRIAL_MAX (99)
 
-#define GAMEDATA_FOLDER_NAME ".gamedata"
+#define AuctionDATA_FOLDER_NAME ".Auctiondata"
 
 #define SCOREBOARD_MAX_ENTRIES (10)
 #define SCOREBOARD_FILE_NAME "scoreboard.dat"
 
-#define GAMES_FOLDER_NAME "games"
+#define AuctionS_FOLDER_NAME "Auctions"
 */
 
 #define HELP_MENU_COMMAND_COLUMN_WIDTH (20)

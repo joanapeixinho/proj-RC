@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <iostream>
 
-// #include "client_game.hpp"
+// #include "client_Auction.hpp"
 #include "common/protocol.hpp"
 
 extern bool is_shutting_down;
@@ -94,32 +94,32 @@ void LoginCommand::handle(std::string args, UserState& state) {
   }
 
   // Populate and send packet
-  StartGameServerbound packet_out;
-  packet_out.player_id = player_id;
+  StartAuctionServerbound packet_out;
+  packet_out.user_id = user_id;
 
-  ReplyStartGameClientbound rsg;
+  ReplyStartAuctionClientbound rsg;
   state.sendUdpPacketAndWaitForReply(packet_out, rsg);
 
   // Check status
-  ClientGame* game;
+  ClientAuction* Auction;
   switch (rsg.status) {
-    case ReplyStartGameClientbound::status::OK:
-      // Start game
-      game = new ClientGame(player_id, rsg.n_letters, rsg.max_errors);
-      state.startGame(game);
-      // Output game info
-      std::cout << "Game started successfully!" << std::endl;
+    case ReplyStartAuctionClientbound::status::OK:
+      // Start Auction
+      Auction = new ClientAuction(user_id, rsg.n_letters, rsg.max_errors);
+      state.startAuction(Auction);
+      // Output Auction info
+      std::cout << "Auction started successfully!" << std::endl;
       break;
 
-    case ReplyStartGameClientbound::status::NOK:
+    case ReplyStartAuctionClientbound::status::NOK:
       std::cout
-          << "Game failed to start: that player already has an on-going game."
+          << "Auction failed to start: that user already has an on-going Auction."
           << std::endl;
       break;
 
-    case ReplyStartGameClientbound::status::ERR:
+    case ReplyStartAuctionClientbound::status::ERR:
     default:
-      std::cout << "Game failed to start: packet was wrongly structured."
+      std::cout << "Auction failed to start: packet was wrongly structured."
                 << std::endl;
       break;
   }
@@ -141,9 +141,9 @@ void GuessLetterCommand::handle(std::string args, PlayerState& state) {
 
   // Populate and send packet
   GuessLetterServerbound packet_out;
-  packet_out.player_id = state.game->getPlayerId();
+  packet_out.user_id = state.Auction->getuserId();
   packet_out.guess = guess;
-  packet_out.trial = state.game->getCurrentTrial();
+  packet_out.trial = state.Auction->getCurrentTrial();
 
   GuessLetterClientbound rlg;
   state.sendUdpPacketAndWaitForReply(packet_out, rlg);
@@ -151,33 +151,33 @@ void GuessLetterCommand::handle(std::string args, PlayerState& state) {
   // Check packet status
   if (rlg.status == GuessLetterClientbound::status::ERR) {
     std::cout
-        << "Word guess failed: there is no on-going game for this player on "
-           "the server. Use 'state' command to check the state of the game."
+        << "Word guess failed: there is no on-going Auction for this user on "
+           "the server. Use 'state' command to check the state of the Auction."
         << std::endl;
     return;
   }
 
   switch (rlg.status) {
     case GuessLetterClientbound::status::OK:
-      // Update game state
+      // Update Auction state
       for (auto it = rlg.pos.begin(); it != rlg.pos.end(); ++it) {
-        state.game->updateWordChar(*it - 1, guess);
+        state.Auction->updateWordChar(*it - 1, guess);
       }
-      state.game->increaseTrial();
+      state.Auction->increaseTrial();
       std::cout << "Letter '" << guess << "' is part of the word!" << std::endl;
       break;
 
     case GuessLetterClientbound::status::WIN:
-      // Update game state
-      for (uint32_t i = 0; i < state.game->getWordLen(); i++) {
-        if (state.game->getWordProgress()[i] == '_') {
-          state.game->updateWordChar(i, guess);
+      // Update Auction state
+      for (uint32_t i = 0; i < state.Auction->getWordLen(); i++) {
+        if (state.Auction->getWordProgress()[i] == '_') {
+          state.Auction->updateWordChar(i, guess);
         }
       }
-      state.game->increaseTrial();
-      // Output game info
-      print_game_progress(state);
-      state.game->finishGame();
+      state.Auction->increaseTrial();
+      // Output Auction info
+      print_Auction_progress(state);
+      state.Auction->finishAuction();
       std::cout << "Letter '" << guess << "' is part of the word!" << std::endl;
       std::cout << "YOU WON!" << std::endl;
       break;
@@ -190,23 +190,23 @@ void GuessLetterCommand::handle(std::string args, PlayerState& state) {
     case GuessLetterClientbound::status::NOK:
       std::cout << "Letter '" << guess << "' is NOT part of the word."
                 << std::endl;
-      state.game->increaseTrial();
-      state.game->updateNumErrors();
+      state.Auction->increaseTrial();
+      state.Auction->updateNumErrors();
       break;
 
     case GuessLetterClientbound::status::OVR:
-      state.game->updateNumErrors();
-      state.game->increaseTrial();
-      print_game_progress(state);
-      state.game->finishGame();
+      state.Auction->updateNumErrors();
+      state.Auction->increaseTrial();
+      print_Auction_progress(state);
+      state.Auction->finishAuction();
       std::cout << "Letter '" << guess << "' is NOT part of the word."
                 << std::endl;
-      std::cout << "Game over. You've lost." << std::endl;
+      std::cout << "Auction over. You've lost." << std::endl;
       break;
 
     case GuessLetterClientbound::status::INV:
-      std::cout << "Client and game server are out-of-sync. Please quit the "
-                   "current game and start a new one."
+      std::cout << "Client and Auction server are out-of-sync. Please quit the "
+                   "current Auction and start a new one."
                 << std::endl;
       break;
 
@@ -216,23 +216,23 @@ void GuessLetterCommand::handle(std::string args, PlayerState& state) {
   }
 }
 
-void GuessWordCommand::handle(std::string args, PlayerState& state) {
-  // Check if there is a game running
-  if (!is_game_active(state)) {
+void GuessWordCommand::handle(std::string args, userState& state) {
+  // Check if there is a Auction running
+  if (!is_Auction_active(state)) {
     return;
   }
 
   // Argument parsing
-  if (args.length() != state.game->getWordLen()) {
+  if (args.length() != state.Auction->getWordLen()) {
     std::cout << "Invalid argument. It must be a word of length "
-              << state.game->getWordLen() << std::endl;
+              << state.Auction->getWordLen() << std::endl;
     return;
   }
 
   // Populate and send packet
   GuessWordServerbound packet_out;
-  packet_out.player_id = state.game->getPlayerId();
-  packet_out.trial = state.game->getCurrentTrial();
+  packet_out.user_id = state.Auction->getuserId();
+  packet_out.trial = state.Auction->getCurrentTrial();
   packet_out.guess = args;
 
   GuessWordClientbound rwg;
@@ -241,22 +241,22 @@ void GuessWordCommand::handle(std::string args, PlayerState& state) {
   // Check packet status
   if (rwg.status == GuessWordClientbound::status::ERR) {
     std::cout
-        << "Word guess failed: there is no on-going game for this player on "
-           "the server. Use 'state' command to check the state of the game."
+        << "Word guess failed: there is no on-going Auction for this user on "
+           "the server. Use 'state' command to check the state of the Auction."
         << std::endl;
     return;
   }
 
   switch (rwg.status) {
     case GuessWordClientbound::status::WIN:
-      // Update game state
-      for (uint32_t i = 0; i < state.game->getWordLen(); i++) {
-        state.game->updateWordChar(i, args[i]);
+      // Update Auction state
+      for (uint32_t i = 0; i < state.Auction->getWordLen(); i++) {
+        state.Auction->updateWordChar(i, args[i]);
       }
-      state.game->increaseTrial();
-      // Output game info
-      print_game_progress(state);
-      state.game->finishGame();
+      state.Auction->increaseTrial();
+      // Output Auction info
+      print_Auction_progress(state);
+      state.Auction->finishAuction();
       std::cout << "Word '" << args << "' is the correct word." << std::endl;
       std::cout << "YOU WON!" << std::endl;
       break;
@@ -265,20 +265,20 @@ void GuessWordCommand::handle(std::string args, PlayerState& state) {
                 << std::endl;
       break;
     case GuessWordClientbound::status::NOK:
-      state.game->updateNumErrors();
-      state.game->increaseTrial();
+      state.Auction->updateNumErrors();
+      state.Auction->increaseTrial();
       std::cout << "Word '" << args << "' is NOT the correct word."
                 << std::endl;
       break;
 
     case GuessWordClientbound::status::OVR:
-      state.game->updateNumErrors();
-      state.game->increaseTrial();
+      state.Auction->updateNumErrors();
+      state.Auction->increaseTrial();
       std::cout << "Word '" << args << "' is NOT the correct word."
                 << std::endl;
-      print_game_progress(state);
-      state.game->finishGame();
-      std::cout << "Game over. You've lost." << std::endl;
+      print_Auction_progress(state);
+      state.Auction->finishAuction();
+      std::cout << "Auction over. You've lost." << std::endl;
       break;
 
     case GuessWordClientbound::status::INV:
@@ -291,79 +291,79 @@ void GuessWordCommand::handle(std::string args, PlayerState& state) {
   }
 }
 
-void QuitCommand::handle(std::string args, PlayerState& state) {
+void QuitCommand::handle(std::string args, userState& state) {
   (void)args;  // unused - no args
-  // Check if there is a game running
-  if (!is_game_active(state)) {
+  // Check if there is a Auction running
+  if (!is_Auction_active(state)) {
     return;
   }
 
   // Populate and send packet
-  QuitGameServerbound packet_out;
-  packet_out.player_id = state.game->getPlayerId();
+  QuitAuctionServerbound packet_out;
+  packet_out.user_id = state.Auction->getuserId();
 
-  QuitGameClientbound rq;
+  QuitAuctionClientbound rq;
   state.sendUdpPacketAndWaitForReply(packet_out, rq);
 
   // Check packet status
   switch (rq.status) {
-    case QuitGameClientbound::status::OK:
-      std::cout << "Game quit successfully." << std::endl;
-      state.game->finishGame();
+    case QuitAuctionClientbound::status::OK:
+      std::cout << "Auction quit successfully." << std::endl;
+      state.Auction->finishAuction();
       break;
 
-    case QuitGameClientbound::status::NOK:
-      std::cout << "Game had already finished." << std::endl;
-      state.game->finishGame();
+    case QuitAuctionClientbound::status::NOK:
+      std::cout << "Auction had already finished." << std::endl;
+      state.Auction->finishAuction();
       break;
 
-    case QuitGameClientbound::status::ERR:
+    case QuitAuctionClientbound::status::ERR:
     default:
       std::cout << "Error with the request. Please try again." << std::endl;
       break;
   }
 }
 
-void ExitCommand::handle(std::string args, PlayerState& state) {
+void ExitCommand::handle(std::string args, userState& state) {
   (void)args;  // unused - no args
-  if (state.hasActiveGame()) {
+  if (state.hasActiveAuction()) {
     // Populate and send packet
-    QuitGameServerbound packet_out;
-    packet_out.player_id = state.game->getPlayerId();
+    QuitAuctionServerbound packet_out;
+    packet_out.user_id = state.Auction->getuserId();
 
-    QuitGameClientbound rq;
+    QuitAuctionClientbound rq;
     state.sendUdpPacketAndWaitForReply(packet_out, rq);
 
     // Check packet status
     switch (rq.status) {
-      case QuitGameClientbound::status::OK:
-        std::cout << "Game quit successfully." << std::endl;
-        state.game->finishGame();
+      case QuitAuctionClientbound::status::OK:
+        std::cout << "Auction quit successfully." << std::endl;
+        state.Auction->finishAuction();
         break;
 
-      case QuitGameClientbound::status::NOK:
-        std::cout << "Game had already finished." << std::endl;
-        state.game->finishGame();
+      case QuitAuctionClientbound::status::NOK:
+        std::cout << "Auction had already finished." << std::endl;
+        state.Auction->finishAuction();
         break;
 
-      case QuitGameClientbound::status::ERR:
+      case QuitAuctionClientbound::status::ERR:
       default:
-        std::cout << "Failed to quit game." << std::endl;
+        std::cout << "Failed to quit Auction." << std::endl;
         break;
     }
   }
   is_shutting_down = true;
 }
 
-void RevealCommand::handle(std::string args, PlayerState& state) {
+void RevealCommand::handle(std::string args, userState& state) {
   (void)args;  // unused - no args
-  // Check if there is a game running
-  if (!is_game_active(state)) {
+  // Check if there is a Auction running
+  if (!is_Auction_active(state)) {
     return;
   }
   // Populate and send packet
   RevealWordServerbound packet_out;
-  packet_out.player_id = state.game->getPlayerId();
+  packet_out.user_id = state.Auction->getuserId();
 
   RevealWordClientbound rrv;
   state.sendUdpPacketAndWaitForReply(packet_out, rrv);
@@ -371,7 +371,7 @@ void RevealCommand::handle(std::string args, PlayerState& state) {
   std::cout << "Word: " << rrv.word << std::endl;
 }
 
-void ScoreboardCommand::handle(std::string args, PlayerState& state) {
+void ScoreboardCommand::handle(std::string args, userState& state) {
   (void)args;  // unused - no args
 
   ScoreboardServerbound scoreboard_packet;
@@ -394,15 +394,15 @@ void ScoreboardCommand::handle(std::string args, PlayerState& state) {
   }
 }
 
-void HintCommand::handle(std::string args, PlayerState& state) {
+void HintCommand::handle(std::string args, userState& state) {
   (void)args;  // unused - no args
-  // Check if there is a game running
-  if (!is_game_active(state)) {
+  // Check if there is a Auction running
+  if (!is_Auction_active(state)) {
     return;
   }
 
   HintServerbound hint_packet;
-  hint_packet.player_id = state.game->getPlayerId();
+  hint_packet.user_id = state.Auction->getuserId();
   HintClientbound packet_reply;
 
   state.sendTcpPacketAndWaitForReply(hint_packet, packet_reply);
@@ -422,35 +422,35 @@ void HintCommand::handle(std::string args, PlayerState& state) {
   }
 }
 
-void StateCommand::handle(std::string args, PlayerState& state) {
+void StateCommand::handle(std::string args, userState& state) {
   (void)args;  // unused - no args
-  if (!state.hasGame()) {
-    std::cout << "You need to start a game to use this command." << std::endl;
+  if (!state.hasAuction()) {
+    std::cout << "You need to start a Auction to use this command." << std::endl;
     return;
   }
 
   StateServerbound packet_out;
-  packet_out.player_id = state.game->getPlayerId();
+  packet_out.user_id = state.Auction->getuserId();
 
   StateClientbound packet_reply;
   state.sendTcpPacketAndWaitForReply(packet_out, packet_reply);
 
   switch (packet_reply.status) {
     case StateClientbound::status::ACT:
-      std::cout << "There is an active game." << std::endl;
+      std::cout << "There is an active Auction." << std::endl;
       std::cout << "Path to file: " << packet_reply.file_name << std::endl;
       display_file(packet_reply.file_name);
       break;
     case StateClientbound::status::FIN:
-      std::cout << "There is a finished game." << std::endl;
+      std::cout << "There is a finished Auction." << std::endl;
       std::cout << "Path to file: " << packet_reply.file_name << std::endl;
       display_file(packet_reply.file_name);
-      if (state.hasActiveGame()) {
-        state.game->finishGame();
+      if (state.hasActiveAuction()) {
+        state.Auction->finishAuction();
       }
       break;
     case StateClientbound::status::NOK:
-      std::cout << "There is no game history available for this player."
+      std::cout << "There is no Auction history available for this user."
                 << std::endl;
       break;
 
@@ -459,43 +459,43 @@ void StateCommand::handle(std::string args, PlayerState& state) {
   }
 }
 
-void HelpCommand::handle(std::string args, PlayerState& state) {
+void HelpCommand::handle(std::string args, userState& state) {
   (void)args;   // unused - no args
   (void)state;  // unused
   manager.printHelp();
 }
 
-void KillCommand::handle(std::string args, PlayerState& state) {
-  uint32_t player_id;
+void KillCommand::handle(std::string args, userState& state) {
+  uint32_t user_id;
   // Argument parsing
   try {
-    player_id = parse_player_id(args);
+    user_id = parse_user_id(args);
   } catch (...) {
-    std::cout << "Invalid player ID. It must be a positive number up to "
-              << PLAYER_ID_MAX_LEN << " digits" << std::endl;
+    std::cout << "Invalid user ID. It must be a positive number up to "
+              << user_ID_MAX_LEN << " digits" << std::endl;
     return;
   }
 
   // Populate and send packet
-  QuitGameServerbound packet_out;
-  packet_out.player_id = player_id;
+  QuitAuctionServerbound packet_out;
+  packet_out.user_id = user_id;
 
-  QuitGameClientbound rq;
+  QuitAuctionClientbound rq;
   state.sendUdpPacketAndWaitForReply(packet_out, rq);
   // Check packet status
   switch (rq.status) {
-    case QuitGameClientbound::status::OK:
-      std::cout << "Game quit successfully." << std::endl;
+    case QuitAuctionClientbound::status::OK:
+      std::cout << "Auction quit successfully." << std::endl;
       break;
 
-    case QuitGameClientbound::status::NOK:
-      std::cout << "There is no on-going game for this player." << std::endl;
-      // Game was already finished
+    case QuitAuctionClientbound::status::NOK:
+      std::cout << "There is no on-going Auction for this user." << std::endl;
+      // Auction was already finished
       break;
 
-    case QuitGameClientbound::status::ERR:
+    case QuitAuctionClientbound::status::ERR:
     default:
-      std::cout << "Failed to quit game on server." << std::endl;
+      std::cout << "Failed to quit Auction on server." << std::endl;
       break;
   }
 }
@@ -509,26 +509,26 @@ void write_word(std::ostream& stream, char* word, uint32_t word_len) {
   }
 }
 
-bool is_game_active(PlayerState& state) {
-  if (!state.hasActiveGame()) {
-    std::cout << "There is no on-going game. Please start a game using the "
+bool is_Auction_active(userState& state) {
+  if (!state.hasActiveAuction()) {
+    std::cout << "There is no on-going Auction. Please start a Auction using the "
                  "'start' command."
               << std::endl;
   }
-  return state.hasActiveGame();
+  return state.hasActiveAuction();
 }
 
-void print_game_progress(PlayerState& state) {
-  if (!state.hasActiveGame()) {
+void print_Auction_progress(userState& state) {
+  if (!state.hasActiveAuction()) {
     return;
   }
   std::cout << std::endl << "Word progress: ";
-  write_word(std::cout, state.game->getWordProgress(),
-             state.game->getWordLen());
+  write_word(std::cout, state.Auction->getWordProgress(),
+             state.Auction->getWordLen());
   std::cout << std::endl;
-  std::cout << "Current trial: " << state.game->getCurrentTrial() << std::endl;
-  std::cout << "Number of errors: " << state.game->getNumErrors() << "/"
-            << state.game->getMaxErrors() << std::endl
+  std::cout << "Current trial: " << state.Auction->getCurrentTrial() << std::endl;
+  std::cout << "Number of errors: " << state.Auction->getNumErrors() << "/"
+            << state.Auction->getMaxErrors() << std::endl
             << std::endl;
 }
 */

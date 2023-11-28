@@ -77,7 +77,7 @@ std::string UdpPacket::readString(std::stringstream &buffer, uint32_t max_len) {
     ++i;
   }
   return str;
-}
+};
 
 std::string UdpPacket::readAlphabeticalString(std::stringstream &buffer,
                                               uint32_t max_len) {
@@ -90,7 +90,7 @@ std::string UdpPacket::readAlphabeticalString(std::stringstream &buffer,
     str[i] = (char)tolower((unsigned char)str[i]);
   }
   return str;
-}
+};
 
 uint32_t UdpPacket::readInt(std::stringstream &buffer) {
   int64_t i;
@@ -99,49 +99,52 @@ uint32_t UdpPacket::readInt(std::stringstream &buffer) {
     throw InvalidPacketException();
   }
   return (uint32_t)i;
-}
+};
 
 uint32_t UdpPacket::readUserId(std::stringstream &buffer) {
   std::string id_str = readString(buffer, 6);
   return parse_packet_user_id(id_str);
-}
-/*
+};
+
 // Packet type seriliazation and deserialization methods
-std::stringstream StartGameServerbound::serialize() {
+std::stringstream StartAuctionServerbound::serialize() {
   std::stringstream buffer;
-  buffer << StartGameServerbound::ID << " ";
-  write_player_id(buffer, player_id);
+  buffer << StartAuctionServerbound::ID << " ";
+  write_user_id(buffer, user_id);
   buffer << std::endl;
   return buffer;
 };
 
-void StartGameServerbound::deserialize(std::stringstream &buffer) {
+void StartAuctionServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
-  player_id = readPlayerId(buffer);
+  user_id = readUserId(buffer);
   readPacketDelimiter(buffer);
 };
 
-std::stringstream ReplyStartGameClientbound::serialize() {
+
+
+std::stringstream ReplyStartAuctionClientbound::serialize() {
   std::stringstream buffer;
-  buffer << ReplyStartGameClientbound::ID << " ";
-  if (status == ReplyStartGameClientbound::status::OK) {
+  buffer << ReplyStartAuctionClientbound::ID << " ";
+  if (status == ReplyStartAuctionClientbound::status::OK) {
     buffer << "OK " << n_letters << " " << max_errors;
-  } else if (status == ReplyStartGameClientbound::status::NOK) {
+  } else if (status == ReplyStartAuctionClientbound::status::NOK) {
     buffer << "NOK";
-  } else if (status == ReplyStartGameClientbound::status::ERR) {
+  } else if (status == ReplyStartAuctionClientbound::status::ERR) {
     buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
   buffer << std::endl;
   return buffer;
-};
+}
 
-void ReplyStartGameClientbound::deserialize(std::stringstream &buffer) {
+
+void ReplyStartAuctionClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
-  readPacketId(buffer, ReplyStartGameClientbound::ID);
+  readPacketId(buffer, ReplyStartAuctionClientbound::ID);
   readSpace(buffer);
   auto status_str = readString(buffer, 3);
   if (status_str == "OK") {
@@ -163,7 +166,7 @@ void ReplyStartGameClientbound::deserialize(std::stringstream &buffer) {
 std::stringstream GuessLetterServerbound::serialize() {
   std::stringstream buffer;
   buffer << GuessLetterServerbound::ID << " ";
-  write_player_id(buffer, player_id);
+  write_user_id(buffer, user_id);
   buffer << " " << guess << " " << trial << std::endl;
   return buffer;
 };
@@ -172,7 +175,7 @@ void GuessLetterServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
-  player_id = readPlayerId(buffer);
+  user_id = readuserId(buffer);
   readSpace(buffer);
   guess = readAlphabeticalChar(buffer);
   readSpace(buffer);
@@ -260,7 +263,7 @@ void GuessLetterClientbound::deserialize(std::stringstream &buffer) {
 std::stringstream GuessWordServerbound::serialize() {
   std::stringstream buffer;
   buffer << GuessWordServerbound::ID << " ";
-  write_player_id(buffer, player_id);
+  write_user_id(buffer, user_id);
   buffer << " " << guess << " " << trial << std::endl;
   return buffer;
 };
@@ -269,7 +272,7 @@ void GuessWordServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
-  player_id = readPlayerId(buffer);
+  user_id = readuserId(buffer);
   readSpace(buffer);
   guess = readAlphabeticalString(buffer, WORD_MAX_LEN);
   if (guess.length() < WORD_MIN_LEN || guess.length() > WORD_MAX_LEN) {
@@ -343,25 +346,25 @@ void GuessWordClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
-std::stringstream QuitGameServerbound::serialize() {
+std::stringstream QuitAuctionServerbound::serialize() {
   std::stringstream buffer;
-  buffer << QuitGameServerbound::ID << " ";
-  write_player_id(buffer, player_id);
+  buffer << QuitAuctionServerbound::ID << " ";
+  write_user_id(buffer, user_id);
   buffer << std::endl;
   return buffer;
 };
 
-void QuitGameServerbound::deserialize(std::stringstream &buffer) {
+void QuitAuctionServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
-  player_id = readPlayerId(buffer);
+  user_id = readuserId(buffer);
   readPacketDelimiter(buffer);
 };
 
-std::stringstream QuitGameClientbound::serialize() {
+std::stringstream QuitAuctionClientbound::serialize() {
   std::stringstream buffer;
-  buffer << QuitGameClientbound::ID << " ";
+  buffer << QuitAuctionClientbound::ID << " ";
   if (status == OK) {
     buffer << "OK";
   } else if (status == NOK) {
@@ -375,9 +378,9 @@ std::stringstream QuitGameClientbound::serialize() {
   return buffer;
 };
 
-void QuitGameClientbound::deserialize(std::stringstream &buffer) {
+void QuitAuctionClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
-  readPacketId(buffer, QuitGameClientbound::ID);
+  readPacketId(buffer, QuitAuctionClientbound::ID);
   readSpace(buffer);
   auto status_str = readString(buffer, 3);
   if (status_str == "OK") {
@@ -395,7 +398,7 @@ void QuitGameClientbound::deserialize(std::stringstream &buffer) {
 std::stringstream RevealWordServerbound::serialize() {
   std::stringstream buffer;
   buffer << RevealWordServerbound::ID << " ";
-  write_player_id(buffer, player_id);
+  write_user_id(buffer, user_id);
   buffer << std::endl;
   return buffer;
 };
@@ -404,7 +407,7 @@ void RevealWordServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
-  player_id = readPlayerId(buffer);
+  user_id = readuserId(buffer);
   readPacketDelimiter(buffer);
 };
 
@@ -421,7 +424,7 @@ void RevealWordClientbound::deserialize(std::stringstream &buffer) {
   word = readAlphabeticalString(buffer, WORD_MAX_LEN);
   readPacketDelimiter(buffer);
 };
-*/
+
 std::stringstream ErrorUdpPacket::serialize() {
   std::stringstream buffer;
   buffer << ErrorUdpPacket::ID << std::endl;
@@ -559,7 +562,7 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
     int ready_fd = select(std::max(fd, fileno(stdin)) + 1, &file_descriptors,
                           NULL, NULL, &timeout);
     if (is_shutting_down) {
-      std::cout << "Cancelling TCP download, player is shutting down..."
+      std::cout << "Cancelling TCP download, user is shutting down..."
                 << std::endl;
       throw OperationCancelledException();
     }
@@ -603,7 +606,7 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
 
   file.close();
 }
-/*
+
 void ScoreboardServerbound::send(int fd) {
   std::stringstream stream;
   stream << ScoreboardServerbound::ID << std::endl;
@@ -654,7 +657,7 @@ void ScoreboardClientbound::receive(int fd) {
 void StateServerbound::send(int fd) {
   std::stringstream stream;
   stream << StateServerbound::ID << " ";
-  write_player_id(stream, player_id);
+  write_user_id(stream, user_id);
   stream << std::endl;
   writeString(fd, stream.str());
 }
@@ -662,8 +665,8 @@ void StateServerbound::send(int fd) {
 void StateServerbound::receive(int fd) {
   // Serverbound packets don't read their ID
   readSpace(fd);
-  player_id = readPlayerId(fd);
-  if (player_id > PLAYER_ID_MAX) {
+  user_id = readuserId(fd);
+  if (user_id > user_ID_MAX) {
     throw InvalidPacketException();
   }
   readPacketDelimiter(fd);
@@ -714,7 +717,7 @@ void StateClientbound::receive(int fd) {
 void HintServerbound::send(int fd) {
   std::stringstream stream;
   stream << HintServerbound::ID << " ";
-  write_player_id(stream, player_id);
+  write_user_id(stream, user_id);
   stream << std::endl;
   writeString(fd, stream.str());
 }
@@ -722,8 +725,8 @@ void HintServerbound::send(int fd) {
 void HintServerbound::receive(int fd) {
   // Serverbound packets don't read their ID
   readSpace(fd);
-  player_id = readPlayerId(fd);
-  if (player_id > PLAYER_ID_MAX) {
+  user_id = readuserId(fd);
+  if (user_id > user_ID_MAX) {
     throw InvalidPacketException();
   }
   readPacketDelimiter(fd);
@@ -767,7 +770,7 @@ void HintClientbound::receive(int fd) {
   }
   readPacketDelimiter(fd);
 }
-*/
+
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
   writeString(fd, "\n");
