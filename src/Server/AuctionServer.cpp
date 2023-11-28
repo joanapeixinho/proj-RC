@@ -1,108 +1,271 @@
-// AuctionServer.cpp
+#include "server.hpp"
+
+#include <arpa/inet.h>
+#include <unistd.h>
 
 #include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <ctime>
-#include <fstream>
+#include <thread>
 
-// Define necessary data structures for auctions, users, etc.
+#include "common/common.hpp"
+#include "common/protocol.hpp"
 
-struct Auction {
-    int auctionID;
-    std::string name;
-    std::string assetFileName;
-    // Add other relevant fields
-};
+extern bool is_shutting_down;
 
-struct Bid {
-    int userID;
-    int auctionID;
-    int value;
-    // Add other relevant fields
-};
-
-struct User {
-    std::string userID;
-    std::string password;
-    bool loggedIn;
-    // Add other relevant fields
-};
-
-class AuctionServer {
-private:
-    std::vector<Auction> auctions;
-    std::vector<Bid> bids;
-    std::unordered_map<std::string, User> users;
-
-public:
-    // Implement necessary functions for handling requests
-    void handleLogin(std::string userID, std::string password);
-    void handleOpenAuction(std::string userID, std::string name, std::string assetFileName, int startValue, int duration);
-    // Add other functions based on your specifications
-};
-
-int main() {
-    // Implement the main loop for the Auction Server
-    AuctionServer auctionServer;
-    // Set up and listen for incoming connections
-    // Handle incoming requests
-    return 0;
-}
-
-void AuctionServer::communicateWithServerUDP(const std::string& message) {
-    // Create a UDP socket
-    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0) {
-        std::cerr << "Cannot open socket\n";
-        return;
+int main(int argc, char *argv[]) {
+  try {
+    AuctionServer config(argc, argv);
+    if (config.help) {
+      config.printHelp(std::cout);
+      return EXIT_SUCCESS;
     }
+    GameServerState state(config.wordFilePath, config.port, config.verbose,
+                          config.random);
+    state.registerPacketHandlers();
 
-    struct sockaddr_in serv_addr;
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(std::stoi(ASport));
-    if (inet_pton(AF_INET, ASIP.c_str(), &serv_addr.sin_addr) <= 0) {
-        std::cerr << "Invalid IP address\n";
-        return;
-    }
-
-    // Send the message to the server
-    if (sendto(sockfd, message.c_str(), message.size(), 0, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-        std::cerr << "Cannot send message\n";
-        return;
-    }
-
-    // Close the socket
-    close(sockfd);
-}
-
-void AuctionServer::handleLogin(std::string userID, std::string password) {
-     // Check if the user is already registered
-    auto it = users.find(userID);
-    if (it != users.end()) {
-        // The user is already registered, check the password
-        if (it->second.password == password) {
-            // The password is correct, log the user in
-            it->second.loggedIn = true;
-            // Send a reply with status = OK
-            std::string message = "RLI OK";
-            communicateWithServerUDP(message);
-        } else {
-            // The password is incorrect, send a reply with status = NOK
-            std::string message = "RLI NOK";
-            communicateWithServerUDP(message);
-        }
+    setup_signal_handlers();
+    if (config.random) {
+      std::cout << "Words will be selected randomly" << std::endl;
     } else {
-        // The user is not registered, register and log the user in
-        User newUser;
-        newUser.userID = userID;
-        newUser.password = password;
-        newUser.loggedIn = true;
-        users[userID] = newUser;
-        // Send a reply with status = REG
-        std::string message = "RLI REG";
-        communicateWithServerUDP(message);
+      std::cout << "Words will be selected sequentially" << std::endl;
     }
+
+    state.cdebug << "Verbose mode is active" << std::endl << std::endl;
+
+    std::thread tcp_thread(main_tcp, std::ref(state));
+    uint32_t ex_trial = 0;
+    while (!is_shutting_down) {
+      try {
+        wait_for_udp_packet(state);
+        ex_trial = 0;
+      } catch (std::exception &e) {
+        std::cerr << "Encountered unrecoverable error while running the "
+                     "application. Retrying..."
+                  << std::endl
+                  << e.what() << std::endl;
+        ex_trial++;
+      } catch (...) {
+        std::cerr << "Encountered unrecoverable error while running the "
+                     "application. Retrying..."
+                  << std::endl;
+        ex_trial++;
+      }
+      if (ex_trial >= EXCEPTION_RETRY_MAX) {
+        std::cerr << "Max trials reached, shutting down..." << std::endl;
+        is_shutting_down = true;
+      }
+    }
+
+    std::cout << "Shutting down UDP server..." << std::endl;
+
+    tcp_thread.join();
+  } catch (std::exception &e) {
+    std::cerr << "Encountered unrecoverable error while running the "
+                 "application. Shutting down..."
+              << std::endl
+              << e.what() << std::endl;
+    return EXIT_FAILURE;
+  } catch (...) {
+    std::cerr << "Encountered unrecoverable error while running the "
+                 "application. Shutting down..."
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }
 
+void main_tcp(GameServerState &state) {
+  WorkerPool worker_pool(state);
+
+  if (listen(state.tcp_socket_fd, TCP_MAX_QUEUE_SIZE) < 0) {
+    perror("Error while executing listen");
+    std::cerr << "TCP server is being shutdown..." << std::endl;
+    is_shutting_down = true;
+    return;
+  }
+
+  uint32_t ex_trial = 0;
+  while (!is_shutting_down) {
+    try {
+      wait_for_tcp_packet(state, worker_pool);
+      ex_trial = 0;
+    } catch (std::exception &e) {
+      std::cerr << "Encountered unrecoverable error while running the "
+                   "application. Retrying..."
+                << std::endl
+                << e.what() << std::endl;
+      ex_trial++;
+    } catch (...) {
+      std::cerr << "Encountered unrecoverable error while running the "
+                   "application. Retrying..."
+                << std::endl;
+      ex_trial++;
+    }
+    if (ex_trial >= EXCEPTION_RETRY_MAX) {
+      std::cerr << "Max trials reached, shutting down..." << std::endl;
+      is_shutting_down = true;
+    }
+  }
+
+  std::cout << "Shutting down TCP server... This might take a while if there "
+               "are open connections. Press CTRL + C again to forcefully close "
+               "the server."
+            << std::endl;
+}
+
+void wait_for_udp_packet(GameServerState &server_state) {
+  Address addr_from;
+  std::stringstream stream;
+  char buffer[SOCKET_BUFFER_LEN];
+
+  addr_from.size = sizeof(addr_from.addr);
+  ssize_t n = recvfrom(server_state.udp_socket_fd, buffer, SOCKET_BUFFER_LEN, 0,
+                       (struct sockaddr *)&addr_from.addr, &addr_from.size);
+  if (is_shutting_down) {
+    return;
+  }
+  if (n == -1) {
+    if (errno == EAGAIN) {
+      return;
+    }
+    throw UnrecoverableError("Failed to receive UDP message (recvfrom)", errno);
+  }
+  addr_from.socket = server_state.udp_socket_fd;
+
+  char addr_str[INET_ADDRSTRLEN + 1] = {0};
+  inet_ntop(AF_INET, &addr_from.addr.sin_addr, addr_str, INET_ADDRSTRLEN);
+  std::cout << "Receiving incoming UDP message from " << addr_str << ":"
+            << ntohs(addr_from.addr.sin_port) << std::endl;
+
+  stream.write(buffer, n);
+
+  return handle_packet(stream, addr_from, server_state);
+}
+
+void handle_packet(std::stringstream &buffer, Address &addr_from,
+                   GameServerState &server_state) {
+  try {
+    char packet_id[PACKET_ID_LEN + 1];
+    buffer >> packet_id;
+
+    if (!buffer.good()) {
+      std::cerr << "Received malformatted packet ID" << std::endl;
+      throw InvalidPacketException();
+    }
+
+    std::string packet_id_str = std::string(packet_id);
+
+    server_state.callUdpPacketHandler(packet_id_str, buffer, addr_from);
+  } catch (InvalidPacketException &e) {
+    try {
+      ErrorUdpPacket error_packet;
+      send_packet(error_packet, addr_from.socket,
+                  (struct sockaddr *)&addr_from.addr, addr_from.size);
+    } catch (std::exception &ex) {
+      std::cerr << "Failed to reply with ERR packet: " << ex.what()
+                << std::endl;
+    }
+  } catch (std::exception &e) {
+    std::cerr << "Failed to handle UDP packet: " << e.what() << std::endl;
+  } catch (...) {
+    std::cerr << "Failed to handle UDP packet: unknown" << std::endl;
+  }
+}
+
+void wait_for_tcp_packet(GameServerState &server_state, WorkerPool &pool) {
+  Address addr_from;
+
+  addr_from.size = sizeof(addr_from.addr);
+  int connection_fd =
+      accept(server_state.tcp_socket_fd, (struct sockaddr *)&addr_from.addr,
+             &addr_from.size);
+  if (is_shutting_down) {
+    return;
+  }
+  if (connection_fd < 0) {
+    if (errno == EAGAIN) {  // timeout, just go around and keep listening
+      return;
+    }
+    throw UnrecoverableError("[ERROR] Failed to accept a connection", errno);
+  }
+
+  struct timeval read_timeout;
+  read_timeout.tv_sec = TCP_READ_TIMEOUT_SECONDS;
+  read_timeout.tv_usec = 0;
+  if (setsockopt(connection_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout,
+                 sizeof(read_timeout)) < 0) {
+    throw UnrecoverableError("Failed to set TCP read timeout socket option",
+                             errno);
+  }
+
+  char addr_str[INET_ADDRSTRLEN + 1] = {0};
+  inet_ntop(AF_INET, &addr_from.addr.sin_addr, addr_str, INET_ADDRSTRLEN);
+  std::cout << "Receiving incoming TCP connection from " << addr_str << ":"
+            << ntohs(addr_from.addr.sin_port) << std::endl;
+
+  try {
+    pool.delegateConnection(connection_fd);
+  } catch (std::exception &e) {
+    close(connection_fd);
+    throw UnrecoverableError(
+        std::string("Failed to delegate connection to worker: ") + e.what() +
+        "\nClosing connection.");
+  }
+}
+
+AuctionServer::AuctionServer(int argc, char *argv[]) {
+  programPath = argv[0];
+  int opt;
+
+  while ((opt = getopt(argc, argv, "-p:vhr")) != -1) {
+    switch (opt) {
+      case 'p':
+        port = std::string(optarg);
+        break;
+      case 'h':
+        help = true;
+        return;
+        break;
+      case 'v':
+        verbose = true;
+        break;
+      case 'r':
+        random = true;
+        break;
+      case 1:
+        // The `-` flag in `getopt` makes non-options behave as if they
+        // were values of an option -0x01
+        if (wordFilePath.empty()) {
+          // Only keep the first non-option argument
+          wordFilePath = std::string(optarg);
+        }
+        break;
+      default:
+        std::cerr << std::endl;
+        printHelp(std::cerr);
+        exit(EXIT_FAILURE);
+    }
+  }
+
+  if (wordFilePath.empty()) {
+    std::cerr << programPath << ": required argument 'word_file' not provided"
+              << std::endl
+              << std::endl;
+    printHelp(std::cerr);
+    exit(EXIT_FAILURE);
+  }
+
+  validate_port_number(port);
+}
+
+void AuctionServer::printHelp(std::ostream &stream) {
+  stream << "Usage: " << programPath << " word_file [-p GSport] [-v] [-t]"
+         << std::endl;
+  stream << "Available options:" << std::endl;
+  stream << "word_file\tPath to the word file" << std::endl;
+  stream << "-p GSport\tSet port of Game Server. Default: " << DEFAULT_PORT
+         << std::endl;
+  stream << "-h\t\tEnable verbose mode." << std::endl;
+  stream << "-r\t\tEnable random mode. Words will be selected randomly."
+         << std::endl;
+}
