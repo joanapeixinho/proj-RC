@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "client_game.hpp"
+// #include "client_game.hpp"
 #include "common/protocol.hpp"
 
 extern bool is_shutting_down;
@@ -31,7 +31,7 @@ void CommandManager::printHelp() {
   }
   std::cout << std::endl << std::resetiosflags(std::ios_base::basefield);
 }
-
+/*
 void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
   this->handlerList.push_back(handler);
   this->handlers.insert({handler->name, handler});
@@ -80,9 +80,9 @@ void CommandManager::waitForCommand(PlayerState& state) {
     std::cout << "[ERROR] An unknown error occurred." << std::endl;
   }
 }
-
+*/
 /* Command handlers */
-
+/*
 void StartCommand::handle(std::string args, PlayerState& state) {
   uint32_t player_id;
   // Argument parsing
@@ -531,16 +531,16 @@ void print_game_progress(PlayerState& state) {
             << state.game->getMaxErrors() << std::endl
             << std::endl;
 }
-
-uint32_t parse_player_id(std::string& args) {
+*/
+uint32_t parse_user_id(std::string& args) {
   size_t converted = 0;
-  long player_id = std::stol(args, &converted, 10);
-  if (converted != args.length() || player_id <= 0 ||
-      player_id > PLAYER_ID_MAX) {
-    throw std::runtime_error("invalid player id");
+  long user_id = std::stol(args, &converted, 10);
+  if (converted != args.length() || user_id <= 0 ||
+      user_id > USER_ID_MAX) {
+    throw std::runtime_error("invalid user id");
   }
 
-  return (uint32_t)player_id;
+  return (uint32_t)user_id;
 }
 
 void display_file(std::string filename) {

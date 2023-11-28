@@ -19,7 +19,7 @@ class CommandManager {
  public:
   void printHelp();
   void registerCommand(std::shared_ptr<CommandHandler> handler);
-  void waitForCommand(PlayerState& state);
+  void waitForCommand(UserState& state);
 };
 
 class CommandHandler {
@@ -37,9 +37,9 @@ class CommandHandler {
   const std::optional<const char*> alias;
   const std::optional<const char*> usage;
   const char* description;
-  virtual void handle(std::string args, PlayerState& state) = 0;
+  virtual void handle(std::string args, UserState& state) = 0;
 };
-
+/*
 class StartCommand : public CommandHandler {
   void handle(std::string args, PlayerState& state);
 
@@ -128,14 +128,14 @@ class KillCommand : public CommandHandler {
  public:
   KillCommand() : CommandHandler("kill", "kl", "PLID", "Kill game on server") {}
 };
+*/
+// void write_word(std::ostream& stream, char* word, uint32_t word_len);
 
-void write_word(std::ostream& stream, char* word, uint32_t word_len);
+// bool is_game_active(PlayerState& state);
 
-bool is_game_active(PlayerState& state);
+// void print_game_progress(PlayerState& state);
 
-void print_game_progress(PlayerState& state);
-
-uint32_t parse_player_id(std::string& args);
+uint32_t parse_user_id(std::string& args);
 
 void display_file(std::string filename);
 
