@@ -25,7 +25,7 @@ UserState::~UserState() {
   if (this->server_tcp_addr != NULL) {
     freeaddrinfo(this->server_tcp_addr);
   }
-  delete this->Auction;
+  this->logged_in = false;
 }
 
 /*
@@ -36,14 +36,11 @@ bool userState::hasActiveAuction() {
 bool userState::hasAuction() {
   return this->Auction != NULL;
 }
-
-void userState::startAuction(ClientAuction *__Auction) {
-  if (this->Auction != __Auction) {
-    delete this->Auction;
-  }
-  this->Auction = __Auction;
-}
 */
+
+void UserState::login() {
+  this->logged_in = true;
+}
 
 void UserState::setupSockets() {
   // Create a UDP socket

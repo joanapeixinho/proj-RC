@@ -33,7 +33,7 @@ class UserState {
 
   // bool hasActiveAuction();
   // bool hasAuction();
-  // void startAuction(ClientAuction* Auction);
+  void login();
   void sendUdpPacketAndWaitForReply(UdpPacket& out_packet,
                                     UdpPacket& in_packet);
   void sendTcpPacketAndWaitForReply(TcpPacket& out_packet,

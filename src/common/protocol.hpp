@@ -92,7 +92,7 @@ class UdpPacket {
 
 
 // Start New Auction Packet (LIN)
-class StartAuctionServerbound : public UdpPacket {
+class LoginServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LIN";
   uint32_t user_id;
@@ -102,7 +102,7 @@ class StartAuctionServerbound : public UdpPacket {
 };
 
 // Reply to Start Auction Packet (RSG)
-class ReplyStartAuctionClientbound : public UdpPacket {
+class ReplyLoginClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RSG";
@@ -195,7 +195,7 @@ class RevealWordClientbound : public UdpPacket {
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
-*/
+
 
 class ErrorUdpPacket : public UdpPacket {
  public:

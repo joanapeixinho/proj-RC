@@ -107,15 +107,15 @@ uint32_t UdpPacket::readUserId(std::stringstream &buffer) {
 };
 
 // Packet type seriliazation and deserialization methods
-std::stringstream StartAuctionServerbound::serialize() {
+std::stringstream LoginServerbound::serialize() {
   std::stringstream buffer;
-  buffer << StartAuctionServerbound::ID << " ";
+  buffer << LoginServerbound::ID << " ";
   write_user_id(buffer, user_id);
   buffer << std::endl;
   return buffer;
 };
 
-void StartAuctionServerbound::deserialize(std::stringstream &buffer) {
+void LoginServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
@@ -125,14 +125,14 @@ void StartAuctionServerbound::deserialize(std::stringstream &buffer) {
 
 
 
-std::stringstream ReplyStartAuctionClientbound::serialize() {
+std::stringstream ReplyLoginClientbound::serialize() {
   std::stringstream buffer;
-  buffer << ReplyStartAuctionClientbound::ID << " ";
-  if (status == ReplyStartAuctionClientbound::status::OK) {
+  buffer << ReplyLoginClientbound::ID << " ";
+  if (status == ReplyLoginClientbound::status::OK) {
     buffer << "OK " << n_letters << " " << max_errors;
-  } else if (status == ReplyStartAuctionClientbound::status::NOK) {
+  } else if (status == ReplyLoginClientbound::status::NOK) {
     buffer << "NOK";
-  } else if (status == ReplyStartAuctionClientbound::status::ERR) {
+  } else if (status == ReplyLoginClientbound::status::ERR) {
     buffer << "ERR";
   } else {
     throw PacketSerializationException();
@@ -142,9 +142,9 @@ std::stringstream ReplyStartAuctionClientbound::serialize() {
 }
 
 
-void ReplyStartAuctionClientbound::deserialize(std::stringstream &buffer) {
+void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
-  readPacketId(buffer, ReplyStartAuctionClientbound::ID);
+  readPacketId(buffer, ReplyLoginClientbound::ID);
   readSpace(buffer);
   auto status_str = readString(buffer, 3);
   if (status_str == "OK") {

@@ -94,30 +94,27 @@ void LoginCommand::handle(std::string args, UserState& state) {
   }
 
   // Populate and send packet
-  StartAuctionServerbound packet_out;
+  LoginServerbound packet_out;
   packet_out.user_id = user_id;
 
-  ReplyStartAuctionClientbound rsg;
+  ReplyLoginClientbound rsg;
   state.sendUdpPacketAndWaitForReply(packet_out, rsg);
 
-  // Check status
-  ClientAuction* Auction;
   switch (rsg.status) {
-    case ReplyStartAuctionClientbound::status::OK:
-      // Start Auction
-      Auction = new ClientAuction(user_id, rsg.n_letters, rsg.max_errors);
-      state.startAuction(Auction);
-      // Output Auction info
-      std::cout << "Auction started successfully!" << std::endl;
+    case ReplyLoginClientbound::status::OK:
+      // Login user
+      state.login(Auction);
+      // Output Login info
+      std::cout << "Logged in successfully!" << std::endl;
       break;
 
-    case ReplyStartAuctionClientbound::status::NOK:
+    case ReplyLoginClientbound::status::NOK:
       std::cout
           << "Auction failed to start: that user already has an on-going Auction."
           << std::endl;
       break;
 
-    case ReplyStartAuctionClientbound::status::ERR:
+    case ReplyLoginClientbound::status::ERR:
     default:
       std::cout << "Auction failed to start: packet was wrongly structured."
                 << std::endl;
