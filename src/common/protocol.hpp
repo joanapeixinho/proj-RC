@@ -111,84 +111,130 @@ class ReplyLoginClientbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-class GuessLetterServerbound : public UdpPacket {
+// Logout Packet (LOU)
+class LogoutServerbound : public UdpPacket {
  public:
-  static constexpr const char *ID = "PLG";
+  static constexpr const char *ID = "LOU";
   uint32_t user_id;
-  char guess;
-  uint32_t trial;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class GuessLetterClientbound : public UdpPacket {
+// Reply to Logout Packet (RLO)
+class ReplyLogoutClientbound : public UdpPacket {
  public:
-  enum status { OK, WIN, DUP, NOK, OVR, INV, ERR };
-  static constexpr const char *ID = "RLG";
+  enum status { OK, NOK, UNR};
+  static constexpr const char *ID = "RLI";
   status status;
-  uint32_t trial;
-  std::vector<uint32_t> pos;
-
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class GuessWordServerbound : public UdpPacket {
+// Unregister Packet (UNR)
+class UnregisterServerbound : public UdpPacket {
  public:
-  static constexpr const char *ID = "PWG";
+  static constexpr const char *ID = "UNR";
   uint32_t user_id;
-  std::string guess;
-  uint32_t trial;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class GuessWordClientbound : public UdpPacket {
+// Reply to Unregister Packet (RUN)
+class ReplyUnregisterClientbound : public UdpPacket {
  public:
-  enum status { WIN, DUP, NOK, OVR, INV, ERR };
-  static constexpr const char *ID = "RWG";
+  enum status { OK, NOK, UNR };
+  static constexpr const char *ID = "RUN";
   status status;
-  uint32_t trial;
-
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class QuitAuctionServerbound : public UdpPacket {
+// List MyAuctions Packet (LMA)
+
+class ListMyAuctionsServerbound : public UdpPacket {
  public:
-  static constexpr const char *ID = "QUT";
+  static constexpr const char *ID = "LMA";
   uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class QuitAuctionClientbound : public UdpPacket {
+// Reply to List MyAuctions Packet (RLM)
+
+class ReplyListMyAuctionsClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, ERR };
-  static constexpr const char *ID = "RQT";
+  enum status { OK, NLG, NOK };
+  static constexpr const char *ID = "RLM";
   status status;
-
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class RevealWordServerbound : public UdpPacket {
+// List my bids Packet (LMB)
+
+class ListBidsServerbound : public UdpPacket {
  public:
-  static constexpr const char *ID = "REV";
+  static constexpr const char *ID = "LMB";
   uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-class RevealWordClientbound : public UdpPacket {
- public:
-  static constexpr const char *ID = "RRV";
-  std::string word;
+// Reply to List my bids Packet (RMB)
 
+class ReplyListBidsClientbound : public UdpPacket {
+ public:
+  enum status { OK, NOK, NLG };
+  static constexpr const char *ID = "RMB";
+  status status;
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
+
+// List Auctions Packet (LST)
+
+class ListAuctionsServerbound : public UdpPacket {
+ public:
+  static constexpr const char *ID = "LST";
+  uint32_t user_id;
+
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
+
+// Reply to List Auctions Packet (RLS)
+
+class ReplyListAuctionsClientbound : public UdpPacket {
+ public:
+  enum status { OK, NOK };
+  static constexpr const char *ID = "RLS";
+  status status;
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
+
+// Show Record Packet (SRC)
+
+class ShowRecordServerbound : public UdpPacket {
+ public:
+  static constexpr const char *ID = "SRC";
+  uint32_t user_id;
+
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
+
+// Reply to Show Record Packet (RRC)
+
+class ReplyShowRecordClientbound : public UdpPacket {
+ public:
+  enum status { OK, NOK };
+  static constexpr const char *ID = "RRC";
+  status status;
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };

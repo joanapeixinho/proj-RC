@@ -149,10 +149,7 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   auto status_str = readString(buffer, 3);
   if (status_str == "OK") {
     status = OK;
-    readSpace(buffer);
-    n_letters = readInt(buffer);
-    readSpace(buffer);
-    max_errors = readInt(buffer);
+    //TODO 
   } else if (status_str == "NOK") {
     status = NOK;
   } else if (status_str == "ERR") {
@@ -163,214 +160,31 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
-std::stringstream GuessLetterServerbound::serialize() {
+std::stringstream LogoutServerbound::serialize() {
   std::stringstream buffer;
-  buffer << GuessLetterServerbound::ID << " ";
+  buffer << LogoutServerbound::ID << " ";
   write_user_id(buffer, user_id);
-  buffer << " " << guess << " " << trial << std::endl;
+  buffer << std::endl;
   return buffer;
 };
 
-void GuessLetterServerbound::deserialize(std::stringstream &buffer) {
+void LogoutServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
   user_id = readUserId(buffer);
-  readSpace(buffer);
-  guess = readAlphabeticalChar(buffer);
-  readSpace(buffer);
-  trial = readInt(buffer);
-
-  if (trial < TRIAL_MIN || trial > TRIAL_MAX) {
-    throw InvalidPacketException();
-  }
-
   readPacketDelimiter(buffer);
 };
 
-std::stringstream GuessLetterClientbound::serialize() {
+std::stringstream ReplyLogoutClientbound::serialize() {
   std::stringstream buffer;
-  buffer << GuessLetterClientbound::ID << " ";
-  if (status == OK) {
-    buffer << "OK"
-           << " " << trial << " " << pos.size();
-    for (auto it = pos.begin(); it != pos.end(); ++it) {
-      buffer << " " << *it;
-    }
-  } else if (status == WIN) {
-    buffer << "WIN " << trial;
-  } else if (status == DUP) {
-    buffer << "DUP " << trial;
-  } else if (status == NOK) {
-    buffer << "NOK " << trial;
-  } else if (status == OVR) {
-    buffer << "OVR " << trial;
-  } else if (status == INV) {
-    buffer << "INV " << trial;
-  } else if (status == ERR) {
-    buffer << "ERR";
-  } else {
-    throw PacketSerializationException();
-  }
-  buffer << std::endl;
-  return buffer;
-};
-
-void GuessLetterClientbound::deserialize(std::stringstream &buffer) {
-  buffer >> std::noskipws;
-  readPacketId(buffer, GuessLetterClientbound::ID);
-  readSpace(buffer);
-  auto success = readString(buffer, 3);
-
-  if (success == "ERR") {
-    status = ERR;
-    readPacketDelimiter(buffer);
-    return;
-  }
-
-  readSpace(buffer);
-  trial = readInt(buffer);
-
-  if (trial + 1 < TRIAL_MIN || trial > TRIAL_MAX) {
-    throw InvalidPacketException();
-  }
-
-  if (success == "OK") {
-    status = OK;
-    readSpace(buffer);
-    uint32_t n = readInt(buffer);
-    pos.clear();
-    for (uint32_t i = 0; i < n; ++i) {
-      readSpace(buffer);
-      pos.push_back(readInt(buffer));
-    }
-  } else if (success == "WIN") {
-    status = WIN;
-  } else if (success == "DUP") {
-    status = DUP;
-  } else if (success == "NOK") {
-    status = NOK;
-  } else if (success == "OVR") {
-    status = OVR;
-  } else if (success == "INV") {
-    status = INV;
-  } else {
-    throw InvalidPacketException();
-  }
-  readPacketDelimiter(buffer);
-};
-
-std::stringstream GuessWordServerbound::serialize() {
-  std::stringstream buffer;
-  buffer << GuessWordServerbound::ID << " ";
-  write_user_id(buffer, user_id);
-  buffer << " " << guess << " " << trial << std::endl;
-  return buffer;
-};
-
-void GuessWordServerbound::deserialize(std::stringstream &buffer) {
-  buffer >> std::noskipws;
-  // Serverbound packets don't read their ID
-  readSpace(buffer);
-  user_id = readuserId(buffer);
-  readSpace(buffer);
-  guess = readAlphabeticalString(buffer, WORD_MAX_LEN);
-  if (guess.length() < WORD_MIN_LEN || guess.length() > WORD_MAX_LEN) {
-    throw InvalidPacketException();
-  }
-
-  readSpace(buffer);
-  trial = readInt(buffer);
-  if (trial < TRIAL_MIN || trial > TRIAL_MAX) {
-    throw InvalidPacketException();
-  }
-
-  readPacketDelimiter(buffer);
-};
-
-std::stringstream GuessWordClientbound::serialize() {
-  std::stringstream buffer;
-  buffer << GuessWordClientbound::ID << " ";
-  if (status == WIN) {
-    buffer << "WIN " << trial;
-  } else if (status == NOK) {
-    buffer << "NOK " << trial;
-  } else if (status == DUP) {
-    buffer << "DUP " << trial;
-  } else if (status == OVR) {
-    buffer << "OVR " << trial;
-  } else if (status == INV) {
-    buffer << "INV " << trial;
-  } else if (status == ERR) {
-    buffer << "ERR";
-  } else {
-    throw InvalidPacketException();
-  }
-  buffer << std::endl;
-  return buffer;
-};
-
-void GuessWordClientbound::deserialize(std::stringstream &buffer) {
-  buffer >> std::noskipws;
-
-  readPacketId(buffer, GuessWordClientbound::ID);
-  readSpace(buffer);
-  auto statusString = readString(buffer, 3);
-
-  if (statusString == "ERR") {
-    status = ERR;
-    readPacketDelimiter(buffer);
-    return;
-  }
-
-  readSpace(buffer);
-  trial = readInt(buffer);
-
-  if (trial + 1 < TRIAL_MIN || trial > TRIAL_MAX) {
-    throw InvalidPacketException();
-  }
-
-  if (statusString == "WIN") {
-    status = WIN;
-  } else if (statusString == "NOK") {
-    status = NOK;
-  } else if (statusString == "DUP") {
-    status = DUP;
-  } else if (statusString == "OVR") {
-    status = OVR;
-  } else if (statusString == "INV") {
-    status = INV;
-  } else {
-    throw InvalidPacketException();
-  }
-  readPacketDelimiter(buffer);
-};
-
-std::stringstream QuitAuctionServerbound::serialize() {
-  std::stringstream buffer;
-  buffer << QuitAuctionServerbound::ID << " ";
-  write_user_id(buffer, user_id);
-  buffer << std::endl;
-  return buffer;
-};
-
-void QuitAuctionServerbound::deserialize(std::stringstream &buffer) {
-  buffer >> std::noskipws;
-  // Serverbound packets don't read their ID
-  readSpace(buffer);
-  user_id = readuserId(buffer);
-  readPacketDelimiter(buffer);
-};
-
-std::stringstream QuitAuctionClientbound::serialize() {
-  std::stringstream buffer;
-  buffer << QuitAuctionClientbound::ID << " ";
-  if (status == OK) {
-    buffer << "OK";
-  } else if (status == NOK) {
+  buffer << ReplyLogoutClientbound::ID << " ";
+  if (status == ReplyLogoutClientbound::status::OK) {
+    buffer << "OK ";
+  } else if (status == ReplyLogoutClientbound::status::NOK) {
     buffer << "NOK";
-  } else if (status == ERR) {
-    buffer << "ERR";
+  } else if (status == ReplyLogoutClientbound::status::UNR) {
+    buffer << "UNR";
   } else {
     throw PacketSerializationException();
   }
@@ -378,52 +192,24 @@ std::stringstream QuitAuctionClientbound::serialize() {
   return buffer;
 };
 
-void QuitAuctionClientbound::deserialize(std::stringstream &buffer) {
+void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
-  readPacketId(buffer, QuitAuctionClientbound::ID);
+  readPacketId(buffer, ReplyLogoutClientbound::ID);
   readSpace(buffer);
   auto status_str = readString(buffer, 3);
   if (status_str == "OK") {
     status = OK;
   } else if (status_str == "NOK") {
     status = NOK;
-  } else if (status_str == "ERR") {
-    status = ERR;
+  } else if (status_str == "UNR") {
+    status = UNR;
   } else {
     throw InvalidPacketException();
   }
   readPacketDelimiter(buffer);
 };
 
-std::stringstream RevealWordServerbound::serialize() {
-  std::stringstream buffer;
-  buffer << RevealWordServerbound::ID << " ";
-  write_user_id(buffer, user_id);
-  buffer << std::endl;
-  return buffer;
-};
 
-void RevealWordServerbound::deserialize(std::stringstream &buffer) {
-  buffer >> std::noskipws;
-  // Serverbound packets don't read their ID
-  readSpace(buffer);
-  user_id = readuserId(buffer);
-  readPacketDelimiter(buffer);
-};
-
-std::stringstream RevealWordClientbound::serialize() {
-  std::stringstream buffer;
-  buffer << RevealWordClientbound::ID << " " << word << std::endl;
-  return buffer;
-};
-
-void RevealWordClientbound::deserialize(std::stringstream &buffer) {
-  buffer >> std::noskipws;
-  readPacketId(buffer, RevealWordClientbound::ID);
-  readSpace(buffer);
-  word = readAlphabeticalString(buffer, WORD_MAX_LEN);
-  readPacketDelimiter(buffer);
-};
 
 std::stringstream ErrorUdpPacket::serialize() {
   std::stringstream buffer;
