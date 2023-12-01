@@ -24,4 +24,5 @@ class ClientConfig {
 void registerCommands(CommandManager& manager);
 
 
+
 #endif

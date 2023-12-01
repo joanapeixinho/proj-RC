@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 void registerCommands(CommandManager &manager) {
   manager.registerCommand(std::make_shared<LoginCommand>());        // UDP
   manager.registerCommand(std::make_shared<LogoutCommand>());       // UDP
-  manager.registerCommand(std::make_shared<UnRegisterCommand>());   // UDP
+  manager.registerCommand(std::make_shared<UnregisterCommand>());   // UDP
   manager.registerCommand(std::make_shared<ExitCommand>());
   manager.registerCommand(std::make_shared<OpenAuctionCommand>());  // TCP
   manager.registerCommand(std::make_shared<CloseAuctionCommand>()); // TCP

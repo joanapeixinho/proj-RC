@@ -97,10 +97,10 @@ void LoginCommand::handle(std::string args, UserState& state) {
   LoginServerbound packet_out;
   packet_out.user_id = user_id;
 
-  ReplyLoginClientbound rsg;
-  state.sendUdpPacketAndWaitForReply(packet_out, rsg);
+  ReplyLoginClientbound rli;
+  state.sendUdpPacketAndWaitForReply(packet_out, rli);
 
-  switch (rsg.status) {
+  switch (rli.status) {
     case ReplyLoginClientbound::status::OK:
       // Login user
       state.login();

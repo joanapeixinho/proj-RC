@@ -44,8 +44,100 @@ class LoginCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  LoginCommand() : CommandHandler("login", "sg", "UID", "Login User") {}
+  LoginCommand() : CommandHandler("login", "sng", "UID", "Login User") {}
 };
+
+class LogoutCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  LogoutCommand() : CommandHandler("logout", "sng", std::nullopt, "Logout User") {}
+};
+
+
+class UnregisterCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  UnregisterCommand() : CommandHandler("unregister", "sng", std::nullopt, "Unregister User") {}
+};
+
+class ListAuctionsCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  ListCommand() : CommandHandler("list", "sng", std::nullopt, "List Users") {}
+};
+
+
+class BidCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  BidCommand() : CommandHandler("bid", "sng", "UID", "Bid on Auction") {}
+};
+
+
+class HelpCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  HelpCommand() : CommandHandler("info", "sng", "UID", "Help Auction") {}
+};
+
+class ShowRecordCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  ShowRecordCommand() : CommandHandler("record", "sng", "UID", "Show Record") {}
+};
+
+class ShowAssetCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  ShowAssetCommand() : CommandHandler("asset", "sng", "UID", "Show Asset") {}
+};
+
+class MyAuctionsCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  MyAuctionsCommand() : CommandHandler("myauctions", "sng", "UID", "Show My Auctions") {}
+};
+
+class MyBidsCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  MyBidsCommand() : CommandHandler("mybids", "sng", "UID", "Show My Bids") {}
+};
+
+class OpenAuctionCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  OpenAuctionCommand() : CommandHandler("open", "sng", "UID", "Open Auction") {}
+};
+
+class CloseAuctionCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  CloseAuctionCommand() : CommandHandler("close", "sng", "UID", "Close Auction") {}
+};
+
+class ExitCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
+
+ public:
+  ExitCommand() : CommandHandler("exit", "sng", "UID", "Exit Application") {}
+};
+
+
+
+
+
 
 /*
 class GuessLetterCommand : public CommandHandler {

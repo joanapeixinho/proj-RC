@@ -101,15 +101,12 @@ class LoginServerbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-// Reply to Start Auction Packet (RSG)
+// Reply to Start Auction Packet (RLI)
 class ReplyLoginClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, ERR };
-  static constexpr const char *ID = "RSG";
+  static constexpr const char *ID = "RLI";
   status status;
-  uint32_t n_letters;
-  uint32_t max_errors;
-
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
