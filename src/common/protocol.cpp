@@ -175,7 +175,7 @@ void GuessLetterServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   // Serverbound packets don't read their ID
   readSpace(buffer);
-  user_id = readuserId(buffer);
+  user_id = readUserId(buffer);
   readSpace(buffer);
   guess = readAlphabeticalChar(buffer);
   readSpace(buffer);
