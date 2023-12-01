@@ -83,7 +83,7 @@ void CommandManager::waitForCommand(UserState& state) {
 
 /* Command handlers */
 void LoginCommand::handle(std::string args, UserState& state) {
-  uint32_t player_id;
+  uint32_t user_id;
   // Argument parsing
   try {
     user_id = parse_user_id(args);
@@ -103,14 +103,14 @@ void LoginCommand::handle(std::string args, UserState& state) {
   switch (rsg.status) {
     case ReplyLoginClientbound::status::OK:
       // Login user
-      state.login(Auction);
+      state.login();
       // Output Login info
       std::cout << "Logged in successfully!" << std::endl;
       break;
 
     case ReplyLoginClientbound::status::NOK:
       std::cout
-          << "Auction failed to start: that user already has an on-going Auction."
+          << "Failed to login: the password does not match this UserID."
           << std::endl;
       break;
 

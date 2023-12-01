@@ -39,14 +39,15 @@ class CommandHandler {
   const char* description;
   virtual void handle(std::string args, UserState& state) = 0;
 };
-/*
-class StartCommand : public CommandHandler {
-  void handle(std::string args, userState& state);
+
+class LoginCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
 
  public:
-  StartCommand() : CommandHandler("start", "sg", "UID", "Start a new Auction") {}
+  LoginCommand() : CommandHandler("login", "sg", "UID", "Login User") {}
 };
 
+/*
 class GuessLetterCommand : public CommandHandler {
   void handle(std::string args, userState& state);
 
