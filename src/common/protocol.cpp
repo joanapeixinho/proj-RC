@@ -129,7 +129,7 @@ std::stringstream ReplyLoginClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyLoginClientbound::ID << " ";
   if (status == ReplyLoginClientbound::status::OK) {
-    buffer << "OK " << n_letters << " " << max_errors;
+    buffer << "OK ";
   } else if (status == ReplyLoginClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyLoginClientbound::status::ERR) {
