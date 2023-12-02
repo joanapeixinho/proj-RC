@@ -17,6 +17,7 @@
 
 #define USER_ID_MAX_LEN (6)
 #define USER_ID_MAX ((uint32_t)pow(10, USER_ID_MAX_LEN) - 1)
+#define PASSWORD_MAX_LEN (8)
 
 #define EXCEPTION_RETRY_MAX (3)
 

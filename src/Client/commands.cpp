@@ -84,18 +84,38 @@ void CommandManager::waitForCommand(UserState& state) {
 /* Command handlers */
 void LoginCommand::handle(std::string args, UserState& state) {
   uint32_t user_id;
+  auto splitIndex = args.find(' ');
+  std::string user_id_str = args.substr(0, splitIndex);
+  args.erase(0, splitIndex + 1);
+  std::string password = args;
+  
   // Argument parsing
   try {
-    user_id = parse_user_id(args);
+    user_id = parse_user_id(user_id_str);
   } catch (...) {
     std::cout << "Invalid user ID. It must be a positive number up to "
               << USER_ID_MAX_LEN << " digits" << std::endl;
     return;
   }
+  // Check if Password is too long
+  if (password.length() > PASSWORD_MAX_LEN) {
+    std::cout << "Invalid password. It must be at most " << PASSWORD_MAX_LEN 
+              << " characters long" << std::endl;
+    return;
+  }
+  // Check if Password is AlphaNumeric
+  for (char c : password) {
+    if (!isalnum(c)) {
+      std::cout << "Invalid password. It must be alphanumeric" << std::endl;
+      return;
+    }
+  }
+
 
   // Populate and send packet
   LoginServerbound packet_out;
   packet_out.user_id = user_id;
+  packet_out.password = password;
 
   ReplyLoginClientbound rli;
   state.sendUdpPacketAndWaitForReply(packet_out, rli);
@@ -103,27 +123,123 @@ void LoginCommand::handle(std::string args, UserState& state) {
   switch (rli.status) {
     case ReplyLoginClientbound::status::OK:
       // Login user
-      state.login();
+      state.login(user_id, password);
       // Output Login info
       std::cout << "Logged in successfully!" << std::endl;
       break;
 
     case ReplyLoginClientbound::status::NOK:
       std::cout
-          << "Failed to login: the password does not match this UserID."
+          << "Failed to login: the password does not match the UserID."
           << std::endl;
       break;
 
-    case ReplyLoginClientbound::status::ERR:
+    case ReplyLoginClientbound::status::REG:
     default:
-      std::cout << "Auction failed to start: packet was wrongly structured."
-                << std::endl;
+      // Registered user is still logged in
+      state.login(user_id, password);
+      std::cout << "New user registered successfully!" << std::endl;
       break;
   }
 }
 
+void LogoutCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to logout: you need to be logged in to logout." 
+        << std::endl;
+    return;
+  }
+
+    // Populate and send packet
+  LogoutServerbound packet_out;
+  packet_out.user_id = state.user_id;
+  packet_out.password = state.password;
+
+  ReplyLogoutClientbound lou;
+  state.sendUdpPacketAndWaitForReply(packet_out, lou);
+
+  switch (lou.status) {
+    case ReplyLogoutClientbound::status::OK:
+      // Logout user
+      state.logout();
+      // Output Logout info
+      std::cout << "Logged out successfully!" << std::endl;
+      break;
+
+    case ReplyLogoutClientbound::status::NOK:
+      std::cout
+          << "Failed to logout: the user is not logged in."
+          << std::endl;
+      break;
+
+    case ReplyLogoutClientbound::status::UNR:
+    default:
+      std::cout 
+          << "Failed to logout: the user is not registered." 
+          << std::endl;
+      break;
+  }
+}
+
+void UnregisterCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to unregister: you need to be logged in to unregister." 
+        << std::endl;
+    return;
+  }
+
+  // Populate and send packet
+  UnregisterServerbound packet_out;
+  packet_out.user_id = state.user_id;
+  packet_out.password = state.password;
+
+  ReplyUnregisterClientbound lou;
+  state.sendUdpPacketAndWaitForReply(packet_out, lou);
+
+  switch (lou.status) {
+    case ReplyUnregisterClientbound::status::OK:
+      // When you unregister, you are logged out
+      state.logout();
+      // Output unregister info
+      std::cout << "Un-registered successfully!" << std::endl;
+      break;
+
+    case ReplyUnregisterClientbound::status::NOK:
+      std::cout
+          << "Failed to un-register: the user is not logged in."
+          << std::endl;
+      break;
+
+    case ReplyUnregisterClientbound::status::UNR:
+    default:
+      std::cout 
+          << "Failed to un-register: the user is not registered." 
+          << std::endl;
+      break;
+  }
+}
+
+void ExitCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (state.isLoggedIn()) {
+    std::cout 
+        << "Failed to exit: please logout before exiting." 
+        << std::endl;
+    return;
+  }
+  is_shutting_down = true;
+}
+
+
+
+
 uint32_t parse_user_id(std::string& args) {
   size_t converted = 0;
+  // stol -> String TO Long int; converted -> number of characters converted to int
   long user_id = std::stol(args, &converted, 10);
   if (converted != args.length() || user_id <= 0 ||
       user_id > USER_ID_MAX) {
