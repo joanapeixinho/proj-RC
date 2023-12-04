@@ -234,7 +234,53 @@ void ExitCommand::handle(std::string args, UserState& state) {
   is_shutting_down = true;
 }
 
+void OpenAuctionCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to open auction: you need to be logged in to open an auction." 
+        << std::endl;
+    return;
+  }
 
+  // Argument parsing
+  auto splitIndex = args.find(' ');
+  std::string asset_name = args.substr(0, splitIndex);
+  args.erase(0, splitIndex + 1);
+  std::string asset_description = args;
+
+  // TODO: Is there any rescriction on the asset name or description???
+
+  // Populate and send packet
+  OpenAuctionServerbound packet_out;
+  packet_out.user_id = state.user_id;
+  packet_out.password = state.password;
+  packet_out.asset_name = asset_name;
+  packet_out.asset_description = asset_description;
+
+  ReplyOpenAuctionClientbound roa;
+  state.sendTcpPacketAndWaitForReply(packet_out, roa);
+
+  switch (roa.status) {
+    case ReplyOpenAuctionClientbound::status::OK:
+      // Output open auction info
+      std::cout << "Auction opened successfully!" << std::endl;
+      break;
+
+    case ReplyOpenAuctionClientbound::status::NOK:
+      std::cout
+          << "Failed to open auction: the user is not logged in."
+          << std::endl;
+      break;
+
+    case ReplyOpenAuctionClientbound::status::UNR:
+    default:
+      std::cout 
+          << "Failed to open auction: the user is not registered." 
+          << std::endl;
+      break;
+  }
+}
 
 
 uint32_t parse_user_id(std::string& args) {
