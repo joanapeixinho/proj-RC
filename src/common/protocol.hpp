@@ -96,6 +96,7 @@ class LoginServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LIN";
   uint32_t user_id;
+  std::string password;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -104,7 +105,7 @@ class LoginServerbound : public UdpPacket {
 // Reply to Start Auction Packet (RLI)
 class ReplyLoginClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, ERR };
+  enum status { OK, NOK, REG };
   static constexpr const char *ID = "RLI";
   status status;
   std::stringstream serialize();
@@ -116,6 +117,7 @@ class LogoutServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LOU";
   uint32_t user_id;
+  std::string password;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -136,6 +138,7 @@ class UnregisterServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "UNR";
   uint32_t user_id;
+  std::string password;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);

@@ -23,7 +23,8 @@ class UserState {
 
  public:
   // ClientGame* game = NULL;
-  bool logged_in = false;
+  uint32_t user_id = -1;
+  std::string password = "";
 
   UserState(std::string& hostname, std::string& port);
   ~UserState();
@@ -34,7 +35,8 @@ class UserState {
   // bool hasActiveAuction();
   // bool hasAuction();
   // void startAuction();
-  void login();
+  void login(u_int32_t user_id, std::string& password);
+  void logout();
   void sendUdpPacketAndWaitForReply(UdpPacket& out_packet,
                                     UdpPacket& in_packet);
   void sendTcpPacketAndWaitForReply(TcpPacket& out_packet,

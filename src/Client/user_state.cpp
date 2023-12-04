@@ -38,8 +38,18 @@ bool userState::hasAuction() {
 }
 */
 
-void UserState::login() {
-  this->logged_in = true;
+void UserState::login(uint32_t user_id, std::string &password) {
+  this->user_id = user_id;
+  this->password = password;
+}
+
+bool UserState::isLoggedIn() {
+  return this->user_id != -1;
+}
+
+void UserState::logout() {
+  this->user_id = -1;
+  this->password = "";
 }
 
 void UserState::setupSockets() {
