@@ -289,7 +289,12 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   packet_out.user_id = state.user_id;
   packet_out.password = state.password;
   packet_out.auction_name = auction_name;
-  packet_out.asset_description = asset_description;
+  packet_out.start_value = start_value;
+  packet_out.time_active = timeactive;
+  packet_out.file_name = asset_file_name;
+  // We assume the file is in the ASSETS directory
+  packet_out.file_path = std::filesystem::path(ASSETS_RELATIVE_DIRERCTORY) / asset_file_name;
+
 
   ReplyOpenAuctionClientbound roa;
   state.sendTcpPacketAndWaitForReply(packet_out, roa);
@@ -297,43 +302,110 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   switch (roa.status) {
     case ReplyOpenAuctionClientbound::status::OK:
       // Output open auction info
-      std::cout << "Auction opened successfully!" << std::endl;
+      std::cout << "Auction opened successfully with ID ["<< roa.auction_id
+                << "]!" << std::endl;
       break;
 
     case ReplyOpenAuctionClientbound::status::NOK:
       std::cout
-          << "Failed to open auction: the user is not logged in."
+          << "Failed to open auction: it could not be started."
           << std::endl;
       break;
 
-    case ReplyOpenAuctionClientbound::status::UNR:
+    case ReplyOpenAuctionClientbound::status::NLG:
     default:
       std::cout 
-          << "Failed to open auction: the user is not registered." 
+          << "Failed to open auction: the user is not logged in." 
           << std::endl;
       break;
   }
 }
-std::string fileToString(std::string file_name){
-  std::ifstream file(file_name, std::ios::binary | std::ios::ate);
 
-  if (!file.is_open()) {
-      std::cerr << "Unable to open file." << std::endl;
-      return NULL;
+void CloseAuctionCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to close auction: you need to be logged in to close an auction." 
+        << std::endl;
+    return;
   }
 
-  std::streampos fileSize = file.tellg();
-  file.seekg(0, std::ios::beg);
+  // Argument parsing
+  std::istringstream iss(args);
+  std::string auction_id_str;
+  
+  if (!(iss >> auction_id_str)) {
+    std::cout << "Invalid arguments. Usage: close <auction_id>" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is too long
+  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+              << " digits long" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is Numeric
+  if (!is_numeric(auction_id_str)) {
+    std::cout << "Invalid auction ID. It must be a number" << std::endl;
+    return;
+  }
+  // Convert auction_id_str to uint32_t
+  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
 
-  // Read the file content into a buffer
-  char* buffer = new char[fileSize];
-  file.read(buffer, fileSize);
-  return buffer;
+  // Populate and send packet
+  CloseAuctionServerbound packet_out;
+  packet_out.user_id = state.user_id;
+  packet_out.password = state.password;
+  packet_out.auction_id = auction_id;
+
+  ReplyCloseAuctionClientbound rcl;
+  state.sendTcpPacketAndWaitForReply(packet_out, rcl);
+
+  switch (rcl.status) {
+    case ReplyCloseAuctionClientbound::status::OK:
+      // Output close auction info
+      std::cout << "Auction closed successfully!" << std::endl;
+      break;
+
+    case ReplyCloseAuctionClientbound::status::EAU:
+      std::cout
+          << "Failed to close auction: the auction with ID [" 
+          << auction_id << "] does not exist." << std::endl;
+      break;
+    
+    case ReplyCloseAuctionClientbound::status::EOW:
+      std::cout
+          << "Failed to close auction: the auction with ID [" 
+          << auction_id << "] is not owned by this user." << std::endl;
+      break;
+    
+    case ReplyCloseAuctionClientbound::status::END:
+      std::cout
+          << "Failed to close auction: the auction with ID [" 
+          << auction_id << "] has already ended." << std::endl;
+      break;
+
+    case ReplyCloseAuctionClientbound::status::NLG:
+    default:
+      std::cout 
+          << "Failed to close auction: the user is not logged in." 
+          << std::endl;
+      break;
+  }
 }
 
 bool is_aplhanumeric(std::string str) {
   for (char c : str) {
     if (!isalnum(c)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool is_numeric(std::string str) {
+  for (char c : str) {
+    if (!isdigit(c)) {
       return false;
     }
   }

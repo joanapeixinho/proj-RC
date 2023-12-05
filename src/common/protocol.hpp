@@ -276,6 +276,53 @@ class TcpPacket {
   virtual ~TcpPacket() = default;
 };
 
+class OpenAuctionServerbound : public TcpPacket {
+ public:
+  static constexpr const char *ID = "OPA";
+  uint32_t user_id;
+  std::string password;
+  std::string auction_name;
+  uint32_t start_value;
+  uint32_t time_active;
+  std::string file_name;
+  std::filesystem::path file_path;
+
+  void send(int fd);
+  void receive(int fd);
+};
+
+class ReplyOpenAuctionClientbound : public TcpPacket {
+ public:
+  enum status { OK, NOK, NLG };
+  static constexpr const char *ID = "ROA";
+  status status;
+  uint32_t auction_id; //TODO: confirmar que é deste tipo o ID
+
+  void send(int fd);
+  void receive(int fd);
+};
+
+class CloseAuctionServerbound : public TcpPacket {
+ public:
+  static constexpr const char *ID = "CLS";
+  uint32_t user_id;
+  std::string password;
+  uint32_t auction_id;
+
+  void send(int fd);
+  void receive(int fd);
+};
+
+class ReplyCloseAuctionClientbound : public TcpPacket {
+ public:
+  enum status { OK, EAU, EOW, END, NLG };
+  static constexpr const char *ID = "RCL";
+  status status;
+
+  void send(int fd);
+  void receive(int fd);
+};
+
 
 class ScoreboardServerbound : public TcpPacket {
  public:
