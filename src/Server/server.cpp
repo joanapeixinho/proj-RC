@@ -5,19 +5,25 @@
 
 #include <iostream>
 #include <thread>
+#include <filesystem>
 
 #include "common/common.hpp"
 #include "common/protocol.hpp"
+
 
 extern bool is_shutting_down;
 
 int main(int argc, char *argv[]) {
   try {
+
+
     Server config(argc, argv);
+
     if (config.help) {
       config.printHelp(std::cout);
       return EXIT_SUCCESS;
     }
+
     AuctionServerState state(config.wordFilePath, config.port, config.verbose,
                           config.random);
     state.registerPacketHandlers();
@@ -261,4 +267,19 @@ void Server::printHelp(std::ostream &stream) {
   stream << "-h\t\tEnable verbose mode." << std::endl;
   stream << "-r\t\tEnable random mode. Words will be selected randomly."
          << std::endl;
+}
+
+void initServer (/* parameters */) {
+    
+    // Create Base Directory
+    std::filesystem::create_directory(BASE_DIR);
+
+    // Create Auction Directory in Base Directory
+    std::filesystem::create_directory(BASE_DIR + AUCTION_DIR);
+
+    // Create User Directory in Base Directory
+    std::filesystem::create_directory(BASE_DIR + USER_DIR);
+
+    //
+
 }

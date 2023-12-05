@@ -500,62 +500,6 @@ void StateClientbound::receive(int fd) {
   readPacketDelimiter(fd);
 }
 
-void HintServerbound::send(int fd) {
-  std::stringstream stream;
-  stream << HintServerbound::ID << " ";
-  write_user_id(stream, user_id);
-  stream << std::endl;
-  writeString(fd, stream.str());
-}
-
-void HintServerbound::receive(int fd) {
-  // Serverbound packets don't read their ID
-  readSpace(fd);
-  user_id = readuserId(fd);
-  if (user_id > user_ID_MAX) {
-    throw InvalidPacketException();
-  }
-  readPacketDelimiter(fd);
-}
-
-void HintClientbound::send(int fd) {
-  std::stringstream stream;
-  stream << HintClientbound::ID << " ";
-  if (status == OK) {
-    stream << "OK ";
-    stream << file_name << " " << getFileSize(file_path) << " ";
-    writeString(fd, stream.str());
-    stream.str(std::string());
-    stream.clear();
-    sendFile(fd, file_path);
-  } else if (status == NOK) {
-    stream << "NOK";
-  } else {
-    throw PacketSerializationException();
-  }
-  stream << std::endl;
-  writeString(fd, stream.str());
-}
-
-void HintClientbound::receive(int fd) {
-  readPacketId(fd, HintClientbound::ID);
-  readSpace(fd);
-  auto status_str = readString(fd);
-  if (status_str == "OK") {
-    this->status = OK;
-    readSpace(fd);
-    file_name = readString(fd);
-    readSpace(fd);
-    uint32_t file_size = readInt(fd);
-    readSpace(fd);
-    readAndSaveToFile(fd, file_name, file_size, true);
-  } else if (status_str == "NOK") {
-    this->status = NOK;
-  } else {
-    throw InvalidPacketException();
-  }
-  readPacketDelimiter(fd);
-}
 
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);

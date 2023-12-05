@@ -22,21 +22,12 @@
 #define EXCEPTION_RETRY_MAX (3)
 
 #define FILE_BUFFER_LEN (512)
-/*
-#define PROGRESS_BAR_STEP_SIZE (10)
 
-#define WORD_MIN_LEN (3)
-#define WORD_MAX_LEN (30)
-#define TRIAL_MIN (1)
-#define TRIAL_MAX (99)
 
-#define AuctionDATA_FOLDER_NAME ".Auctiondata"
+#define BASE_DIR "ASDIR/"
+#define AUCTIONS_DIR "AUCTION/"
+#define USERS_DIR "USERS/"
 
-#define SCOREBOARD_MAX_ENTRIES (10)
-#define SCOREBOARD_FILE_NAME "scoreboard.dat"
-
-#define AuctionS_FOLDER_NAME "Auctions"
-*/
 
 #define HELP_MENU_COMMAND_COLUMN_WIDTH (20)
 #define HELP_MENU_DESCRIPTION_COLUMN_WIDTH (40)

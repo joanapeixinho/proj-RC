@@ -11,10 +11,8 @@
 class Server {
  public:
   char* programPath;
-  std::string wordFilePath;
   std::string port = DEFAULT_PORT;
   bool verbose = false;
-
   AuctionServer(int argc, char* argv[]);
   void printHelp(std::ostream& stream);
 };
@@ -27,5 +25,7 @@ void handle_packet(std::stringstream& buffer, Address& addr_from,
                    AuctionServerState& server_state);
 
 void wait_for_tcp_packet(AuctionServerState& server_state, WorkerPool& pool);
+
+void init_server(AuctionServerState& server_state);
 
 #endif

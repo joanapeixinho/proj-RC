@@ -40,14 +40,10 @@ AuctionServerState::~AuctionServerState() {
 void AuctionServerState::registerPacketHandlers() {
   // UDP
   udp_packet_handlers.insert({StartAuctionServerbound::ID, handle_start_Auction});
-  udp_packet_handlers.insert({GuessLetterServerbound::ID, handle_guess_letter});
-  udp_packet_handlers.insert({GuessWordServerbound::ID, handle_guess_word});
-  udp_packet_handlers.insert({QuitAuctionServerbound::ID, handle_quit_Auction});
-  udp_packet_handlers.insert({RevealWordServerbound::ID, handle_reveal_word});
+ 
 
   // TCP
   tcp_packet_handlers.insert({ScoreboardServerbound::ID, handle_scoreboard});
-  tcp_packet_handlers.insert({HintServerbound::ID, handle_hint});
   tcp_packet_handlers.insert({StateServerbound::ID, handle_state});
 }
 
