@@ -297,15 +297,6 @@ class ScoreboardClientbound : public TcpPacket {
   void receive(int fd);
 };
 
-class HintServerbound : public TcpPacket {
- public:
-  static constexpr const char *ID = "GHL";
-  uint32_t user_id;
-
-  void send(int fd);
-  void receive(int fd);
-};
-
 class StateServerbound : public TcpPacket {
  public:
   static constexpr const char *ID = "STA";
@@ -327,17 +318,6 @@ class StateClientbound : public TcpPacket {
   void receive(int fd);
 };
 
-class HintClientbound : public TcpPacket {
- public:
-  enum status { OK, NOK };
-  static constexpr const char *ID = "RHL";
-  status status;
-  std::filesystem::path file_path;
-  std::string file_name;
-
-  void send(int fd);
-  void receive(int fd);
-};
 
 
 class ErrorTcpPacket : public TcpPacket {

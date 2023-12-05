@@ -1,11 +1,12 @@
 #include "file_manager.hpp"
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
-FileManager::FileManager(const std::string& baseDir) : baseDirectory(baseDir) {}
 
-bool FileManager::writeToFile(const std::string& fileName, const std::string& data) {
-    std::ofstream file(baseDirectory + "/" + fileName);
+bool FileManager::writeToFile(const std::string& fileName, const std::string& data, const std::string& directory) {
+    
+    std::ofstream file(BASE_DIR + directory + "/" + fileName);
     
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o arquivo: " << fileName << std::endl;
@@ -18,8 +19,8 @@ bool FileManager::writeToFile(const std::string& fileName, const std::string& da
     return true;
 }
 
-bool FileManager::readFromFile(const std::string& fileName, std::string& data) {
-    std::ifstream file(baseDirectory + "/" + fileName);
+bool FileManager::readFromFile(const std::string& fileName, std::string& data, const std::string& directory) {
+    std::ifstream file(directory + "/" + fileName);
     
     if (!file.is_open()) {
         std::cerr << "Erro ao abrir o arquivo: " << fileName << std::endl;
@@ -32,4 +33,3 @@ bool FileManager::readFromFile(const std::string& fileName, std::string& data) {
     return true;
 }
 
-// Implemente outros métodos conforme necessário
