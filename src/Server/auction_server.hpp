@@ -9,8 +9,7 @@
 
 class AuctionServer {
 public:
-    AuctionServer();  // Construtor
-    ~AuctionServer(); // Destrutor
+    AuctionServer(std::string auctionsFile, std::string usersFile);  // Construtor
 
     void start();     // Iniciar o servidor
     void stop();      // Parar o servidor
