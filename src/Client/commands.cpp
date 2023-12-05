@@ -98,17 +98,15 @@ void LoginCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if Password is too long
-  if (password.length() > PASSWORD_MAX_LEN) {
-    std::cout << "Invalid password. It must be at most " << PASSWORD_MAX_LEN 
+  if (password.length() == 0 || password.length() > PASSWORD_MAX_LEN) {
+    std::cout << "Invalid password. It must be between 1 and " << PASSWORD_MAX_LEN 
               << " characters long" << std::endl;
     return;
   }
   // Check if Password is AlphaNumeric
-  for (char c : password) {
-    if (!isalnum(c)) {
-      std::cout << "Invalid password. It must be alphanumeric" << std::endl;
-      return;
-    }
+  if (!is_aplhanumeric(password)) {
+    std::cout << "Invalid password. It must be alphanumeric" << std::endl;
+    return;
   }
 
 
@@ -244,18 +242,53 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   }
 
   // Argument parsing
-  auto splitIndex = args.find(' ');
-  std::string asset_name = args.substr(0, splitIndex);
-  args.erase(0, splitIndex + 1);
-  std::string asset_description = args;
+  std::istringstream iss(args);
+  std::string auction_name;
+  std::string asset_file_name;
+  std::string start_value_str;
+  std::string timeactive_str;
+  
+  if (!(iss >> auction_name) || !(iss >> asset_file_name) || 
+      !(iss >> start_value_str) || !(iss >> timeactive_str)) {
+    std::cout << "Invalid arguments. Usage: openauction <auction_name> "
+              << "<asset_name> <start_value> <timeactive>" << std::endl;
+    return;
+  }
+  // Check if asset_name is too long
+  if (auction_name.length() > AUCTION_NAME_MAX_LEN) {
+    std::cout << "Invalid auction name. It must be at most " << AUCTION_NAME_MAX_LEN 
+              << " characters long" << std::endl;
+    return;
+  }
+  // Check if asset_name is AlphaNumeric
+  if (!is_aplhanumeric(auction_name)) {
+    std::cout << "Invalid auction name. It must be alphanumeric" << std::endl;
+    return;
+  }
+  // Check if start_value_str is too long
+  if (start_value_str.length() > AUCTION_START_VALUE_MAX_LEN) {
+    std::cout << "Invalid start value. It must be at most " << AUCTION_START_VALUE_MAX_LEN 
+              << " characters long" << std::endl;
+    return;
+  }
+  // Check if timeactive_str is too long
+  if (timeactive_str.length() > AUCTION_DURATION_MAX_LEN) {
+    std::cout << "Invalid auction duration. It must be at most " << AUCTION_DURATION_MAX_LEN 
+              << " characters long" << std::endl;
+    return;
+  }
 
-  // TODO: Is there any rescriction on the asset name or description???
+  // Convert start_value_str to uint32_t
+  long start_value = std::stol(start_value_str, NULL, 10);
+  long timeactive = std::stol(timeactive_str, NULL, 10);
+
+
 
   // Populate and send packet
   OpenAuctionServerbound packet_out;
   packet_out.user_id = state.user_id;
   packet_out.password = state.password;
-  packet_out.asset_name = asset_name;
+  packet_out.auction_name = auction_name;
   packet_out.asset_description = asset_description;
 
   ReplyOpenAuctionClientbound roa;
@@ -280,6 +313,31 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
           << std::endl;
       break;
   }
+}
+std::string fileToString(std::string file_name){
+  std::ifstream file(file_name, std::ios::binary | std::ios::ate);
+
+  if (!file.is_open()) {
+      std::cerr << "Unable to open file." << std::endl;
+      return NULL;
+  }
+
+  std::streampos fileSize = file.tellg();
+  file.seekg(0, std::ios::beg);
+
+  // Read the file content into a buffer
+  char* buffer = new char[fileSize];
+  file.read(buffer, fileSize);
+  return buffer;
+}
+
+bool is_aplhanumeric(std::string str) {
+  for (char c : str) {
+    if (!isalnum(c)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 

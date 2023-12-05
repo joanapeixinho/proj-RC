@@ -19,6 +19,10 @@
 #define USER_ID_MAX ((uint32_t)pow(10, USER_ID_MAX_LEN) - 1)
 #define PASSWORD_MAX_LEN (8)
 
+#define AUCTION_NAME_MAX_LEN (10)
+#define AUCTION_START_VALUE_MAX_LEN (6)
+#define AUCTION_DURATION_MAX_LEN (50)
+
 #define EXCEPTION_RETRY_MAX (3)
 
 #define FILE_BUFFER_LEN (512)
