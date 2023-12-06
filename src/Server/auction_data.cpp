@@ -3,7 +3,7 @@
 AuctionData::AuctionData(int id, const std::string& itemName, double initialBid, int durationSeconds)
     : id(id), itemName(itemName), initialBid(initialBid), durationSeconds(durationSeconds) {}
 
-int AuctionData::getId() const {
+uint32_t AuctionData::getId() const {
     return id;
 }
 
