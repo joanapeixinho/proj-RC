@@ -32,8 +32,8 @@
 
 
 #define BASE_DIR "ASDIR/"
-#define AUCTIONS_DIR "AUCTION/"
-#define USERS_DIR "USERS/"
+#define AUCTION_DIR "AUCTION/"
+#define USER_DIR "USERS/"
 
 
 #define HELP_MENU_COMMAND_COLUMN_WIDTH (20)

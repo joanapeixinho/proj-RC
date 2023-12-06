@@ -6,7 +6,6 @@
 class AuctionData {
 public:
     AuctionData(int id, const std::string& itemName, double initialBid, int durationSeconds);
-    
     uint32_t getId() const;
     const std::string& getItemName() const;
     double getInitialBid() const;
