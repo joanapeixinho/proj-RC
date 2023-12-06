@@ -394,6 +394,47 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
   }
 }
 
+void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to list auctions: you need to be logged in to list your auctions." 
+        << std::endl;
+    return;
+  }
+
+  // Populate and send packet
+  ListMyAuctionsServerbound packet_out;
+  packet_out.user_id = state.user_id;
+
+  ReplyListMyAuctionsClientbound rma;
+  state.sendUdpPacketAndWaitForReply(packet_out, rma);
+
+  switch (rma.status) {
+    case ReplyListMyAuctionsClientbound::status::OK:
+      // Output unregister info
+      std::cout << "Displaying your auctions:" << std::endl;
+      // When you unregister, you are logged out
+      PUT FUNCTION TO DISPLAY AUCTIONS HERE
+      break;
+
+    case ReplyListMyAuctionsClientbound::status::NOK:
+      std::cout
+          << "Failed to list auctions: the user has 0 ongoing auctions."
+          << std::endl;
+      break;
+
+    case ReplyListMyAuctionsClientbound::status::NLG:
+    default:
+      std::cout 
+          << "Failed to list auctions: the user has  to be logged in." 
+          << std::endl;
+      break;
+  }
+}
+
+void 
+
 bool is_aplhanumeric(std::string str) {
   for (char c : str) {
     if (!isalnum(c)) {

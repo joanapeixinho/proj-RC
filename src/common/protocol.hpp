@@ -220,28 +220,6 @@ class ReplyListAuctionsClientbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-// Show Record Packet (SRC)
-
-class ShowRecordServerbound : public UdpPacket {
- public:
-  static constexpr const char *ID = "SRC";
-  uint32_t user_id;
-
-  std::stringstream serialize();
-  void deserialize(std::stringstream &buffer);
-};
-
-// Reply to Show Record Packet (RRC)
-
-class ReplyShowRecordClientbound : public UdpPacket {
- public:
-  enum status { OK, NOK };
-  static constexpr const char *ID = "RRC";
-  status status;
-  std::stringstream serialize();
-  void deserialize(std::stringstream &buffer);
-};
-
 
 class ErrorUdpPacket : public UdpPacket {
  public:
@@ -250,6 +228,16 @@ class ErrorUdpPacket : public UdpPacket {
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
+
+class MyAuctionsServerbound : public UdpPacket {
+ public:
+  static constexpr const char *ID = "LMA";
+  uint32_t user_id;
+
+  void send(int fd);
+  void receive(int fd);
+};
+
 
 class TcpPacket {
  private:

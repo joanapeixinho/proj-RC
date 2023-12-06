@@ -62,7 +62,7 @@ class UnregisterCommand : public CommandHandler {
   UnregisterCommand() : CommandHandler("unregister", "sng", std::nullopt, "Unregister User") {}
 };
 
-class ListAuctionsCommand : public CommandHandler {
+class ListMyAuctionsCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
