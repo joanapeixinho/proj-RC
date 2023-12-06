@@ -98,17 +98,15 @@ void LoginCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if Password is too long
-  if (password.length() > PASSWORD_MAX_LEN) {
-    std::cout << "Invalid password. It must be at most " << PASSWORD_MAX_LEN 
+  if (password.length() == 0 || password.length() > PASSWORD_MAX_LEN) {
+    std::cout << "Invalid password. It must be between 1 and " << PASSWORD_MAX_LEN 
               << " characters long" << std::endl;
     return;
   }
   // Check if Password is AlphaNumeric
-  for (char c : password) {
-    if (!isalnum(c)) {
-      std::cout << "Invalid password. It must be alphanumeric" << std::endl;
-      return;
-    }
+  if (!is_aplhanumeric(password)) {
+    std::cout << "Invalid password. It must be alphanumeric" << std::endl;
+    return;
   }
 
 
@@ -244,19 +242,59 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   }
 
   // Argument parsing
-  auto splitIndex = args.find(' ');
-  std::string asset_name = args.substr(0, splitIndex);
-  args.erase(0, splitIndex + 1);
-  std::string asset_description = args;
+  std::istringstream iss(args);
+  std::string auction_name;
+  std::string asset_file_name;
+  std::string start_value_str;
+  std::string timeactive_str;
+  
+  if (!(iss >> auction_name) || !(iss >> asset_file_name) || 
+      !(iss >> start_value_str) || !(iss >> timeactive_str)) {
+    std::cout << "Invalid arguments. Usage: openauction <auction_name> "
+              << "<asset_name> <start_value> <timeactive>" << std::endl;
+    return;
+  }
+  // Check if asset_name is too long
+  if (auction_name.length() > AUCTION_NAME_MAX_LEN) {
+    std::cout << "Invalid auction name. It must be at most " << AUCTION_NAME_MAX_LEN 
+              << " characters long" << std::endl;
+    return;
+  }
+  // Check if asset_name is AlphaNumeric
+  if (!is_aplhanumeric(auction_name)) {
+    std::cout << "Invalid auction name. It must be alphanumeric" << std::endl;
+    return;
+  }
+  // Check if start_value_str is too long
+  if (start_value_str.length() > AUCTION_START_VALUE_MAX_LEN) {
+    std::cout << "Invalid start value. It must be at most " << AUCTION_START_VALUE_MAX_LEN 
+              << " characters long" << std::endl;
+    return;
+  }
+  // Check if timeactive_str is too long
+  if (timeactive_str.length() > AUCTION_DURATION_MAX_LEN) {
+    std::cout << "Invalid auction duration. It must be at most " << AUCTION_DURATION_MAX_LEN 
+              << " characters long" << std::endl;
+    return;
+  }
 
-  // TODO: Is there any rescriction on the asset name or description???
+  // Convert start_value_str to uint32_t
+  long start_value = std::stol(start_value_str, NULL, 10);
+  long timeactive = std::stol(timeactive_str, NULL, 10);
+
+
 
   // Populate and send packet
   OpenAuctionServerbound packet_out;
   packet_out.user_id = state.user_id;
   packet_out.password = state.password;
-  packet_out.asset_name = asset_name;
-  packet_out.asset_description = asset_description;
+  packet_out.auction_name = auction_name;
+  packet_out.start_value = start_value;
+  packet_out.time_active = timeactive;
+  packet_out.file_name = asset_file_name;
+  // We assume the file is in the ASSETS directory
+  packet_out.file_path = std::filesystem::path(ASSETS_RELATIVE_DIRERCTORY) / asset_file_name;
+
 
   ReplyOpenAuctionClientbound roa;
   state.sendTcpPacketAndWaitForReply(packet_out, roa);
@@ -264,22 +302,114 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   switch (roa.status) {
     case ReplyOpenAuctionClientbound::status::OK:
       // Output open auction info
-      std::cout << "Auction opened successfully!" << std::endl;
+      std::cout << "Auction opened successfully with ID ["<< roa.auction_id
+                << "]!" << std::endl;
       break;
 
     case ReplyOpenAuctionClientbound::status::NOK:
       std::cout
-          << "Failed to open auction: the user is not logged in."
+          << "Failed to open auction: it could not be started."
           << std::endl;
       break;
 
-    case ReplyOpenAuctionClientbound::status::UNR:
+    case ReplyOpenAuctionClientbound::status::NLG:
     default:
       std::cout 
-          << "Failed to open auction: the user is not registered." 
+          << "Failed to open auction: the user is not logged in." 
           << std::endl;
       break;
   }
+}
+
+void CloseAuctionCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to close auction: you need to be logged in to close an auction." 
+        << std::endl;
+    return;
+  }
+
+  // Argument parsing
+  std::istringstream iss(args);
+  std::string auction_id_str;
+  
+  if (!(iss >> auction_id_str)) {
+    std::cout << "Invalid arguments. Usage: close <auction_id>" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is too long
+  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+              << " digits long" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is Numeric
+  if (!is_numeric(auction_id_str)) {
+    std::cout << "Invalid auction ID. It must be a number" << std::endl;
+    return;
+  }
+  // Convert auction_id_str to uint32_t
+  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+
+  // Populate and send packet
+  CloseAuctionServerbound packet_out;
+  packet_out.user_id = state.user_id;
+  packet_out.password = state.password;
+  packet_out.auction_id = auction_id;
+
+  ReplyCloseAuctionClientbound rcl;
+  state.sendTcpPacketAndWaitForReply(packet_out, rcl);
+
+  switch (rcl.status) {
+    case ReplyCloseAuctionClientbound::status::OK:
+      // Output close auction info
+      std::cout << "Auction closed successfully!" << std::endl;
+      break;
+
+    case ReplyCloseAuctionClientbound::status::EAU:
+      std::cout
+          << "Failed to close auction: the auction with ID [" 
+          << auction_id << "] does not exist." << std::endl;
+      break;
+    
+    case ReplyCloseAuctionClientbound::status::EOW:
+      std::cout
+          << "Failed to close auction: the auction with ID [" 
+          << auction_id << "] is not owned by this user." << std::endl;
+      break;
+    
+    case ReplyCloseAuctionClientbound::status::END:
+      std::cout
+          << "Failed to close auction: the auction with ID [" 
+          << auction_id << "] has already ended." << std::endl;
+      break;
+
+    case ReplyCloseAuctionClientbound::status::NLG:
+    default:
+      std::cout 
+          << "Failed to close auction: the user is not logged in." 
+          << std::endl;
+      break;
+  }
+}
+
+bool is_aplhanumeric(std::string str) {
+  for (char c : str) {
+    if (!isalnum(c)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool is_numeric(std::string str) {
+  for (char c : str) {
+    if (!isdigit(c)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 
