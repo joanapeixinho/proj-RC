@@ -1,6 +1,6 @@
 #include "auction_server.hpp"
 
-AuctionServer::AuctionServer() {
+AuctionServer::AuctionServer( std::string auctionsFile, std::string usersFile) {
     // Inicialize o servidor, carregue dados, etc.
     loadAuctions();
     loadUsers();
