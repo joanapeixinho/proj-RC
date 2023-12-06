@@ -60,3 +60,12 @@ void FileManager::loadAuction(const std::string& fileName, std::vector<AuctionDa
         auctions.push_back(AuctionData(id, itemName, initialBid, durationSeconds));
     }
 }
+
+/*Function to save auction to file*/
+void FileManager::saveAuction(const std::string& fileName, const std::vector<AuctionData>& auctions) {
+    std::stringstream ss;
+    for (const auto& auction : auctions) {
+        ss << auction.getId() << " " << auction.getItemName() << " " << auction.getInitialBid() << " " << auction.getDurationSeconds() << std::endl;
+    }
+    writeToFile(fileName, ss.str(), AUCTION_DIR);
+}
