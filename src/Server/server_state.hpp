@@ -9,7 +9,6 @@
 #include <sstream>
 #include <unordered_map>
 
-#include "scoreboard.hpp"
 #include "auction_server.hpp"
 
 class Address {

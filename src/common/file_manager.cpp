@@ -47,16 +47,28 @@ void FileManager::createUserDirectory(const std::string& userId) {
 
 }
 
+void FileManager::removeUserDirectory(const std::string& userId) {
+    std::filesystem::remove(std::string(USER_DIR) + '/' + userId);
+}
+
 void FileManager:: createUserPassFile(const std::string& userId, const std::string& password) {
     std::ofstream file(USER_DIR + '/' + userId + "_pass.txt");
     file << password;
     file.close();
 }
 
+void FileManager:: removeUserPassFile(const std::string& userId) {
+    std::filesystem::remove(std::string(USER_DIR)  + userId + "_pass.txt");
+}
+
 void FileManager:: createUserLoginFile(const std::string& userId, const std::string& login) {
     std::ofstream file(USER_DIR + '/' + userId + "_login.txt");
     file << login;
     file.close();
+}
+
+void FileManager:: removeUserLoginFile(const std::string& userId) {
+    std::filesystem::remove(std::string(USER_DIR)  + userId + "_login.txt");
 }
 
 void FileManager::removeUserFiles(const std::string& userId) {

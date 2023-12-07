@@ -17,8 +17,11 @@ class FileManager {
 public:
     void initServer(/* parameters */);
     void createUserDirectory(const std::string& userId);
+    void removeUserDirectory(const std::string& userId);
     void createUserPassFile(const std::string& userId, const std::string& password);
+    void removeUserPassFile(const std::string& userId);
     void createUserLoginFile(const std::string& userId, const std::string& login);
+    void removeUserLoginFile(const std::string& userId);
     void removeUserFiles(const std::string& userId);
     void createAuctionDirectory(const std::string& auctionId);
     void createUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
