@@ -88,9 +88,9 @@ void FileManager::removeUserAuctionFile(const std::string& userId, const std::st
 }
 
 void FileManager::createAuctionStartFile(const std::string& auctionId, const AuctionData& data) {
-    std::ofstream file(AUCTION_DIR + '/' + auctionId + '/START (' + auctionId + ').txt');
-    file << data.toString();
-    file.close();
+    if (!writeToFile("START (" + auctionId + ").txt", data.toString(), AUCTION_DIR + '/' + auctionId)) {
+        std::cerr << "Unable to create START file for auction: " << auctionId << std::endl;
+    }
 }
 
 void FileManager::createAuctionAssetFile(const std::string& auctionId, const std::string& assetData) {
@@ -99,9 +99,13 @@ void FileManager::createAuctionAssetFile(const std::string& auctionId, const std
     file.close();
 }
 
-void FileManager::createAuctionEndFile(const std::string& auctionId) {
-    std::ofstream file(AUCTION_DIR + '/' + auctionId + '/END (' + auctionId + ').txt');
-    file.close();
+void FileManager::createAuctionEndFile(const std::string& auctionId, const std::time_t& endTime, const int& activeSeconds) {
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
+    ss << activeSeconds;
+    if (!writeToFile("END (" + auctionId + ").txt", ss.str(), AUCTION_DIR + '/' + auctionId)) {
+        std::cerr << "Unable to create END file for auction: " << auctionId << std::endl;
+    }
 }
 
 void FileManager::createBidsDirectory(const std::string& auctionId) {
