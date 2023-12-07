@@ -1,7 +1,5 @@
 #include "file_manager.hpp"
 
-
-
 bool FileManager::writeToFile(const std::string& fileName, const std::string& data, const std::string& directory) {
     
     std::ofstream file(BASE_DIR + directory + "/" + fileName);

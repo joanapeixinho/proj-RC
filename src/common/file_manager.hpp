@@ -15,7 +15,6 @@
 
 class FileManager {
 public:
-    void initServer(/* parameters */);
     void createUserDirectory(const std::string& userId);
     void removeUserDirectory(const std::string& userId);
     void createUserPassFile(const std::string& userId, const std::string& password);
