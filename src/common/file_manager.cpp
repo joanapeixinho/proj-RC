@@ -118,7 +118,7 @@ void FileManager::createBidFile(const std::string& auctionId, const std::string&
 }
 
 /* Looks for UserId in Users Dir and if it exists, the userId is returned */
-uint32_t FileManager::findUser(const std::string& userId) {
+uint32_t FileManager::getUser(const std::string& userId) {
     if (std::filesystem::exists(USER_DIR + '/' + userId)) {
         //turn string into uint32_t
         uint32_t id = std::stoul(userId);
@@ -126,7 +126,7 @@ uint32_t FileManager::findUser(const std::string& userId) {
     }
 }
 
-std:: string FileManager::findUserPass(const std::string& userId) {
+std::string FileManager::getUserPass(const std::string& userId) {
     if (std::filesystem::exists(USER_DIR + '/' + userId + "_pass.txt")) {
         return readFromFile(userId + "_pass.txt", USER_DIR);
     }
