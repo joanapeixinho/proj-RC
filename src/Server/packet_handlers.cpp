@@ -16,7 +16,7 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                  << std::endl;
 
-    AuctionData Auction = state.createAuction(packet.user_id);
+    UserData user(packet.user_id, packet.password);
 
     response.status = ReplyLoginClientbound::OK;
    

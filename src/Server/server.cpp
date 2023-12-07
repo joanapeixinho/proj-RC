@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
 
     setup_signal_handlers();
     
+
     state.cdebug << "Verbose mode is active" << std::endl << std::endl;
 
     std::thread tcp_thread(main_tcp, std::ref(state));

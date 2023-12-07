@@ -32,6 +32,7 @@ public:
     void createBidFile(const std::string& auctionId, const std::string& bidValue);
     bool writeToFile(const std::string& fileName, const std::string& data, const std::string& directory);
     std::string readFromFile(const std::string& fileName, const std::string& directory);
+    std::uint32_t findUser(const std::string& userId);
 };
 
 #endif
