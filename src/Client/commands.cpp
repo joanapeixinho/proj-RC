@@ -432,6 +432,46 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
   }
 }
 
+void MyBidsCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to list bids: you need to be logged in to list your bids." 
+        << std::endl;
+    return;
+  }
+
+  // Populate and send packet
+  MyBidsServerbound packet_out;
+  packet_out.user_id = state.user_id;
+
+  ReplyMyBidsClientbound rmb;
+  state.sendUdpPacketAndWaitForReply(packet_out, rmb);
+
+  switch (rmb.status) {
+    case ReplyMyBidsClientbound::status::OK:
+      // Output bids info
+      std::cout 
+          << "Displaying the auctions where you made a bid:" 
+          << std::endl;
+      printAuctions(rmb.myBidsAuctions);
+      break;
+
+    case ReplyMyBidsClientbound::status::NLG:
+      std::cout 
+          << "Failed to list bids: the user has to be logged in." 
+          << std::endl;
+      break;
+    
+    case ReplyMyBidsClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to list bids: the user has 0 ongoing bids."
+          << std::endl;
+      break;
+  }
+}
+
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     for (const auto& auction : auctions) {
         std::cout 

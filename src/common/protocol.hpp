@@ -172,7 +172,7 @@ class ReplyListMyAuctionsClientbound : public UdpPacket {
   enum status { OK, NLG, NOK };
   static constexpr const char *ID = "RLM";
   std::vector<std::pair<uint32_t, bool>> myAuctions;
-  
+
   status status;
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -180,7 +180,7 @@ class ReplyListMyAuctionsClientbound : public UdpPacket {
 
 // List my bids Packet (LMB)
 
-class ListBidsServerbound : public UdpPacket {
+class MyBidsServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LMB";
   uint32_t user_id;
@@ -191,11 +191,13 @@ class ListBidsServerbound : public UdpPacket {
 
 // Reply to List my bids Packet (RMB)
 
-class ReplyListBidsClientbound : public UdpPacket {
+class ReplyMyBidsClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, NLG };
   static constexpr const char *ID = "RMB";
   status status;
+  std::vector<std::pair<uint32_t, bool>> myBidsAuctions;
+
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
