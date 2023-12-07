@@ -127,7 +127,7 @@ uint32_t FileManager::findUser(const std::string& userId) {
 }
 
 std:: string FileManager::findUserPass(const std::string& userId) {
-    if (std::filesystem::exists(USER_DIR + "/" + userId + "_pass.txt")) {
+    if (std::filesystem::exists(USER_DIR + '/' + userId + "_pass.txt")) {
         return readFromFile(userId + "_pass.txt", USER_DIR);
     }
 }
