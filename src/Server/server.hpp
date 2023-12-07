@@ -5,7 +5,7 @@
 
 #include "common/constants.hpp"
 #include "auction_server.hpp"
-#include "server_state.hpp"
+#include "auction_server_state.hpp"
 #include "worker_pool.hpp"
 
 class Server {
@@ -13,8 +13,7 @@ class Server {
   char* programPath;
   std::string port = DEFAULT_PORT;
   bool verbose = false;
-  AuctionServer(int argc, char* argv[]);
-  void printHelp(std::ostream& stream);
+  Server(int argc, char* argv[]);
 };
 
 void main_tcp(AuctionServerState& state);

@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "common/constants.hpp"
-#include "server_state.hpp"
+#include "auction_server_state.hpp"
 
 class WorkerPool;
 

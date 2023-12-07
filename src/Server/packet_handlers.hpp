@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "common/constants.hpp"
-#include "server_state.hpp"
+#include "auction_server_state.hpp"
 
 class userTag {  // IOManip helper
   uint32_t user_id;
@@ -20,20 +20,9 @@ class userTag {  // IOManip helper
 
 // UDP
 
-void handle_start_Auction(std::stringstream &buffer, Address &addr_from,
+void handle_login_user(std::stringstream &buffer, Address &addr_from,
                        AuctionServerState &state);
 
-void handle_guess_letter(std::stringstream &buffer, Address &addr_from,
-                         AuctionServerState &state);
-
-void handle_guess_word(std::stringstream &buffer, Address &addr_from,
-                       AuctionServerState &state);
-
-void handle_quit_Auction(std::stringstream &buffer, Address &addr_from,
-                      AuctionServerState &state);
-
-void handle_reveal_word(std::stringstream &buffer, Address &addr_from,
-                        AuctionServerState &state);
 
 // TCP
 

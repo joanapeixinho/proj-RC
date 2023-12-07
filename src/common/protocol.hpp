@@ -105,7 +105,7 @@ class LoginServerbound : public UdpPacket {
 // Reply to Start Auction Packet (RLI)
 class ReplyLoginClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, REG };
+  enum status { OK, NOK, REG, ERR };
   static constexpr const char *ID = "RLI";
   status status;
   std::stringstream serialize();

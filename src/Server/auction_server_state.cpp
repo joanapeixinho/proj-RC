@@ -1,4 +1,4 @@
-#include "server_state.hpp"
+#include "auction_server_state.hpp"
 
 #include <unistd.h>
 
@@ -11,15 +11,10 @@
 #include "common/protocol.hpp"
 #include "packet_handlers.hpp"
 
-AuctionServerState::AuctionServerState(std::string &__word_file_path,
-                                 std::string &port, bool __verbose,
-                                 bool __select_randomly)
-    : select_randomly{__select_randomly}, cdebug{DebugStream(__verbose)} {
+AuctionServerState::AuctionServerState(std::string &port, bool __verbose)
+    : cdebug{DebugStream(__verbose)} {
   this->setup_sockets();
   this->resolveServerAddress(port);
-  this->registerWords(__word_file_path);
-  this->scoreboard.loadFromFile();
-  srand((uint32_t)time(NULL));  // Initialize rand seed
 }
 
 AuctionServerState::~AuctionServerState() {
@@ -39,7 +34,7 @@ AuctionServerState::~AuctionServerState() {
 
 void AuctionServerState::registerPacketHandlers() {
   // UDP
-  udp_packet_handlers.insert({StartAuctionServerbound::ID, handle_start_Auction});
+  udp_packet_handlers.insert({StartAuctionServerbound::ID, handle_login_user});
  
 
   // TCP

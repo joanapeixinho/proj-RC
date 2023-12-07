@@ -20,22 +20,14 @@ int main(int argc, char *argv[]) {
 
     Server config(argc, argv);
 
-    if (config.help) {
-      config.printHelp(std::cout);
-      return EXIT_SUCCESS;
-    }
+    
 
-    AuctionServerState state(config.wordFilePath, config.port, config.verbose,
-                          config.random);
+    AuctionServerState state(config.port, config.verbose);
+
     state.registerPacketHandlers();
 
     setup_signal_handlers();
-    if (config.random) {
-      std::cout << "Words will be selected randomly" << std::endl;
-    } else {
-      std::cout << "Words will be selected sequentially" << std::endl;
-    }
-
+    
     state.cdebug << "Verbose mode is active" << std::endl << std::endl;
 
     std::thread tcp_thread(main_tcp, std::ref(state));
@@ -235,25 +227,11 @@ Server::Server(int argc, char *argv[]) {
 
       default:
         std::cerr << std::endl;
-        printHelp(std::cerr);
         exit(EXIT_FAILURE);
     }
   }
 
-
   validate_port_number(port);
-}
-
-void Server::printHelp(std::ostream &stream) {
-  stream << "Usage: " << programPath << " word_file [-p GSport] [-v] [-t]"
-         << std::endl;
-  stream << "Available options:" << std::endl;
-  stream << "word_file\tPath to the word file" << std::endl;
-  stream << "-p GSport\tSet port of Auction Server. Default: " << DEFAULT_PORT
-         << std::endl;
-  stream << "-h\t\tEnable verbose mode." << std::endl;
-  stream << "-r\t\tEnable random mode. Words will be selected randomly."
-         << std::endl;
 }
 
 void initServerFyleSystem () {

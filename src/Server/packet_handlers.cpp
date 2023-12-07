@@ -6,19 +6,19 @@
 
 #include "common/protocol.hpp"
 
-void handle_start_Auction(std::stringstream &buffer, Address &addr_from,
+void handle_login_user(std::stringstream &buffer, Address &addr_from,
                        AuctionServerState &state) {
-  StartAuctionServerbound packet;
-  ReplyStartAuctionClientbound response;
+  LoginServerbound packet;
+  ReplyLoginClientbound response;
 
   try {
     packet.deserialize(buffer);
     state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                  << std::endl;
 
-    AuctionServerSync Auction = state.createAuction(packet.user_id);
+    AuctionData Auction = state.createAuction(packet.user_id);
 
-    response.status = ReplyStartAuctionClientbound::OK;
+    response.status = ReplyLoginClientbound::OK;
    
 
     Auction->saveToFile();
@@ -29,10 +29,10 @@ void handle_start_Auction(std::stringstream &buffer, Address &addr_from,
   } catch (AuctionAlreadyStartedException &e) {
     state.cdebug << userTag(packet.user_id) << "Auction already started"
                  << std::endl;
-    response.status = ReplyStartAuctionClientbound::NOK;
+    response.status = ReplyLoginClientbound::NOK;
   } catch (InvalidPacketException &e) {
     state.cdebug << "[Start Auction] Invalid packet received" << std::endl;
-    response.status = ReplyStartAuctionClientbound::ERR;
+    response.status = ReplyLoginClientbound::ERR;
   } catch (std::exception &e) {
     std::cerr << "[Start Auction] There was an unhandled exception that prevented "
                  "the server from starting a new Auction:"

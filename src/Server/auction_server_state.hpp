@@ -7,6 +7,9 @@
 #include <iostream>
 #include <optional>
 #include <sstream>
+#include <string>
+#include <thread>
+#include <mutex>
 #include <unordered_map>
 
 #include "auction_server.hpp"
@@ -18,10 +21,6 @@ class Address {
   socklen_t size;
 };
 
-struct Word {
-  std::string word;
-  std::optional<std::filesystem::path> hint_path;
-};
 
 class DebugStream {
   bool active;
@@ -69,10 +68,8 @@ class AuctionServerState {
   std::unordered_map<std::string, UdpPacketHandler> udp_packet_handlers;
   std::unordered_map<std::string, TcpPacketHandler> tcp_packet_handlers;
   std::unordered_map<uint32_t, AuctionServer> Auctions;
-  std::vector<Word> words;
   std::mutex AuctionsLock;
   std::string word_file_dir;
-  uint32_t current_word_index = 0;
   bool select_randomly;
   void setup_sockets();
 
@@ -81,21 +78,16 @@ class AuctionServerState {
   int tcp_socket_fd = -1;
   struct addrinfo* server_udp_addr = NULL;
   struct addrinfo* server_tcp_addr = NULL;
-  Scoreboard scoreboard;
   DebugStream cdebug;
 
-  AuctionServerState(std::string& __word_file_path, std::string& port,
-                  bool __verbose, bool __select_randomly);
+  AuctionServerState ( std::string& port, bool __verbose);
   ~AuctionServerState();
   void resolveServerAddress(std::string& port);
   void registerPacketHandlers();
   void registerWords(std::string& __word_file_path);
-  Word& selectRandomWord();
   void callUdpPacketHandler(std::string packet_id, std::stringstream& stream,
                             Address& addr_from);
   void callTcpPacketHandler(std::string packet_id, int connection_fd);
-  AuctionServerSync getAuction(uint32_t user_id);
-  AuctionServerSync createAuction(uint32_t user_id);
 };
 
 /** Exceptions **/
