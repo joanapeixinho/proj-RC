@@ -496,6 +496,63 @@ void ListCommand::handle(std::string args, UserState& state) {
   }
 }
 
+void ShowAssetCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to show asset: you need to be logged in to show an asset." 
+        << std::endl;
+    return;
+  }
+
+  // Argument parsing
+  std::istringstream iss(args);
+  std::string auction_id_str;
+  
+  if (!(iss >> auction_id_str)) {
+    std::cout << "Invalid arguments. Usage: show_asset <auction_id>" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is too long
+  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+              << " digits long" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is Numeric
+  if (!is_numeric(auction_id_str)) {
+    std::cout << "Invalid auction ID. It must be a number" << std::endl;
+    return;
+  }
+  // Convert auction_id_str to uint32_t
+  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+
+  // Populate and send packet
+  ShowAssetServerbound packet_out;
+  packet_out.auction_id = auction_id;
+
+  ReplyShowAssetClientbound rsa;
+  state.sendTcpPacketAndWaitForReply(packet_out, rsa);
+
+  switch (rsa.status) {
+    case ReplyShowAssetClientbound::status::OK:
+      // Output asset info
+      std::cout 
+          << "Displaying the asset '"<< rsa.file_name 
+          <<"' of the auction with ID [" << auction_id << "]:" 
+          << std::endl;
+      display_file(rsa.file_path);
+      break;
+
+    case ReplyShowAssetClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to show asset: the auction with ID [" 
+          << auction_id << "] does not exist." << std::endl;
+      break;
+  }
+}
+
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     for (const auto& auction : auctions) {
         std::cout 
@@ -505,7 +562,7 @@ void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     }
 }
 
-bool is_aplhanumeric(std::string str) {
+bool is_aplhanumeric(std::string& str) {
   for (char c : str) {
     if (!isalnum(c)) {
       return false;
@@ -514,7 +571,7 @@ bool is_aplhanumeric(std::string str) {
   return true;
 }
 
-bool is_numeric(std::string str) {
+bool is_numeric(std::string& str) {
   for (char c : str) {
     if (!isdigit(c)) {
       return false;

@@ -317,21 +317,22 @@ class ReplyCloseAuctionClientbound : public TcpPacket {
 };
 
 
-class ScoreboardServerbound : public TcpPacket {
+class ShowAssetServerbound : public TcpPacket {
  public:
-  static constexpr const char *ID = "GSB";
+  static constexpr const char *ID = "SAS";
+  uint32_t auction_id;
 
   void send(int fd);
   void receive(int fd);
 };
 
-class ScoreboardClientbound : public TcpPacket {
+class ReplyShowAssetClientbound : public TcpPacket {
  public:
-  enum status { OK, EMPTY };
-  static constexpr const char *ID = "RSB";
+  enum status { OK, NOK };
+  static constexpr const char *ID = "RSA";
   status status;
   std::string file_name;
-  std::string file_data;
+  std::string file_path;
 
   void send(int fd);
   void receive(int fd);

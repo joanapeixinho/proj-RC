@@ -30,6 +30,7 @@
 
 #define FILE_BUFFER_LEN (512)
 
+#define PROGRESS_BAR_STEP_SIZE (10)
 
 #define BASE_DIR "ASDIR/"
 #define AUCTION_DIR "AUCTION/"

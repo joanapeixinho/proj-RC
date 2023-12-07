@@ -137,6 +137,9 @@ class ShowRecordCommand : public CommandHandler {
 
 // void write_word(std::ostream& stream, char* word, uint32_t word_len);
 
+bool is_numeric(std::string& str);
+
+bool is_aphanumeric(std::string& str);
 
 uint32_t parse_user_id(std::string& args);
 
