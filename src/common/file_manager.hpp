@@ -27,7 +27,7 @@ public:
     void removeUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
     void createAuctionStartFile(const std::string& auctionId, const AuctionData& data);
     void createAuctionAssetFile(const std::string& auctionId, const std::string& assetData);
-    void createAuctionEndFile(const std::string& auctionId);
+    void createAuctionEndFile(const std::string& auctionId, const std::time_t& endTime, const int& activeSeconds);
     void createBidsDirectory(const std::string& auctionId);
     void createBidFile(const std::string& auctionId, const std::string& bidValue);
     bool writeToFile(const std::string& fileName, const std::string& data, const std::string& directory);

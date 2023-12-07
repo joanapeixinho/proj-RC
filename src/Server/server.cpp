@@ -232,14 +232,7 @@ Server::Server(int argc, char *argv[]) {
       case 'v':
         verbose = true;
         break;
-      case 1:
-        // The `-` flag in `getopt` makes non-options behave as if they
-        // were values of an option -0x01
-        if (wordFilePath.empty()) {
-          // Only keep the first non-option argument
-          wordFilePath = std::string(optarg);
-        }
-        break;
+
       default:
         std::cerr << std::endl;
         printHelp(std::cerr);
@@ -247,13 +240,6 @@ Server::Server(int argc, char *argv[]) {
     }
   }
 
-  if (wordFilePath.empty()) {
-    std::cerr << programPath << ": required argument 'word_file' not provided"
-              << std::endl
-              << std::endl;
-    printHelp(std::cerr);
-    exit(EXIT_FAILURE);
-  }
 
   validate_port_number(port);
 }
