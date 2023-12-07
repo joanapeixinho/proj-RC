@@ -207,7 +207,6 @@ class ReplyMyBidsClientbound : public UdpPacket {
 class ListAuctionsServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LST";
-  uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -220,6 +219,8 @@ class ReplyListAuctionsClientbound : public UdpPacket {
   enum status { OK, NOK };
   static constexpr const char *ID = "RLS";
   status status;
+  std::vector<std::pair<uint32_t, bool>> auctions;
+
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };

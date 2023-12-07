@@ -472,6 +472,30 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
   }
 }
 
+void ListCommand::handle(std::string args, UserState& state) {
+
+  // Populate and send packet
+  ListAuctionsServerbound packet_out;
+
+  ReplyListAuctionsClientbound rls;
+  state.sendUdpPacketAndWaitForReply(packet_out, rls);
+
+  switch (rls.status) {
+    case ReplyListAuctionsClientbound::status::OK:
+      // Output autions info
+      std::cout << "Displaying all the auctions:" << std::endl;
+      printAuctions(rls.auctions);
+      break;
+
+    case ReplyListAuctionsClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to list auctions: there are no ongoing auctions."
+          << std::endl;
+      break;
+  }
+}
+
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     for (const auto& auction : auctions) {
         std::cout 
