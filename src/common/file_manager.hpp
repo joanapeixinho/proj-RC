@@ -25,10 +25,13 @@ public:
     void createAuctionDirectory(const std::string& auctionId);
     void createUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
     void removeUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
-    void createAuctionStartFile(const std::string& auctionId, 
+    void createAuctionStartFile(const std::string& auctionId, const AuctionData& data);
+    void createAuctionAssetFile(const std::string& auctionId, const std::string& assetData);
+    void createAuctionEndFile(const std::string& auctionId);
+    void createBidsDirectory(const std::string& auctionId);
+    void createBidFile(const std::string& auctionId, const std::string& bidValue);
     bool writeToFile(const std::string& fileName, const std::string& data, const std::string& directory);
     std::string readFromFile(const std::string& fileName, const std::string& directory);
-
 };
 
 #endif

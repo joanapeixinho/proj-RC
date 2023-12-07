@@ -21,7 +21,7 @@ std::string FileManager::readFromFile(const std::string& fileName, const std::st
     
     if (!file.is_open()) {
         std::cerr << 'Failed opening file: ' << fileName << std::endl;
-        return '';
+        return "";
     }
 
     std::getline(file, data, '\0'); // Ler todo o conteúdo do arquivo
@@ -29,7 +29,7 @@ std::string FileManager::readFromFile(const std::string& fileName, const std::st
 
     if (data.empty()) {
         std::cerr << 'Failed reading file: ' << fileName << std::endl;
-        return '';
+        return "";
     }
     
     return data;
