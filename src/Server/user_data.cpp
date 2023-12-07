@@ -8,7 +8,6 @@ int UserData::getId() const {
 }
 
 const std::string& UserData::getPassword() const {
-    
     return password;
 }
 
