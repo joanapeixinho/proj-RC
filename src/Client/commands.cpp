@@ -412,28 +412,34 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
 
   switch (rma.status) {
     case ReplyListMyAuctionsClientbound::status::OK:
-      // Output unregister info
-      std::cout << "Displaying your auctions:" << std::endl;
-      // When you unregister, you are logged out
-      PUT FUNCTION TO DISPLAY AUCTIONS HERE
-      break;
-
-    case ReplyListMyAuctionsClientbound::status::NOK:
-      std::cout
-          << "Failed to list auctions: the user has 0 ongoing auctions."
-          << std::endl;
+      // Output autions info
+      std::cout << "Displaying the auctions started by you:" << std::endl;
+      printAuctions(rma.myAuctions);
       break;
 
     case ReplyListMyAuctionsClientbound::status::NLG:
-    default:
       std::cout 
-          << "Failed to list auctions: the user has  to be logged in." 
+          << "Failed to list auctions: the user has to be logged in." 
+          << std::endl;
+      break;
+    
+    case ReplyListMyAuctionsClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to list auctions: the user has 0 ongoing auctions."
           << std::endl;
       break;
   }
 }
 
-void 
+void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
+    for (const auto& auction : auctions) {
+        std::cout 
+            << "Auction ID: " << auction.first
+            << " - Status: " << (auction.second ? "Active" : "Inactive") 
+            << std::endl;
+    }
+}
 
 bool is_aplhanumeric(std::string str) {
   for (char c : str) {
