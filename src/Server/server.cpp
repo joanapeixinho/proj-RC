@@ -16,6 +16,7 @@ extern bool is_shutting_down;
 int main(int argc, char *argv[]) {
   try {
 
+    initServerFyleSystem();
 
     Server config(argc, argv);
 
@@ -269,27 +270,19 @@ void Server::printHelp(std::ostream &stream) {
          << std::endl;
 }
 
-void initServer (/* parameters */) {
-    
-    // Create Base Directory
-    std::filesystem::create_directory(BASE_DIR);
+void initServerFyleSystem () {
+    try {
+        // Create Base Directory
+        std::filesystem::create_directory(BASE_DIR);
 
-    // Create Auction Directory in Base Directory
-    std::string auctionDir = BASE_DIR + '/' + AUCTION_DIR;
-    std::filesystem::create_directory(auctionDir);
+        // Create Auction Directory in Base Directory
+        std::string auctionDir = BASE_DIR + '/' + AUCTION_DIR;
+        std::filesystem::create_directory(auctionDir);
 
-    // Create User Directory in Base Directory
-    std::string userDir = BASE_DIR + '/' + USER_DIR;
-    std::filesystem::create_directory(userDir);
-
-    //Check if Auction Directory has 
-    if (std::filesystem::is_empty(BASE_DIR + AUCTION_DIR)) {
-        // Load Auctions from file
-        // FileManager::loadAuction();
+        // Create User Directory in Base Directory
+        std::string userDir = BASE_DIR + '/' + USER_DIR;
+        std::filesystem::create_directory(userDir);
+    } catch (std::filesystem::filesystem_error& e) {
+        std::cerr << "Failed to create directory: " << e.what() << std::endl;
     }
-
-
-
-
-
 }
