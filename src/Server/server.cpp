@@ -275,10 +275,12 @@ void initServer (/* parameters */) {
     std::filesystem::create_directory(BASE_DIR);
 
     // Create Auction Directory in Base Directory
-    std::filesystem::create_directory(BASE_DIR + AUCTION_DIR);
+    std::string auctionDir = BASE_DIR + '/' + AUCTION_DIR;
+    std::filesystem::create_directory(auctionDir);
 
     // Create User Directory in Base Directory
-    std::filesystem::create_directory(BASE_DIR + USER_DIR);
+    std::string userDir = BASE_DIR + '/' + USER_DIR;
+    std::filesystem::create_directory(userDir);
 
     //Check if Auction Directory has 
     if (std::filesystem::is_empty(BASE_DIR + AUCTION_DIR)) {

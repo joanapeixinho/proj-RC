@@ -1,12 +1,5 @@
 #include "file_manager.hpp"
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <sstream>
-#include <vector>
 
-#include "Server/auction_data.hpp"
-#include "common/constants.hpp"
 
 
 bool FileManager::writeToFile(const std::string& fileName, const std::string& data, const std::string& directory) {
@@ -14,7 +7,7 @@ bool FileManager::writeToFile(const std::string& fileName, const std::string& da
     std::ofstream file(BASE_DIR + directory + "/" + fileName);
     
     if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo: " << fileName << std::endl;
+        std::cerr << "Failed opening file: " << fileName << std::endl;
         return false;
     }
 
@@ -29,43 +22,57 @@ std::string FileManager::readFromFile(const std::string& fileName, const std::st
     std::string data;
     
     if (!file.is_open()) {
-        std::cerr << "Erro ao abrir o arquivo: " << fileName << std::endl;
+        std::cerr << "Failed opening file: " << fileName << std::endl;
         return "";
     }
 
     std::getline(file, data, '\0'); // Ler todo o conteúdo do arquivo
     file.close();
+
+    if (data.empty()) {
+        std::cerr << "Failed reading file: " << fileName << std::endl;
+        return "";
+    }
     
     return data;
 }
 
-/*Function to load auction to server from file*/
-void FileManager::loadAuction(const std::string& fileName, std::vector<AuctionData>& auctions) {
-    std::string data = readFromFile(fileName, AUCTION_DIR);
-    if (data.empty()) {
-        std::cerr << "Erro ao abrir o arquivo: " << fileName << std::endl;
-        return;
-    }
+void FileManager::createUserDirectory(const std::string& userId) {
+    std::string UserDir = std::string(USER_DIR) + '/' + userId;
+    std::filesystem::create_directory(UserDir);
 
-    std::string line;
-    std::string itemName;
-    double initialBid;
-    int durationSeconds;
-    int id;
+    
+    std::filesystem::create_directory(UserDir + "/HOSTED");
+    std::filesystem::create_directory(UserDir + "/BIDDED");
 
-    std::stringstream ss(data);
-    while (std::getline(ss, line)) {
-        std::stringstream ss2(line);
-        ss2 >> id >> itemName >> initialBid >> durationSeconds;
-        auctions.push_back(AuctionData(id, itemName, initialBid, durationSeconds));
-    }
 }
 
-/*Function to save auction to file*/
-void FileManager::saveAuction(const std::string& fileName, const std::vector<AuctionData>& auctions) {
-    std::stringstream ss;
-    for (const auto& auction : auctions) {
-        ss << auction.getId() << " " << auction.getItemName() << " " << auction.getInitialBid() << " " << auction.getDurationSeconds() << std::endl;
-    }
-    writeToFile(fileName, ss.str(), AUCTION_DIR);
+void FileManager:: createUserPassFile(const std::string& userId, const std::string& password) {
+    std::ofstream file(USER_DIR + '/' + userId + "_pass.txt");
+    file << password;
+    file.close();
+}
+
+void FileManager:: createUserLoginFile(const std::string& userId, const std::string& login) {
+    std::ofstream file(USER_DIR + '/' + userId + "_login.txt");
+    file << login;
+    file.close();
+}
+
+void FileManager::removeUserFiles(const std::string& userId) {
+    std::filesystem::remove(std::string(USER_DIR)  + userId + "_pass.txt");
+    std::filesystem::remove(std::string(USER_DIR)  + userId + "_login.txt");
+}
+
+void FileManager::createAuctionDirectory(const std::string& auctionId) {
+    std::filesystem::create_directory(AUCTION_DIR  + '/' + auctionId);
+}
+
+void FileManager::createUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory) {
+    std::ofstream file(USER_DIR + '/' + userId + '/' + directory + '/' + auctionId);
+    file.close();
+}
+
+void FileManager::removeUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory) {
+    std::filesystem::remove(USER_DIR + '/' + userId + '/' + directory + '/' + auctionId);
 }
