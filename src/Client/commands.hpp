@@ -44,14 +44,14 @@ class LoginCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  LoginCommand() : CommandHandler("login", "sng", "UID", "Login User") {}
+  LoginCommand() : CommandHandler("login", std::nullopt, "UID", "Login User") {}
 };
 
 class LogoutCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  LogoutCommand() : CommandHandler("logout", "sng", std::nullopt, "Logout User") {}
+  LogoutCommand() : CommandHandler("logout", std::nullopt, std::nullopt, "Logout User") {}
 };
 
 
@@ -59,14 +59,14 @@ class UnregisterCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  UnregisterCommand() : CommandHandler("unregister", "sng", std::nullopt, "Unregister User") {}
+  UnregisterCommand() : CommandHandler("unregister", std::nullopt, std::nullopt, "Unregister User") {}
 };
 
-class ListMyAuctionsCommand : public CommandHandler {
+class ListCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ListCommand() : CommandHandler("list", "sng", std::nullopt, "List Users") {}
+  ListCommand() : CommandHandler("list", "l", std::nullopt, "List Users") {}
 };
 
 
@@ -74,7 +74,7 @@ class BidCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  BidCommand() : CommandHandler("bid", "sng", "UID", "Bid on Auction") {}
+  BidCommand() : CommandHandler("bid", "b", "AID", "Bid on Auction") {}
 };
 
 
@@ -85,62 +85,58 @@ class HelpCommand : public CommandHandler {
   HelpCommand() : CommandHandler("info", "sng", "UID", "Help Auction") {}
 };
 
-class ShowRecordCommand : public CommandHandler {
-  void handle(std::string args, UserState& state);
-
- public:
-  ShowRecordCommand() : CommandHandler("record", "sng", "UID", "Show Record") {}
-};
 
 class ShowAssetCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ShowAssetCommand() : CommandHandler("asset", "sng", "UID", "Show Asset") {}
+  ShowAssetCommand() : CommandHandler("show_asset", "sa", "AID", "Show Asset") {}
 };
 
-class MyAuctionsCommand : public CommandHandler {
+class ListMyAuctionsCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  MyAuctionsCommand() : CommandHandler("myauctions", "sng", "UID", "Show My Auctions") {}
+  ListMyAuctionsCommand() : CommandHandler("myauctions", "ma", std::nullopt, "Show My Auctions") {}
 };
 
 class MyBidsCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  MyBidsCommand() : CommandHandler("mybids", "sng", "UID", "Show My Bids") {}
+  MyBidsCommand() : CommandHandler("mybids", "mb", std::nullopt, "Show My Bids") {}
 };
 
 class OpenAuctionCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  OpenAuctionCommand() : CommandHandler("open", "sng", "UID", "Open Auction") {}
+  OpenAuctionCommand() : CommandHandler("open", std::nullopt, "AuctionName", "Open Auction") {}
 };
 
 class CloseAuctionCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  CloseAuctionCommand() : CommandHandler("close", "sng", "UID", "Close Auction") {}
+  CloseAuctionCommand() : CommandHandler("close", std::nullopt, "AID", "Close Auction") {}
 };
 
 class ExitCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ExitCommand() : CommandHandler("exit", "sng", "UID", "Exit Application") {}
+  ExitCommand() : CommandHandler("exit", std::nullopt, std::nullopt, "Exit Application") {}
 };
 
+class ShowRecordCommand : public CommandHandler {
+  void handle(std::string args, UserState& state);
 
+ public:
+  ShowRecordCommand() : CommandHandler("show_record", "sr", "AID", "Show Record") {}
+};
 
 // void write_word(std::ostream& stream, char* word, uint32_t word_len);
 
-// bool is_Auction_active(userState& state);
-
-// void print_Auction_progress(userState& state);
 
 uint32_t parse_user_id(std::string& args);
 
