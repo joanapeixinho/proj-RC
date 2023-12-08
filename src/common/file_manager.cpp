@@ -85,17 +85,10 @@ void FileManager:: createUserPassFile(const std::string& userId, const std::stri
     file.close();
 }
 
-void FileManager:: removeUserPassFile(const std::string& userId) {
-    std::filesystem::remove(std::string(USER_DIR)  + userId + "_pass.txt");
-}
 
 void FileManager:: createUserLoginFile(const std::string& userId) {
     std::ofstream file(USER_DIR + '/' + userId + "_login.txt");
     file.close();
-}
-
-void FileManager:: removeUserLoginFile(const std::string& userId) {
-    std::filesystem::remove(std::string(USER_DIR)  + userId + "_login.txt");
 }
 
 void FileManager::removeUserFiles(const std::string& userId) {
@@ -106,6 +99,7 @@ void FileManager::removeUserFiles(const std::string& userId) {
 void FileManager::createAuctionDirectory(const std::string& auctionId) {
     std::filesystem::create_directory(AUCTION_DIR  + '/' + auctionId);
 }
+
 
 void FileManager::createUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory) {
     std::ofstream file(USER_DIR + '/' + userId + '/' + directory + '/' + auctionId);
@@ -144,13 +138,15 @@ void FileManager::createBidFile(const std::string& auctionId, const std::string&
     file.close();
 }
 
-/* Looks for UserId in Users Dir and if it exists, the userId is returned */
-uint32_t FileManager::getUser(const std::string& userId) {
-    if (std::filesystem::exists(USER_DIR + '/' + userId)) {
-        //turn string into uint32_t
-        uint32_t id = std::stoul(userId);
-        return id;
+std::string FileManager::getUserPassword(const std::string& userId) {
+    if (std::filesystem::exists(USER_DIR + '/' + userId + "_pass.txt")) {
+        return readFromFile(userId + "_pass.txt", USER_DIR);
     }
+}
+
+
+bool FileManager::UserInDir(const std::string& userId) {
+    return std::filesystem::exists(USER_DIR + '/' + userId);
 }
 
 std::string FileManager::getUserPassword(const std::string& userId) {
@@ -159,8 +155,17 @@ std::string FileManager::getUserPassword(const std::string& userId) {
     }
 }
 
+void FileManager::loginUser(const std::string& userId, const std::string& password) {
+    safeLockUser(userId, [&]() {
+    createUserLoginFile(userId);
+    });
 
-void FileManager::registerUser(const std::string& userId, const std::string& password) {
+    safeLockUser(userId, [&]() {
+    createUserPassFile(userId, password);
+    });
+   
+}
+ void FileManager::registerUser(const std::string& userId, const std::string& password) {
     safeLockUser(userId, [&]() {
     createUserDirectory(userId);
     });
@@ -171,3 +176,10 @@ void FileManager::registerUser(const std::string& userId, const std::string& pas
     createUserLoginFile(userId);
     });
 }
+
+void FileManager::unregisterUser(const std::string& userId) {
+    safeLockUser(userId, [&]() {
+    removeUserFiles(userId);
+    });
+}
+

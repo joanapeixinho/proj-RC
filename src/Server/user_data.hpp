@@ -11,6 +11,7 @@ public:
     int getId() const;
     const std::string& getPassword() const;
     void login(uint32_t id, const std::string& password);
+    void registerUser(uint32_t id, const std::string& password);
 
 private:
     uint32_t id;

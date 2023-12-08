@@ -21,29 +21,28 @@
 
 class FileManager {
 public:
-    void createUserDirectory(const std::string& userId);
-    void removeUserDirectory(const std::string& userId);
-    void createUserPassFile(const std::string& userId, const std::string& password);
-    void removeUserPassFile(const std::string& userId);
-    void createUserLoginFile(const std::string& userId);
-    void removeUserLoginFile(const std::string& userId);
-    void removeUserFiles(const std::string& userId);
-    void createAuctionDirectory(const std::string& auctionId);
-    void createUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
-    void removeUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
-    void createAuctionStartFile(const std::string& auctionId, const AuctionData& data);
-    void createAuctionAssetFile(const std::string& auctionId, const std::string& assetData);
-    void createAuctionEndFile(const std::string& auctionId, const std::time_t& endTime, const int& activeSeconds);
-    void createBidsDirectory(const std::string& auctionId);
-    void createBidFile(const std::string& auctionId, const std::string& bidValue);
-    bool writeToFile(const std::string& fileName, const std::string& data, const std::string& directory);
-    std::string readFromFile(const std::string& fileName, const std::string& directory);
-    void safeLockUser(const std::string& userId, std::function<void()> func);
-    void safeLockAuction(const std::string& auctionId, std::function<void()> func);
-    std::uint32_t getUser(const std::string& userId);
-    std::string getUserPassword(const std::string& userId);
-    void FileManager::registerUser(const std::string& userId, const std::string& password);
-    
+    static void createUserDirectory(const std::string& userId);
+    static void removeUserDirectory(const std::string& userId);
+    static void createUserPassFile(const std::string& userId, const std::string& password);
+    static void createUserLoginFile(const std::string& userId);
+    static void removeUserFiles(const std::string& userId);
+    static void createAuctionDirectory(const std::string& auctionId);
+    static void removeUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
+    static void createUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
+    static void createAuctionStartFile(const std::string& auctionId, const AuctionData& data);
+    static void createAuctionAssetFile(const std::string& auctionId, const std::string& assetData);
+    static void createAuctionEndFile(const std::string& auctionId, const std::time_t& endTime, const int& activeSeconds);
+    static void createBidsDirectory(const std::string& auctionId);
+    static void createBidFile(const std::string& auctionId, const std::string& bidValue);
+    static bool writeToFile(const std::string& fileName, const std::string& data, const std::string& directory);
+    static std::string readFromFile(const std::string& fileName, const std::string& directory);
+    static void safeLockUser(const std::string& userId, std::function<void()> func);
+    static void safeLockAuction(const std::string& auctionId, std::function<void()> func);
+    static bool UserInDir(const std::string& userId);
+    static std::string getUserPassword(const std::string& userId);
+    static void loginUser(const std::string& userId, const std::string& password);
+    static void FileManager::registerUser(const std::string& userId, const std::string& password);
+    static void FileManager::unregisterUser(const std::string& userId);
 
 private:
     std::map<std::string, std::mutex> userMutexes;
