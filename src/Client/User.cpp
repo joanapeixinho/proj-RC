@@ -57,9 +57,9 @@ void registerCommands(CommandManager &manager) {
   manager.registerCommand(std::make_shared<ExitCommand>());
   manager.registerCommand(std::make_shared<OpenAuctionCommand>());  // TCP
   manager.registerCommand(std::make_shared<CloseAuctionCommand>()); // TCP
-  manager.registerCommand(std::make_shared<MyAuctionsCommand>());   // UDP
+  manager.registerCommand(std::make_shared<ListMyAuctionsCommand>());   // UDP
   manager.registerCommand(std::make_shared<MyBidsCommand>());       // UDP
-  manager.registerCommand(std::make_shared<ListMyAuctionsCommand>()); // UDP
+  manager.registerCommand(std::make_shared<ListCommand>()); // UDP
   manager.registerCommand(std::make_shared<ShowAssetCommand>());    // TCP
   manager.registerCommand(std::make_shared<BidCommand>());          // TCP
   manager.registerCommand(std::make_shared<ShowRecordCommand>());   // TCP

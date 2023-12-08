@@ -412,30 +412,157 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
 
   switch (rma.status) {
     case ReplyListMyAuctionsClientbound::status::OK:
-      // Output unregister info
-      std::cout << "Displaying your auctions:" << std::endl;
-      // When you unregister, you are logged out
-      PUT FUNCTION TO DISPLAY AUCTIONS HERE
-      break;
-
-    case ReplyListMyAuctionsClientbound::status::NOK:
-      std::cout
-          << "Failed to list auctions: the user has 0 ongoing auctions."
-          << std::endl;
+      // Output autions info
+      std::cout << "Displaying the auctions started by you:" << std::endl;
+      printAuctions(rma.myAuctions);
       break;
 
     case ReplyListMyAuctionsClientbound::status::NLG:
-    default:
       std::cout 
-          << "Failed to list auctions: the user has  to be logged in." 
+          << "Failed to list auctions: the user has to be logged in." 
+          << std::endl;
+      break;
+    
+    case ReplyListMyAuctionsClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to list auctions: the user has 0 ongoing auctions."
           << std::endl;
       break;
   }
 }
 
-void 
+void MyBidsCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to list bids: you need to be logged in to list your bids." 
+        << std::endl;
+    return;
+  }
 
-bool is_aplhanumeric(std::string str) {
+  // Populate and send packet
+  MyBidsServerbound packet_out;
+  packet_out.user_id = state.user_id;
+
+  ReplyMyBidsClientbound rmb;
+  state.sendUdpPacketAndWaitForReply(packet_out, rmb);
+
+  switch (rmb.status) {
+    case ReplyMyBidsClientbound::status::OK:
+      // Output bids info
+      std::cout 
+          << "Displaying the auctions where you made a bid:" 
+          << std::endl;
+      printAuctions(rmb.myBidsAuctions);
+      break;
+
+    case ReplyMyBidsClientbound::status::NLG:
+      std::cout 
+          << "Failed to list bids: the user has to be logged in." 
+          << std::endl;
+      break;
+    
+    case ReplyMyBidsClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to list bids: the user has 0 ongoing bids."
+          << std::endl;
+      break;
+  }
+}
+
+void ListCommand::handle(std::string args, UserState& state) {
+
+  // Populate and send packet
+  ListAuctionsServerbound packet_out;
+
+  ReplyListAuctionsClientbound rls;
+  state.sendUdpPacketAndWaitForReply(packet_out, rls);
+
+  switch (rls.status) {
+    case ReplyListAuctionsClientbound::status::OK:
+      // Output autions info
+      std::cout << "Displaying all the auctions:" << std::endl;
+      printAuctions(rls.auctions);
+      break;
+
+    case ReplyListAuctionsClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to list auctions: there are no ongoing auctions."
+          << std::endl;
+      break;
+  }
+}
+
+void ShowAssetCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to show asset: you need to be logged in to show an asset." 
+        << std::endl;
+    return;
+  }
+
+  // Argument parsing
+  std::istringstream iss(args);
+  std::string auction_id_str;
+  
+  if (!(iss >> auction_id_str)) {
+    std::cout << "Invalid arguments. Usage: show_asset <auction_id>" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is too long
+  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+              << " digits long" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is Numeric
+  if (!is_numeric(auction_id_str)) {
+    std::cout << "Invalid auction ID. It must be a number" << std::endl;
+    return;
+  }
+  // Convert auction_id_str to uint32_t
+  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+
+  // Populate and send packet
+  ShowAssetServerbound packet_out;
+  packet_out.auction_id = auction_id;
+
+  ReplyShowAssetClientbound rsa;
+  state.sendTcpPacketAndWaitForReply(packet_out, rsa);
+
+  switch (rsa.status) {
+    case ReplyShowAssetClientbound::status::OK:
+      // Output asset info
+      std::cout 
+          << "Displaying the asset '"<< rsa.file_name 
+          <<"' of the auction with ID [" << auction_id << "]:" 
+          << std::endl;
+      display_file(rsa.file_path);
+      break;
+
+    case ReplyShowAssetClientbound::status::NOK:
+    default:
+      std::cout
+          << "Failed to show asset: the auction with ID [" 
+          << auction_id << "] does not exist." << std::endl;
+      break;
+  }
+}
+
+void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
+    for (const auto& auction : auctions) {
+        std::cout 
+            << "Auction ID: " << auction.first
+            << " - Status: " << (auction.second ? "Active" : "Inactive") 
+            << std::endl;
+    }
+}
+
+bool is_aplhanumeric(std::string& str) {
   for (char c : str) {
     if (!isalnum(c)) {
       return false;
@@ -444,7 +571,7 @@ bool is_aplhanumeric(std::string str) {
   return true;
 }
 
-bool is_numeric(std::string str) {
+bool is_numeric(std::string& str) {
   for (char c : str) {
     if (!isdigit(c)) {
       return false;

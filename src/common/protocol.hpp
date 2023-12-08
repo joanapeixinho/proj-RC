@@ -171,6 +171,8 @@ class ReplyListMyAuctionsClientbound : public UdpPacket {
  public:
   enum status { OK, NLG, NOK };
   static constexpr const char *ID = "RLM";
+  std::vector<std::pair<uint32_t, bool>> myAuctions;
+
   status status;
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -178,7 +180,7 @@ class ReplyListMyAuctionsClientbound : public UdpPacket {
 
 // List my bids Packet (LMB)
 
-class ListBidsServerbound : public UdpPacket {
+class MyBidsServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LMB";
   uint32_t user_id;
@@ -189,11 +191,13 @@ class ListBidsServerbound : public UdpPacket {
 
 // Reply to List my bids Packet (RMB)
 
-class ReplyListBidsClientbound : public UdpPacket {
+class ReplyMyBidsClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, NLG };
   static constexpr const char *ID = "RMB";
   status status;
+  std::vector<std::pair<uint32_t, bool>> myBidsAuctions;
+
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
@@ -203,7 +207,6 @@ class ReplyListBidsClientbound : public UdpPacket {
 class ListAuctionsServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LST";
-  uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -216,6 +219,8 @@ class ReplyListAuctionsClientbound : public UdpPacket {
   enum status { OK, NOK };
   static constexpr const char *ID = "RLS";
   status status;
+  std::vector<std::pair<uint32_t, bool>> auctions;
+
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
@@ -312,21 +317,22 @@ class ReplyCloseAuctionClientbound : public TcpPacket {
 };
 
 
-class ScoreboardServerbound : public TcpPacket {
+class ShowAssetServerbound : public TcpPacket {
  public:
-  static constexpr const char *ID = "GSB";
+  static constexpr const char *ID = "SAS";
+  uint32_t auction_id;
 
   void send(int fd);
   void receive(int fd);
 };
 
-class ScoreboardClientbound : public TcpPacket {
+class ReplyShowAssetClientbound : public TcpPacket {
  public:
-  enum status { OK, EMPTY };
-  static constexpr const char *ID = "RSB";
+  enum status { OK, NOK };
+  static constexpr const char *ID = "RSA";
   status status;
   std::string file_name;
-  std::string file_data;
+  std::string file_path;
 
   void send(int fd);
   void receive(int fd);
