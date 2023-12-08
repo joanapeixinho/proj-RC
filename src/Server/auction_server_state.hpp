@@ -67,9 +67,10 @@ typedef void (*TcpPacketHandler)(int connection_fd, AuctionServerState&);
 class AuctionServerState {
   std::unordered_map<std::string, UdpPacketHandler> udp_packet_handlers;
   std::unordered_map<std::string, TcpPacketHandler> tcp_packet_handlers;
+  
   std::mutex AuctionsLock;
-  std::string word_file_dir;
-  bool select_randomly;
+  std::mutex UsersLock;
+  UserData loggedInUser;
   void setup_sockets();
 
  public:
@@ -87,6 +88,7 @@ class AuctionServerState {
   void callUdpPacketHandler(std::string packet_id, std::stringstream& stream,
                             Address& addr_from);
   void callTcpPacketHandler(std::string packet_id, int connection_fd);
+  void setLoggedInUser(UserData& user);
 };
 
 /** Exceptions **/

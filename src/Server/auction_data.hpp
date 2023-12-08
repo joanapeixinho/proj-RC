@@ -11,15 +11,8 @@
 
 class AuctionData {
 public:
-    AuctionData(int id, const std::string& itemName, double initialBid, int durationSeconds, const std::string& assetFname);
-    uint32_t getId() const;
-    const std::string& getItemName() const;
-    double getInitialBid() const;
-    int getDurationSeconds() const;
-    std::string toString() const;
-    std::string getAssetFname() const;
-    std::time_t getStartTime() const;
-    std::time_t getEndTime() const;
+    AuctionData(int id, const std::string& name, double initialBid, int durationSeconds, const std::string& assetFname);
+    void openAuction();
 
 
 

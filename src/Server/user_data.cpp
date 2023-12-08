@@ -12,22 +12,22 @@ const std::string& UserData::getPassword() const {
 }
 
 
-void UserData::login(uint32_t id, const std::string& password) {
+void UserData::login() {
     
   
-    if (FileManager::UserInDir(std::to_string(id))) {
-        std::string userPassword = FileManager::getUserPassword(std::to_string(id));
-        if (userPassword == password) {
-            FileManager::loginUser(std::to_string(id), password);
+    if (FileManager::UserInDir(std::to_string(this->id))) {
+        std::string userPassword = FileManager::getUserPassword(std::to_string(this->id));
+        if (userPassword == this->password) {
+            FileManager::loginUser(std::to_string(this->id), this->password);
         } else {
-            throw WrongPasswordException(password);
+            throw WrongPasswordException(this->password);
         }
     } else {
-        registerUser(id, password);
+        registerUser();
     }
 }
 
-void UserData::registerUser(uint32_t id, const std::string& password) {
+void UserData::registerUser() {
     
     //check UID IS VALID
     if (id < 100000 || id > 999999) {
@@ -46,10 +46,6 @@ void UserData::registerUser(uint32_t id, const std::string& password) {
         }
     }
 
-    this->id = id;
-    this->password = password;
-
-    //id from uint32_t to string
     std::string idString = std::to_string(id);
     
     FileManager::registerUser(idString, password);

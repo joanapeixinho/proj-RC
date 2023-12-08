@@ -20,6 +20,8 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
 
     user.login(packet.user_id, packet.password);
 
+    state.loggedInUser = user;
+
     response.status = ReplyLoginClientbound::OK;
 
     state.cdebug << userTag(packet.user_id) << "User logged in" << std::endl;

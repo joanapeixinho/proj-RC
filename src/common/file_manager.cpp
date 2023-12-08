@@ -183,3 +183,21 @@ void FileManager::unregisterUser(const std::string& userId) {
     });
 }
 
+void FileManager::openAuction(const std::string& auctionId, const std::string& userId, const AuctionData& data) {
+    safeLockUser(userId, [&]() {
+    createUserAuctionFile(userId, auctionId, "HOSTED");
+    });
+    safeLockAuction(auctionId, [&]() {
+    createAuctionDirectory(auctionId);
+    });
+    safeLockAuction(auctionId, [&]() {
+    createAuctionStartFile(auctionId, data);
+    });
+    safeLockAuction(auctionId, [&]() {
+    createBidsDirectory(auctionId);
+    });
+    safeLockAuction(auctionId, [&]() {
+    createAuctionAssetFile(auctionId, data.getAssetFname());
+    });
+}
+

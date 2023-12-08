@@ -2,6 +2,7 @@
 #define USERDATA_HPP
 
 #include <string>
+
 #include "common/file_manager.hpp"
 
 class UserData {
@@ -10,8 +11,8 @@ public:
     
     int getId() const;
     const std::string& getPassword() const;
-    void login(uint32_t id, const std::string& password);
-    void registerUser(uint32_t id, const std::string& password);
+    void login();
+    void registerUser();
 
 private:
     uint32_t id;

@@ -50,5 +50,38 @@ public:
         : std::runtime_error("Wrong password: " + password) {}
 };
 
+class InvalidAuctionNameException : public std::runtime_error { 
+public:
+    InvalidAuctionNameException(const std::string& auctionName)
+        : std::runtime_error("Invalid auction name: " + auctionName) {}
+};
+
+class InvalidAuctionInitialBidException : public std::runtime_error {
+public:
+    InvalidAuctionInitialBidException(const std::string& initialBid)
+        : std::runtime_error("Invalid auction initial bid: " + initialBid) {}
+};
+
+class InvalidAuctionDurationException : public std::runtime_error {
+public:
+    InvalidAuctionDurationException(const std::string& duration)
+        : std::runtime_error("Invalid auction duration: " + duration) {}
+};
+
+class InvalidAuctionAssetException : public std::runtime_error {
+public:
+    InvalidAuctionAssetException(const std::string& asset)
+        : std::runtime_error("Invalid auction asset: " + asset) {}
+};
+
+class InvalidAuctionIdException : public std::runtime_error {
+public:
+    InvalidAuctionIdException(const std::string& auctionId)
+        : std::runtime_error("Invalid auction id: " + auctionId) {}
+};
+
+    
+
+
 
 
