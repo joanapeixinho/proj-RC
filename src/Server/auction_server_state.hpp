@@ -70,8 +70,7 @@ class AuctionServerState {
   
   std::mutex AuctionsLock;
   std::mutex UsersLock;
-  UserData loggedInUser;
-  int auctionsCount = 0;
+  
   void setup_sockets();
 
  public:
@@ -80,6 +79,9 @@ class AuctionServerState {
   struct addrinfo* server_udp_addr = NULL;
   struct addrinfo* server_tcp_addr = NULL;
   DebugStream cdebug;
+  UserData loggedInUser;
+  int auctionsCount = 0;
+
 
   AuctionServerState ( std::string& port, bool __verbose);
   ~AuctionServerState();

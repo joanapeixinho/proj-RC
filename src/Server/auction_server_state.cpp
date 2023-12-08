@@ -34,11 +34,10 @@ AuctionServerState::~AuctionServerState() {
 
 void AuctionServerState::registerPacketHandlers() {
   // UDP
-  udp_packet_handlers.insert({StartAuctionServerbound::ID, handle_login_user});
+  udp_packet_handlers.insert({LoginServerbound::ID, handle_login_user});
  
 
   // TCP
-  tcp_packet_handlers.insert({ScoreboardServerbound::ID, handle_scoreboard});
   tcp_packet_handlers.insert({StateServerbound::ID, handle_state});
 }
 

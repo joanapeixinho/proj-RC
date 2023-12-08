@@ -42,6 +42,7 @@ void UserData::login() {
             throw WrongPasswordException(this->password);
         }
     } else {
+        registerUser();
         throw UserNotRegisteredException(std::to_string(this->id));
     }
 }

@@ -18,7 +18,7 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
 
     UserData user(packet.user_id, packet.password);
 
-    user.login(packet.user_id, packet.password);
+    user.login();
 
     state.loggedInUser = user;
 
@@ -30,7 +30,6 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
     response.status = ReplyLoginClientbound::NOK;
   } catch ( UserNotRegisteredException &e) {
     state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
-    user.registerUser();
     response.status = ReplyLoginClientbound::REG;
   } catch (UserIdException &e) {
     state.cdebug << userTag(packet.user_id) << "Invalid user id" << std::endl;
@@ -79,16 +78,16 @@ void handle_open_auction(std::stringstream &buffer, Address &addr_from,
   } catch (AuctionIdException &e) {
     state.cdebug << userTag(packet.user_id) << "Invalid auction id" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
-  } catch (AuctionItemNameException &e) {
+  } catch (InvalidAuctionNameException &e) {
     state.cdebug << userTag(packet.user_id) << "Invalid auction item name" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
-  } catch (AuctionInitialBidException &e) {
+  } catch (InvalidAuctionInitialBidException &e) {
     state.cdebug << userTag(packet.user_id) << "Invalid auction initial bid" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
-  } catch (AuctionDurationException &e) {
+  } catch (InvalidAuctionDurationException &e) {
     state.cdebug << userTag(packet.user_id) << "Invalid auction duration" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
-  } catch (AuctionAssetFnameException &e) {
+  } catch (InvalidAuctionAssetException &e) {
     state.cdebug << userTag(packet.user_id) << "Invalid auction asset fname" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   } catch (FileOpenException &e) {
