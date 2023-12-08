@@ -43,7 +43,7 @@ public:
     static void loginUser(const std::string& userId, const std::string& password);
     static void FileManager::registerUser(const std::string& userId, const std::string& password);
     static void FileManager::unregisterUser(const std::string& userId);
-    static void FileManager::openAuction(const std::string& auctionId, const std::string& userId, const AuctionData& data);
+    static void FileManager::openAuction(const std::string& userId, const AuctionData& data);
 
 private:
     std::map<std::string, std::mutex> userMutexes;

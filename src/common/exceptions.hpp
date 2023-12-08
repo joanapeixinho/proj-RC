@@ -26,6 +26,12 @@ public:
         : std::runtime_error("Invalid user id: " + userId) {}
 };
 
+class UserNotRegisteredException : public std::runtime_error {
+public:
+    UserNotRegisteredException(const std::string& userId)
+        : std::runtime_error("User not registered: " + userId) {}
+};
+
 class UserPasswordException : public std::runtime_error {
 public:
     UserPasswordException(const std::string& userPassword)

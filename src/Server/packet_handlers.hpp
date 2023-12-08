@@ -23,6 +23,9 @@ class userTag {  // IOManip helper
 void handle_login_user(std::stringstream &buffer, Address &addr_from,
                        AuctionServerState &state);
 
+void handle_open_auction(std::stringstream &buffer, Address &addr_from,
+                         AuctionServerState &state);
+
 
 // TCP
 

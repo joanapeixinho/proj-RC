@@ -1,7 +1,26 @@
 #include "user_data.hpp"
 
 UserData::UserData(uint32_t id, const std::string& password)
-    : id(id), password(password) {}
+    : id(id), password(password) {
+    
+        //check UID IS VALID
+    if (id < 100000 || id > 999999) {
+        throw UserIdException(std::to_string(id));
+    }
+
+    //check password is valid
+    
+    if (password.length() != 8) {
+        throw UserPasswordException(password);
+    }
+
+    for (char c : password) {
+        if (!std::isalnum(c)) {
+            throw UserPasswordException(password);
+        }
+    }
+
+    }
 
 int UserData::getId() const {
     return id;
@@ -23,32 +42,19 @@ void UserData::login() {
             throw WrongPasswordException(this->password);
         }
     } else {
-        registerUser();
+        throw UserNotRegisteredException(std::to_string(this->id));
     }
 }
 
 void UserData::registerUser() {
     
-    //check UID IS VALID
-    if (id < 100000 || id > 999999) {
-        throw UserIdException(std::to_string(id));
-    }
-
-    //check password is valid
     
-    if (password.length() != 8) {
-        throw UserPasswordException(password);
-    }
-
-    for (char c : password) {
-        if (!std::isalnum(c)) {
-            throw UserPasswordException(password);
-        }
-    }
-
     std::string idString = std::to_string(id);
     
     FileManager::registerUser(idString, password);
 }
 
+void openAuction (const AuctionData& data) {
+    FileManager::openAuction(data.getId(), std::to_string(this->id), data);
+}
 // Path: src/Server/user_data.hpp

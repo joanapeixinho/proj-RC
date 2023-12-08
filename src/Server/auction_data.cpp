@@ -29,7 +29,7 @@
             throw InvalidAuctionAssetException(assetFname);
         }
 
-        
+
     }
 
 uint32_t AuctionData::getId() const {
@@ -72,7 +72,7 @@ std::time_t AuctionData::getEndTime() const {
     return startTime + durationSeconds;
 }
 
-void AuctionData::openAuction() {
-   
-   
+std::string getAssetFname() const {
+    return assetFname;
 }
+
