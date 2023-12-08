@@ -67,8 +67,6 @@ typedef void (*TcpPacketHandler)(int connection_fd, AuctionServerState&);
 class AuctionServerState {
   std::unordered_map<std::string, UdpPacketHandler> udp_packet_handlers;
   std::unordered_map<std::string, TcpPacketHandler> tcp_packet_handlers;
-  std::unordered_map<uint32_t, AuctionData> Auctions;
-  std::unordered_map<uint32_t, UserData> Users;
   std::mutex AuctionsLock;
   std::string word_file_dir;
   bool select_randomly;
