@@ -7,8 +7,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "common/common.hpp"
-#include "common/protocol.hpp"
+#include "../common/common.hpp"
+#include "../common/protocol.hpp"
 #include "packet_handlers.hpp"
 
 AuctionServerState::AuctionServerState(std::string &port, bool __verbose)

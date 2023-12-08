@@ -6,8 +6,8 @@
 #include <iomanip>
 #include <ctime>
 
-#include "common/constants.hpp"
-#include "common/file_manager.hpp"
+#include "../common/constants.hpp"
+#include "../common/file_manager.hpp"
 
 class AuctionData {
 public:

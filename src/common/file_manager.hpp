@@ -11,10 +11,12 @@
 #include <mutex>
 #include <functional>
 
-#include "Server/auction_data.hpp"
-#include "Server/user_data.hpp"
-#include "common/constants.hpp"
-#include "common/exceptions.hpp"
+//include common
+#include "../common/exceptions.hpp"
+#include "../Server/auction_data.hpp"
+#include "../common/constants.hpp"
+
+
 
 
 

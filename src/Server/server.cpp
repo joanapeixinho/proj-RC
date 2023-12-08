@@ -7,8 +7,8 @@
 #include <thread>
 #include <filesystem>
 
-#include "common/common.hpp"
-#include "common/protocol.hpp"
+#include "../common/common.hpp"
+#include "../common/protocol.hpp"
 
 
 extern bool is_shutting_down;

@@ -5,7 +5,7 @@
 #include <mutex>
 #include <thread>
 
-#include "common/constants.hpp"
+#include "../common/constants.hpp"
 #include "auction_server_state.hpp"
 
 class WorkerPool;

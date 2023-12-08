@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "common/protocol.hpp"
+#include "../common/protocol.hpp"
 
 Worker::Worker() {
   thread = std::thread(&Worker::execute, this);

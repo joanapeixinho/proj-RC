@@ -6,7 +6,7 @@
 #include <iostream>
 
 // #include "client_Auction.hpp"
-#include "common/protocol.hpp"
+#include "../common/protocol.hpp"
 
 extern bool is_shutting_down;
 

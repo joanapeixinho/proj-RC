@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "common/protocol.hpp"
+#include "../common/protocol.hpp"
 
 void handle_login_user(std::stringstream &buffer, Address &addr_from,
                        AuctionServerState &state) {
