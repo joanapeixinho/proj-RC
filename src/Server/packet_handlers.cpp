@@ -69,7 +69,7 @@ void handle_open_auction(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                  << std::endl;
 
-    AuctionData auction(packet.auction_id, packet.item_name, packet.initial_bid, packet.duration_seconds, packet.asset_fname);
+    AuctionData auction(auctionsCount++, packet.item_name, packet.initial_bid, packet.duration_seconds, packet.asset_fname);
 
     state.loggedInUser.openAuction(auction);
 

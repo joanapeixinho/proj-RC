@@ -8,7 +8,7 @@
 // seconds (represented with up to 5 digits). In reply, the AS informs if the request was
 // successful, and the assigned auction identifier, AID, a 3-digit numbe
 
- AuctionData(int id, const std::string& name, double initialBid, int durationSeconds, const std::string& assetFname)
+ AuctionData(const uint32_t, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname)
         : id(id), name(name), initialBid(initialBid), durationSeconds(durationSeconds), assetFname(assetFname)
     {
         startTime = std::time(nullptr);
@@ -29,12 +29,19 @@
             throw InvalidAuctionAssetException(assetFname);
         }
 
+        //reached maximum auctions number
+
+        if (id > AUCTION_MAX_NUMBER) {
+            throw MaximumAuctionsException(std::to_string(id));
+        }
 
     }
 
-uint32_t AuctionData::getId() const {
-    return id;
-}
+std::string AuctionData :: getId() const {
+        std::ostringstream oss;
+        oss << std::setw(3) << std::setfill('0') << id;
+        return oss.str();
+    }
 
 const std::string& AuctionData::getItemName() const {
     return itemName;

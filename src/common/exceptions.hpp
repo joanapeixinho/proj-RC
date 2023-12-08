@@ -86,6 +86,11 @@ public:
         : std::runtime_error("Invalid auction id: " + auctionId) {}
 };
 
+class MaximumAuctionsException : public std::runtime_error {
+public:
+    MaximumAuctionsException(const std::string& auctionId)
+        : std::runtime_error("Maximum number of auctions reached: " + auctionId) {}
+};
     
 
 

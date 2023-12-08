@@ -11,9 +11,9 @@
 
 class AuctionData {
 public:
-    AuctionData(int id, const std::string& name, double initialBid, int durationSeconds, const std::string& assetFname);
+    AuctionData(uint32_t id, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname);
     void openAuction();
-    uint32_t getId() const;
+    std::string getId() const;
     std::string toString() const; 
     std::string getAssetFname() const;   
 
@@ -22,6 +22,7 @@ public:
 
 private:
     int id;
+    int nextId;
     std::string itemName;
     double initialBid;
     int durationSeconds;

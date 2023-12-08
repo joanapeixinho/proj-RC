@@ -71,6 +71,7 @@ class AuctionServerState {
   std::mutex AuctionsLock;
   std::mutex UsersLock;
   UserData loggedInUser;
+  int auctionsCount = 0;
   void setup_sockets();
 
  public:
