@@ -24,7 +24,7 @@ void UserData::login(uint32_t id, const std::string& password) {
         if (userPassword == password) {
             FileManager::loginUser(std::to_string(id), password);
         } else {
-            throw UserPasswordException(password);
+            throw WrongPasswordException(password);
         }
     } else {
         registerUser(id, password);

@@ -44,5 +44,11 @@ public:
         : std::runtime_error("Invalid bid value: " + bidValue) {}
 };
 
+class WrongPasswordException : public std::runtime_error {
+public:
+    WrongPasswordException(const std::string& password)
+        : std::runtime_error("Wrong password: " + password) {}
+};
+
 
 
