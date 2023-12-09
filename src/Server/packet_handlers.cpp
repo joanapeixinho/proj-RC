@@ -339,6 +339,59 @@ void handle_list_auctions(std::stringstream &buffer, Address &addr_from,
 
 }
 
+void handle_show_record(std::stringstream &buffer, Address &addr_from,
+                        AuctionServerState &state)
+{
+  ShowRecordServerbound packet;
+  ReplyShowRecordClientbound response;
+
+  try
+  {
+    packet.deserialize(buffer);
+    state.cdebug << userTag(packet.user_id) << "Asked to show record"
+                 << std::endl;
+
+    UserData user(packet.user_id, state.file_manager);
+    std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions("ENDED");
+    response.status = ReplyShowRecordClientbound::OK;
+    response.auctions = auctions;
+    
+  }
+  catch (UserNotLoggedInException) {
+    response.status = ReplyShowRecordClientbound::NLG;
+    state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+  }
+  catch(UserHasNoAuctionsException &e) {
+    response.status = ReplyShowRecordClientbound::NOK;
+    state.cdebug << userTag(packet.user_id) << "User has no auctions" << std::endl;
+  }
+  catch (FileOpenException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    response.status = ReplyShowRecordClientbound::ERR;
+  }
+  catch (FileWriteException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    response.status = ReplyShowRecordClientbound::ERR;
+  }
+  catch (FileReadException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    response.status = ReplyShowRecordClientbound::ERR;
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << "[ShowRecord] There was an unhandled exception that prevented "
+                 "the server from showing record:"
+              << e.what() << std::endl;
+    return;
+  }
+
+  send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr, addr_from.size);
+
+}
+
   // TCP
 
   void handle_open_auction(int connection_fd, AuctionServerState &state)
