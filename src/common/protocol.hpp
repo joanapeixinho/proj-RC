@@ -260,11 +260,11 @@ class ReplyShowRecordClientbound : public UdpPacket {
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RRC";
   status status;
+
   AuctionData auction_data;
   // Bids Info
   std::vector<Bid> bids;
   // If the auction is closed Info
-  bool is_active;
   std::string end_date_time;
   uint32_t end_sec_time;
 

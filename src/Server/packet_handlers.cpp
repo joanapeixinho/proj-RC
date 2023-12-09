@@ -351,8 +351,13 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
     state.cdebug << auctionTag(packet.auction_id) << "Asked to show record"
                  << std::endl;
 
-    state.file_manager.getAuctionRecord(std::to_string(packet.auction_id));
+    AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
 
+    std::vector<Bid> bids = auction.getBids();
+
+    if (!auction.isActive()){
+      response.end_date_time = auction.getEndTime();
+    }
     
     response.status = ReplyShowRecordClientbound::OK;
 

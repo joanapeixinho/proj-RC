@@ -206,13 +206,14 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
     safeLockUser(userId, [&]() {
         for (const auto& entry : std::filesystem::directory_iterator(USER_DIR + '/' + userId + '/' + directory)) {
             //update auction
-            UpdateAuction(entry.path().filename().string());
-
-            //add auction to list
             std::string auctionId = entry.path().filename().string();
+            UpdateAuction(auctionId);
+
+            //check if auction is active
             bool isActive = AuctionActive(auctionId);
             uint32_t intAuctionId = std::stoi(auctionId);
 
+            //add to list
             auctionList.push_back(std::make_pair(intAuctionId, isActive));
         }
     });
@@ -225,14 +226,14 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions() {
     for (const auto& entry : std::filesystem::directory_iterator(AUCTION_DIR)) {
         if (std::filesystem::is_directory(entry.status())) {
             //update auction
-            UpdateAuction(entry.path().filename().string());
-
-            //add auction to list
             std::string auctionId = entry.path().filename().string();
-            bool isActive = AuctionActive(auctionId);
-            uint32_t intAuctionId = std::stoi(auctionId);
+            safeLockAuction(auctionId, [&]() {
+                UpdateAuction(auctionId);
+                bool isActive = AuctionActive(auctionId);
+                uint32_t intAuctionId = std::stoi(auctionId);
 
-            auctionList.push_back(std::make_pair(intAuctionId, isActive));
+                auctionList.push_back(std::make_pair(intAuctionId, isActive));
+            });
         }
     }
 
@@ -243,22 +244,28 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions() {
     return auctionList;
 }
 
-std::string FileManager::getAuctionRecord (const std::string& auctionId) {
+AuctionData FileManager::getAuction (const std::string& auctionId) {
+
+    //update Auction
+    safeLockAuction(auctionId, [&]() {
+        UpdateAuction(auctionId);
+    });
+
     std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
-    std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
-    std::string assetFile = readFromFile("ASSET (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
-    std::string bidsDir = AUCTION_DIR + '/' + auctionId + "/BIDS";
-    std::vector<std::string> bids;
-    for (const auto& entry : std::filesystem::directory_iterator(bidsDir)) {
-        bids.push_back(readFromFile(entry.path().filename().string(), bidsDir));
+    std::stringstream ss(startFile);
+    std::string token;
+    std::vector<std::string> tokens;
+    while (std::getline(ss, token, ' ')) {
+        tokens.push_back(token);
     }
-    std::cout << "START FILE: " << startFile << std::endl;
-    std::cout << "END FILE: " << endFile << std::endl;
-    std::cout << "ASSET FILE: " << assetFile << std::endl;
-    std::cout << "BIDS: " << std::endl;
-    for (const auto& bid : bids) {
-        std::cout << bid << std::endl;
-    }
+    std::string name = tokens[0];
+    double initialBid = std::stod(tokens[2]);
+    int durationSeconds = std::stoi(tokens[4]);
+    std::time_t startTime = std::stol(tokens[6]);
+    std::string assetFname = readFromFile("ASSET (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
+    std::time_t endTime = startTime + durationSeconds;
+    AuctionData data(std::stoi(auctionId), name, initialBid, durationSeconds, assetFname);
+    return data;
 }
 
 void FileManager::openAuction(const std::string& userId, const AuctionData& data) {
