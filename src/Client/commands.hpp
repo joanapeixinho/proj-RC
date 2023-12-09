@@ -80,9 +80,12 @@ class BidCommand : public CommandHandler {
 
 class HelpCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
+  CommandManager& manager;
 
  public:
-  HelpCommand() : CommandHandler("info", "sng", "UID", "Help Auction") {}
+  HelpCommand(CommandManager& __manager)
+      : CommandHandler("help", "?", std::nullopt, "Show command list"),
+        manager(__manager) {}
 };
 
 
