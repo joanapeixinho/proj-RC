@@ -25,6 +25,9 @@
 #define AUCTION_ID_MAX_LEN (3)
 #define AUCTION_MAX_NUMBER (999)
 
+#define BID_MAX_LEN (6)
+#define BID_MAX_VALUE (999999)
+
 #define ASSETS_RELATIVE_DIRERCTORY "./../../ASSETS/"
 
 #define EXCEPTION_RETRY_MAX (3)
