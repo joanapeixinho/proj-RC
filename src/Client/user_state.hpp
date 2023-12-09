@@ -25,7 +25,7 @@ class UserState {
   UserState(std::string& hostname, std::string& port);
   ~UserState();
   bool isLoggedIn();
-  void login(u_int32_t id, std::string& pwd);
+  void login (uint32_t, std::string& pwd);
   void logout();
   void sendUdpPacketAndWaitForReply(UdpPacket& out_packet,
                                     UdpPacket& in_packet);
