@@ -239,10 +239,33 @@ class MyAuctionsServerbound : public UdpPacket {
   static constexpr const char *ID = "LMA";
   uint32_t user_id;
 
-  void send(int fd);
-  void receive(int fd);
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
 };
 
+class ShowRecordServerbound : public UdpPacket {
+ public:
+  static constexpr const char *ID = "SRD";
+  uint32_t user_id;
+  uint32_t auction_id;
+
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
+
+class ReplyShowRecordClientbound : public UdpPacket {
+ public:
+  enum status { OK, NOK, NLG };
+  static constexpr const char *ID = "RRD";
+  status status;
+  std::string auction_name;
+  std::string file_path;
+  uint32_t start_value;
+  uint32_t time_active;
+
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
 
 class TcpPacket {
  private:
