@@ -12,6 +12,8 @@
 #include <vector>
 
 #include "constants.hpp"
+#include "file_manager.hpp"
+#include "../Server/auction_data.hpp"
 
 // Thrown when the PacketID does not match what was expected
 class UnexpectedPacketException : public std::runtime_error {
@@ -252,12 +254,6 @@ class ShowRecordServerbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-struct Bid {
-  uint32_t bidder_user_id;
-  uint32_t bid_value;
-  std::string date_time;
-  uint32_t sec_time;
-};
 
 class ReplyShowRecordClientbound : public UdpPacket {
  public:
