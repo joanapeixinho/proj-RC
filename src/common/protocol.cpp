@@ -216,6 +216,7 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
 };
 
 
+
 std::stringstream ErrorUdpPacket::serialize() {
   std::stringstream buffer;
   buffer << ErrorUdpPacket::ID << std::endl;

@@ -116,5 +116,10 @@ public:
         : std::runtime_error("No auctions: ") {}
 };
 
+class AuctionDoesNotExistException : public std::runtime_error {
+public:
+    AuctionDoesNotExistException(const std::string& auctionId)
+        : std::runtime_error("Auction does not exist: " + auctionId) {}
+};
 
 

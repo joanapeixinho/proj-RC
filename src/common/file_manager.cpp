@@ -243,6 +243,24 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions() {
     return auctionList;
 }
 
+std::string FileManager::getAuctionRecord (const std::string& auctionId) {
+    std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
+    std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
+    std::string assetFile = readFromFile("ASSET (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
+    std::string bidsDir = AUCTION_DIR + '/' + auctionId + "/BIDS";
+    std::vector<std::string> bids;
+    for (const auto& entry : std::filesystem::directory_iterator(bidsDir)) {
+        bids.push_back(readFromFile(entry.path().filename().string(), bidsDir));
+    }
+    std::cout << "START FILE: " << startFile << std::endl;
+    std::cout << "END FILE: " << endFile << std::endl;
+    std::cout << "ASSET FILE: " << assetFile << std::endl;
+    std::cout << "BIDS: " << std::endl;
+    for (const auto& bid : bids) {
+        std::cout << bid << std::endl;
+    }
+}
+
 void FileManager::openAuction(const std::string& userId, const AuctionData& data) {
     
     std::string auctionId = data.getId();

@@ -348,36 +348,33 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to show record"
+    state.cdebug << auctionTag(packet.auction_id) << "Asked to show record"
                  << std::endl;
 
-    UserData user(packet.user_id, state.file_manager);
-    std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions("ENDED");
-    response.status = ReplyShowRecordClientbound::OK;
-    response.auctions = auctions;
+    state.file_manager.getAuctionRecord(std::to_string(packet.auction_id));
+
     
-  }
-  catch (UserNotLoggedInException) {
-    response.status = ReplyShowRecordClientbound::NLG;
-    state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
-  }
-  catch(UserHasNoAuctionsException &e) {
+    response.status = ReplyShowRecordClientbound::OK;
+
+    // TO DO adicionar mais coisas à response
+    
+    
+  } catch (AuctionDoesNotExistException){
+    state.cdebug << auctionTag(packet.auction_id) << "Auction does not exist" << std::endl;
     response.status = ReplyShowRecordClientbound::NOK;
-    state.cdebug << userTag(packet.user_id) << "User has no auctions" << std::endl;
-  }
-  catch (FileOpenException &e)
+  } catch (FileOpenException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    state.cdebug << auctionTag(packet.auction_id) << "Failed to open file" << std::endl;
     response.status = ReplyShowRecordClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    state.cdebug << auctionTag(packet.auction_id) << "Failed to write to file" << std::endl;
     response.status = ReplyShowRecordClientbound::ERR;
   }
   catch (FileReadException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    state.cdebug << auctionTag(packet.auction_id)  << "Failed to read from file" << std::endl;
     response.status = ReplyShowRecordClientbound::ERR;
   }
   catch (std::exception &e)
