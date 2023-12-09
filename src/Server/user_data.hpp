@@ -9,6 +9,7 @@
 class UserData {
 public:
     UserData(uint32_t id, const std::string& password);
+    UserData(const std::string& id);
     UserData();
     
     int getId() const;

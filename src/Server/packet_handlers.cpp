@@ -182,6 +182,64 @@ void handle_unregister_user(std::stringstream &buffer, Address &addr_from,
   send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr, addr_from.size);
 }
 
+
+void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
+                        AuctionServerState &state)
+
+{
+  ListMyAuctionsServerbound packet;
+  ReplyListMyAuctionsClientbound response;
+
+  try
+  {
+    packet.deserialize(buffer);
+    state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
+                 << std::endl;
+
+    UserData user(packet.user_id);
+    std::string auctions = user.listMyAuctions();
+    response.status = ReplyListMyAuctionsClientbound::OK;
+    response.auctions = auctions;
+    state.cdebug << userTag(packet.user_id) << "User logged out" << std::endl;
+  
+    // duvida -> aqui é suposto verificar a password????
+  }
+  catch (UserNotRegisteredException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
+    response.status = ReplyListMyAuctionsClientbound::UNR;
+  }
+  catch (UserNotLoggedInException) {
+    response.status = ReplyListMyAuctionsClientbound::NOK;
+    state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+  }
+  catch (FileOpenException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    response.status = ReplyListMyAuctionsClientbound::ERR;
+  }
+  catch (FileWriteException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    response.status = ReplyListMyAuctionsClientbound::ERR;
+  }
+  catch (FileReadException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    response.status = ReplyListMyAuctionsClientbound::ERR;
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << "[ListMyAuctions] There was an unhandled exception that prevented "
+                 "the server from listing auctions:"
+              << e.what() << std::endl;
+    return;
+  }
+
+
+
+
+
   // TCP
 
   void handle_open_auction(int connection_fd, AuctionServerState &state)

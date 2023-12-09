@@ -22,6 +22,9 @@ UserData::UserData(uint32_t id, const std::string& password)
 
     }
 
+UserData::UserData(const std::string& id)
+    : id(std::stoi(id)) {}
+
 UserData::UserData() : id(NULL), password("") {}
 
 int UserData::getId() const {
