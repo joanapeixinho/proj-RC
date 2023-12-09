@@ -1,15 +1,8 @@
 #include "auction_data.hpp"
 
 
-// Open a new auction. The User application sends a message to the AS asking to open
-// a new auction, providing a short description name (represented with up to 10
-// alphanumerical characters), an image (or other document file) of the asset to sell, the
-// start value (represented with up to 6 digits), and the duration of the auction in
-// seconds (represented with up to 5 digits). In reply, the AS informs if the request was
-// successful, and the assigned auction identifier, AID, a 3-digit numbe
-
- AuctionData(const uint32_t, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname)
-        : id(id), name(name), initialBid(initialBid), durationSeconds(durationSeconds), assetFname(assetFname)
+ AuctionData::AuctionData(uint32_t id, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname)
+        : id(id), name(name), initialBid(initialBid), durationSeconds(durationSeconds), assetFname(assetFname), endTime(startTime + durationSeconds)
     {
         startTime = std::time(nullptr);
 
@@ -24,11 +17,7 @@
         if (durationSeconds < 0 || durationSeconds > AUCTION_DURATION_MAX_VALUE) {
             throw InvalidAuctionDurationException(std::to_string(durationSeconds));
         }
-
-        if (assetFname.length() > AUCTION_ASSET_MAX_LENGTH) {
-            throw InvalidAuctionAssetException(assetFname);
-        }
-
+        
         //reached maximum auctions number
 
         if (id > AUCTION_MAX_NUMBER) {
@@ -43,8 +32,8 @@ std::string AuctionData :: getId() const {
         return oss.str();
     }
 
-const std::string& AuctionData::getItemName() const {
-    return itemName;
+const std::string& AuctionData::getName() const {
+    return name;
 }
 
 double AuctionData::getInitialBid() const {
@@ -58,7 +47,7 @@ int AuctionData::getDurationSeconds() const {
 std::string AuctionData::toString() const {
     std::stringstream ss;
     ss << std::setw(6) << std::setfill('0') << id << " "; // UID
-    ss << itemName << " "; // name
+    ss << name << " "; // name
     ss << assetFname << " "; // asset fname
     ss << initialBid << " "; // start value
     ss << durationSeconds << " "; // timeactive
@@ -76,10 +65,10 @@ std::time_t AuctionData::getStartTime() const {
 }
 
 std::time_t AuctionData::getEndTime() const {
-    return startTime + durationSeconds;
+    return endTime;
 }
 
-std::string getAssetFname() const {
-    return assetFname;
+bool AuctionData::isActive() const {
+    
 }
 

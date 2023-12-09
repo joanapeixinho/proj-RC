@@ -16,14 +16,16 @@ public:
     std::string getId() const;
     std::string toString() const; 
     std::string getAssetFname() const;   
-
-
-
+    const std::string& getName() const;
+    double getInitialBid() const;
+    int getDurationSeconds() const;
+    std::time_t getStartTime() const;
+    std::time_t getEndTime() const;
+    bool isActive() const;
 
 private:
     int id;
-    int nextId;
-    std::string itemName;
+    std::string name;
     double initialBid;
     int durationSeconds;
     std::time_t startTime;

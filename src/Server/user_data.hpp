@@ -17,6 +17,7 @@ public:
     void logout();
     void registerUser();
     void unregisterUser();
+    void listMyAuctions();
     void openAuction (const AuctionData& data);
 
 private:

@@ -43,18 +43,21 @@ public:
     static void safeLockAuction(const std::string& auctionId, std::function<void()> func);
     static bool UserLoggedIn(const std::string& userId);
     static bool UserRegistered(const std::string& userId);
+    static bool AuctionActive(const std::string& auctionId);
+    static void UpdateAuction(const std::string& auctionId);
     static std::string getUserPassword(const std::string& userId);
     static void loginUser(const std::string& userId);
     static void logoutUser(const std::string& userId);
     static void FileManager::registerUser(const std::string& userId, const std::string& password);
     static void FileManager::unregisterUser(const std::string& userId);
+    static std::string FileManager::getUserAuctions(const std::string& userId);
+    static void FileManager::listAllAuctions(const std::string& userId);
     static void FileManager::openAuction(const std::string& userId, const AuctionData& data);
-    static void FileManager::closeAuction(const std::string& userId, const std::string& auctionId);    
-
+    static void FileManager::closeAuction(const std::string& userId, const std::string& auctionId);
 
 private:
-    std::map<std::string, std::mutex> userMutexes;
-    std::map<std::string, std::mutex> auctionMutexes;
+    static std::map<std::string, std::mutex> userMutexes;
+    static std::map<std::string, std::mutex> auctionMutexes;
 };
 
 #endif
