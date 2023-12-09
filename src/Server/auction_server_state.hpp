@@ -12,10 +12,13 @@
 #include <mutex>
 #include <unordered_map>
 
-#include "auction_server.hpp"
+
 #include "../common/protocol.hpp"
 #include "../common/exceptions.hpp"
 #include "../common/file_manager.hpp"
+#include "../common/constants.hpp"
+#include "../Server/auction_data.hpp"
+#include "../Server/user_data.hpp"
 
 class Address {
  public:
