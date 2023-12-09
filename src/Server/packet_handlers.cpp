@@ -4,8 +4,6 @@
 #include <iomanip>
 #include <iostream>
 
-#include "../common/protocol.hpp"
-
 // UDP
 
 void handle_login_user(std::stringstream &buffer, Address &addr_from,
