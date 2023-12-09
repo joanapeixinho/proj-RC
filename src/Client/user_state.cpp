@@ -25,30 +25,19 @@ UserState::~UserState() {
   if (this->server_tcp_addr != NULL) {
     freeaddrinfo(this->server_tcp_addr);
   }
-  this->logged_in = false;
 }
 
-/*
-bool userState::hasActiveAuction() {
-  return hasAuction() && this->Auction->isOnGoing();
-}
-
-bool userState::hasAuction() {
-  return this->Auction != NULL;
-}
-*/
-
-void UserState::login(uint32_t user_id, std::string &password) {
-  this->user_id = user_id;
-  this->password = password;
+void UserState::login(uint32_t id, std::string &pwd) {
+  this->user_id = id;
+  this->password = pwd;
 }
 
 bool UserState::isLoggedIn() {
-  return this->user_id != -1;
+  return this->user_id != 0;
 }
 
 void UserState::logout() {
-  this->user_id = -1;
+  this->user_id = 0;
   this->password = "";
 }
 

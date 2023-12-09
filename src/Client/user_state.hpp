@@ -22,25 +22,19 @@ class UserState {
   void closeTcpSocket();
 
  public:
-  // ClientGame* game = NULL;
-  uint32_t user_id = -1;
-  std::string password = "";
-
   UserState(std::string& hostname, std::string& port);
   ~UserState();
   bool isLoggedIn();
-  
-  // ClientAuction* Auction = NULL;
-
-  // bool hasActiveAuction();
-  // bool hasAuction();
-  // void startAuction();
-  void login(u_int32_t user_id, std::string& password);
+  void login(u_int32_t id, std::string& pwd);
   void logout();
   void sendUdpPacketAndWaitForReply(UdpPacket& out_packet,
                                     UdpPacket& in_packet);
   void sendTcpPacketAndWaitForReply(TcpPacket& out_packet,
                                     TcpPacket& in_packet);
+  private:
+    uint32_t user_id;
+    std::string password;                                 
 };
+
 
 #endif

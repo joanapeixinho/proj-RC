@@ -2,20 +2,20 @@ CC = g++
 CXX = g++
 LD = g++
 
-INCLUDE_DIRS := src/client src/server src/
+INCLUDE_DIRS := src/Client src/Server src/
 INCLUDES = $(addprefix -I, $(INCLUDE_DIRS))
 
-TARGETS = src/client/player src/server/server
+TARGETS = src/Client/User src/Server/server
 TARGET_EXECS = player GS
 
-CLIENT_SOURCES := $(wildcard src/client/*.cpp)
+CLIENT_SOURCES := $(wildcard src/Client/*.cpp)
 COMMON_SOURCES := $(wildcard src/common/*.cpp)
-SERVER_SOURCES := $(wildcard src/server/*.cpp)
+SERVER_SOURCES := $(wildcard src/Server/*.cpp)
 SOURCES := $(CLIENT_SOURCES) $(COMMON_SOURCES) $(SERVER_SOURCES)
 
-CLIENT_HEADERS := $(wildcard src/client/*.hpp)
+CLIENT_HEADERS := $(wildcard src/Client/*.hpp)
 COMMON_HEADERS := $(wildcard src/common/*.hpp)
-SERVER_HEADERS := $(wildcard src/server/*.hpp)
+SERVER_HEADERS := $(wildcard src/Server/*.hpp)
 HEADERS := $(CLIENT_HEADERS) $(COMMON_HEADERS) $(SERVER_HEADERS)
 
 CLIENT_OBJECTS := $(CLIENT_SOURCES:.cpp=.o)
