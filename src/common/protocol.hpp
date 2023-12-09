@@ -260,13 +260,7 @@ class ReplyShowRecordClientbound : public UdpPacket {
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RRC";
   status status;
-  // Auction Info
-  uint32_t host_user_id;
-  std::string auction_name;
-  std::string asset_fname;
-  uint32_t start_value;
-  std::string start_date_time;
-  uint32_t time_active;
+  AuctionData auction_data;
   // Bids Info
   std::vector<Bid> bids;
   // If the auction is closed Info
