@@ -5,13 +5,14 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
+#include <vector>
 
 #include "../common/constants.hpp"
 #include "../common/file_manager.hpp"
 
 class AuctionData {
 public:
-    AuctionData(uint32_t id, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname);
+    AuctionData(uint32_t id, uint32_t uid, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, std::time_t endTimeSec , std::time_t startTime, std::vector<Bid> bids);
     void openAuction();
     std::string getId() const;
     std::string toString() const; 
@@ -25,12 +26,15 @@ public:
 
 private:
     int id;
+    int uid;
     std::string name;
     double initialBid;
     int durationSeconds;
     std::time_t startTime;
     std::string assetFname;
     std::time_t endTime;
+    std::time_t endTimeSec;
+    std::vector<Bid> bids;
 };
 
 struct Bid {

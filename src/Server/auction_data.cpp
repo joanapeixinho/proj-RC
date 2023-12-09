@@ -1,8 +1,11 @@
 #include "auction_data.hpp"
 
 
- AuctionData::AuctionData(uint32_t id, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname)
-        : id(id), name(name), initialBid(initialBid), durationSeconds(durationSeconds), assetFname(assetFname), endTime(startTime + durationSeconds)
+ AuctionData::AuctionData(uint32_t id, uint32_t uid , std::string& name,
+                             double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, std::time_t endTimeSec, std::time_t startTime
+                             , std::vector<Bid> bids)
+                             : id(id), uid(uid), name(name), initialBid(initialBid), durationSeconds(durationSeconds), 
+        assetFname(assetFname), endTime(endTime), endTimeSec(endTimeSec), startTime(startTime), bids(bids)
     {
         startTime = std::time(nullptr);
 

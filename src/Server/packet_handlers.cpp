@@ -351,12 +351,11 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
     state.cdebug << auctionTag(packet.auction_id) << "Asked to show record"
                  << std::endl;
 
-    state.file_manager.getAuctionRecord(std::to_string(packet.auction_id));
-
+    AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
     
     response.status = ReplyShowRecordClientbound::OK;
+    response.auction = auction;
 
-    // TO DO adicionar mais coisas à response
     
     
   } catch (AuctionDoesNotExistException){
@@ -405,7 +404,11 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
         
         UserData user(packet.user_id, state.file_manager);
 
-        AuctionData auction(state.auctionsCount++, packet.auction_name, packet.start_value, packet.time_active, packet.file_name);
+        //start auction with time now in format YYYY-MM-DD HH:MM:SS
+
+        time_t now = time(0);
+
+        AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, 0, 0, now , std::vector<Bid>());
 
         user.openAuction(auction);
 

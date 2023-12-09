@@ -223,6 +223,10 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream ReplyShowRecordClientbound::serialize() {
+   //TODO
+};
+
 
 
 std::stringstream ErrorUdpPacket::serialize() {
