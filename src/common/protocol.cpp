@@ -421,7 +421,7 @@ void ReplyOpenAuctionClientbound::send(int fd) {
 
   if (status == OK) {
     stream << "OK ";
-    stream << file_name << " " << file_data.length() << " " << file_data;
+    //stream << file_name << " " << file_data.length() << " " << file_data;
   } else if (status == NLG) {
     stream << "NLG";
   } else {

@@ -49,14 +49,14 @@ public:
     std::string getUserPassword(const std::string& userId);
     void loginUser(const std::string& userId);
     void logoutUser(const std::string& userId);
-    void FileManager::registerUser(const std::string& userId, const std::string& password);
-    void FileManager::unregisterUser(const std::string& userId);
+    void registerUser(const std::string& userId, const std::string& password);
+    void unregisterUser(const std::string& userId);
     std::vector<std::pair<uint32_t, bool>> getUserAuctions(const std::string& userId, const std::string& directory); 
     std::vector<std::pair<uint32_t, bool>> getAllAuctions();   
     AuctionData getAuction(const std::string& auctionId);
     std::vector<Bid> getAuctionBids(const std::string& auctionId);
-    void FileManager::openAuction(const std::string& userId, const AuctionData& data);
-    void FileManager::closeAuction(const std::string& userId, const std::string& auctionId);
+    void openAuction(const std::string& userId, const AuctionData& data);
+    void closeAuction(const std::string& userId, const std::string& auctionId);
 
 private:
     std::map<std::string, std::mutex> userMutexes;

@@ -10,6 +10,14 @@
 #include "../common/constants.hpp"
 #include "../common/file_manager.hpp"
 
+
+struct Bid {
+  uint32_t bidder_user_id;
+  uint32_t bid_value;
+  std::string date_time;
+  uint32_t sec_time;
+};
+
 class AuctionData {
 public:
     AuctionData(uint32_t id, uint32_t uid, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, std::time_t endTimeSec , std::time_t startTime, std::vector<Bid> bids);
@@ -37,11 +45,6 @@ private:
     std::vector<Bid> bids;
 };
 
-struct Bid {
-  uint32_t bidder_user_id;
-  uint32_t bid_value;
-  std::string date_time;
-  uint32_t sec_time;
-};
+
 
 #endif  // AUCTIONDATA_HPP
