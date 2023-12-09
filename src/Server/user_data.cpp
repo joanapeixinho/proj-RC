@@ -35,7 +35,7 @@ const std::string& UserData::getPassword() const {
 
 void UserData::login() {
   
-    if (FileManager::UserInDir(std::to_string(this->id))) {
+    if (FileManager::UserRegistered(std::to_string(this->id))) {
         std::string userPassword = FileManager::getUserPassword(std::to_string(this->id));
         if (userPassword == this->password) {
             FileManager::loginUser(std::to_string(this->id));
@@ -44,22 +44,36 @@ void UserData::login() {
         }
     } else {
         registerUser();
+        FileManager::loginUser(std::to_string(this->id));
         throw UserNotRegisteredException(std::to_string(this->id));
     }
 }
 
 void UserData::logout() {
 
-    if (!FileManager::UserInDir(std::to_string(this->id))) {
+    if (!FileManager::UserRegistered(std::to_string(this->id))) {
         throw UserNotRegisteredException(std::to_string(this->id));
+    } else if (!FileManager::UserLoggedIn(std::to_string(this->id))) {
+        throw UserNotLoggedInException(std::to_string(this->id));
+    } else {
+         FileManager::logoutUser(std::to_string(this->id));
     }
-    FileManager::logoutUser(std::to_string(this->id));
+   
 }
 
 void UserData::registerUser() {
 
     std::string idString = std::to_string(id);
     FileManager::registerUser(idString, password);
+}
+
+void UserData::unregisterUser() {
+
+    if (!FileManager::UserRegistered(std::to_string(this->id))) {
+        throw UserNotRegisteredException(std::to_string(this->id));
+    }
+    std::string idString = std::to_string(id);
+    FileManager::unregisterUser(idString);
 }
 
 

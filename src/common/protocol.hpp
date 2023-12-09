@@ -147,7 +147,7 @@ class UnregisterServerbound : public UdpPacket {
 // Reply to Unregister Packet (RUN)
 class ReplyUnregisterClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, UNR };
+  enum status { OK, NOK, UNR, ERR };
   static constexpr const char *ID = "RUN";
   status status;
   std::stringstream serialize();

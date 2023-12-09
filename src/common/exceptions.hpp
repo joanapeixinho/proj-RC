@@ -32,6 +32,12 @@ public:
         : std::runtime_error("User not registered: " + userId) {}
 };
 
+class UserNotLoggedInException : public std::runtime_error {
+public:
+    UserNotLoggedInException(const std::string& userId)
+        : std::runtime_error("User not logged in: " + userId) {}
+};
+
 class UserPasswordException : public std::runtime_error {
 public:
     UserPasswordException(const std::string& userPassword)

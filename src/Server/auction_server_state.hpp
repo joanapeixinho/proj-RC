@@ -79,7 +79,6 @@ class AuctionServerState {
   struct addrinfo* server_udp_addr = NULL;
   struct addrinfo* server_tcp_addr = NULL;
   DebugStream cdebug;
-  UserData loggedInUser;
   int auctionsCount = 0;
 
 

@@ -72,9 +72,6 @@ void FileManager::createUserDirectory(const std::string& userId) {
 
 }
 
-void FileManager::removeUserDirectory(const std::string& userId) {
-    std::filesystem::remove(std::string(USER_DIR) + "/" + userId);
-}
 
 void FileManager:: createUserPassFile(const std::string& userId, const std::string& password) {
     std::ofstream file(USER_DIR + '/' + userId + "_pass.txt");
@@ -149,12 +146,16 @@ std::string FileManager::getUserPassword(const std::string& userId) {
 }
 
 
-bool FileManager::UserInDir(const std::string& userId) {
-    return std::filesystem::exists(USER_DIR + '/' + userId);
+bool FileManager::UserLoggedIn(const std::string& userId) {
+    return std::filesystem::exists(USER_DIR + '/' + userId + "_login.txt");
+}
+
+bool FileManager::UserRegistered(const std::string& userId) {
+    return std::filesystem::exists(USER_DIR + '/' + userId + "_pass.txt");
 }
 
 std::string FileManager::getUserPassword(const std::string& userId) {
-    if (std::filesystem::exists(USER_DIR + '/' + userId + "_pass.txt")) {
+    if (UserRegistered (userId)) {
         return readFromFile(userId + "_pass.txt", USER_DIR);
     }
 }
@@ -175,15 +176,16 @@ void FileManager::logoutUser(const std::string& userId) {
 
 
  void FileManager::registerUser(const std::string& userId, const std::string& password) {
+    
+    
     safeLockUser(userId, [&]() {
     createUserDirectory(userId);
     });
+
     safeLockUser(userId, [&]() {
     createUserPassFile(userId, password);
     });
-    safeLockUser(userId, [&]() {
-    createUserLoginFile(userId);
-    });
+
 }
 
 void FileManager::unregisterUser(const std::string& userId) {
