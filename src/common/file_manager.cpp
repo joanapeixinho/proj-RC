@@ -193,10 +193,10 @@ void FileManager::unregisterUser(const std::string& userId) {
 }
 
 
-std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::string& userId) {
+std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::string& userId, const std::string& directory) {
     std::vector<std::pair<uint32_t, bool>> auctionList;
     safeLockUser(userId, [&]() {
-        for (const auto& entry : std::filesystem::directory_iterator(USER_DIR + '/' + userId + "/HOSTED")) {
+        for (const auto& entry : std::filesystem::directory_iterator(USER_DIR + '/' + userId + '/' + directory)) {
             //update auction
             UpdateAuction(entry.path().filename().string());
 

@@ -52,7 +52,7 @@ public:
     static void logoutUser(const std::string& userId);
     static void FileManager::registerUser(const std::string& userId, const std::string& password);
     static void FileManager::unregisterUser(const std::string& userId);
-    static std::vector<std::pair<uint32_t, bool>> getUserAuctions(const std::string& userId);    static void FileManager::listAllAuctions(const std::string& userId);
+    static std::vector<std::pair<uint32_t, bool>> getUserAuctions(const std::string& userId, const std::string& directory);    
     static void FileManager::openAuction(const std::string& userId, const AuctionData& data);
     static void FileManager::closeAuction(const std::string& userId, const std::string& auctionId);
 

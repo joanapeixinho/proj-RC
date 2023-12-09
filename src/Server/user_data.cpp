@@ -81,12 +81,12 @@ void UserData::openAuction (const AuctionData& data) {
     FileManager::openAuction(idString, data);
 }
 
-std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions() {
+std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions( const std::string& directory) {
     std::vector<std::pair<uint32_t, bool>> auctions;
     if(FileManager::UserLoggedIn(std::to_string(this->id))) {
         std::string idString = std::to_string(id);
 
-        auctions = FileManager::getUserAuctions(idString);
+        auctions = FileManager::getUserAuctions(idString, directory);
         
         if (auctions.empty()) {
             throw UserHasNoAuctionsException(idString);

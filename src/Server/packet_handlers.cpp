@@ -193,11 +193,11 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
+    state.cdebug << userTag(packet.user_id) << "Asked to list auctions"
                  << std::endl;
 
     UserData user(packet.user_id);
-    std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions();
+    std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions("HOSTED");
     response.status = ReplyListMyAuctionsClientbound::OK;
     response.auctions = auctions;
     
@@ -232,9 +232,63 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
               << e.what() << std::endl;
     return;
   }
+
+  send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr, addr_from.size);
 }
 
+void handle_list_mybids(std::stringstream &buffer, Address &addr_from,
+                        AuctionServerState &state)
 
+{
+  MyBidsServerbound packet;
+  ReplyMyBidsClientbound response;
+
+  try
+  {
+    packet.deserialize(buffer);
+    state.cdebug << userTag(packet.user_id) << "Asked to list bids"
+                 << std::endl;
+
+    UserData user(packet.user_id);
+    std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions("BIDDED");
+    response.status = ReplyMyBidsClientbound::OK;
+    response.auctions = auctions;
+    
+  }
+  catch (UserNotLoggedInException) {
+    response.status = ReplyMyBidsClientbound::NLG;
+    state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+  }
+  catch(UserHasNoAuctionsException &e) {
+    response.status = ReplyMyBidsClientbound::NOK;
+    state.cdebug << userTag(packet.user_id) << "User has no bids" << std::endl;
+  }
+  catch (FileOpenException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    response.status = ReplyMyBidsClientbound::ERR;
+  }
+  catch (FileWriteException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    response.status = ReplyMyBidsClientbound::ERR;
+  }
+  catch (FileReadException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    response.status = ReplyMyBidsClientbound::ERR;
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << "[ListMyBids] There was an unhandled exception that prevented "
+                 "the server from listing auctions:"
+              << e.what() << std::endl;
+    return;
+  }
+
+  send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr, addr_from.size);
+
+}
 
   // TCP
 

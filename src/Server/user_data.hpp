@@ -18,7 +18,7 @@ public:
     void logout();
     void registerUser();
     void unregisterUser();
-    std::vector <std::pair<uint32_t, bool>> listMyAuctions();
+    std::vector <std::pair<uint32_t, bool>> listMyAuctions(const std::string& directory);
     void openAuction (const AuctionData& data);
 
 private:
