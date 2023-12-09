@@ -13,6 +13,9 @@
 #include <unordered_map>
 
 #include "auction_server.hpp"
+#include "../common/protocol.hpp"
+#include "../common/exceptions.hpp"
+#include "../common/file_manager.hpp"
 
 class Address {
  public:
@@ -80,17 +83,16 @@ class AuctionServerState {
   struct addrinfo* server_tcp_addr = NULL;
   DebugStream cdebug;
   int auctionsCount = 0;
+  FileManager& file_manager;
 
 
-  AuctionServerState ( std::string& port, bool __verbose);
+  AuctionServerState ( std::string& port, bool __verbose, FileManager& __file_manager );
   ~AuctionServerState();
   void resolveServerAddress(std::string& port);
   void registerPacketHandlers();
-  void registerWords(std::string& __word_file_path);
   void callUdpPacketHandler(std::string packet_id, std::stringstream& stream,
                             Address& addr_from);
   void callTcpPacketHandler(std::string packet_id, int connection_fd);
-  void setLoggedInUser(UserData& user);
 };
 
 /** Exceptions **/

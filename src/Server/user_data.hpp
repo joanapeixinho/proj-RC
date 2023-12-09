@@ -8,9 +8,8 @@
 
 class UserData {
 public:
-    UserData(uint32_t id, const std::string& password);
-    UserData(uint32_t id);
-    UserData();
+    UserData(uint32_t id, const std::string& password, FileManager& fileManager);
+    UserData(uint32_t id, FileManager& fileManager);
     
     int getId() const;
     const std::string& getPassword() const;
@@ -24,6 +23,7 @@ public:
 private:
     uint32_t id;
     std::string password;
+    FileManager& fileManager;
 };
 
 #endif  // USERDATA_HPP

@@ -20,7 +20,7 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                  << std::endl;
 
-    UserData user(packet.user_id, packet.password);
+    UserData user(packet.user_id, packet.password, state.file_manager);
 
     user.login();
     response.status = ReplyLoginClientbound::OK;
@@ -86,7 +86,7 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                  << std::endl;
 
-    UserData user(packet.user_id, packet.password);
+    UserData user(packet.user_id, packet.password, state.file_manager);
     user.logout();
     response.status = ReplyLogoutClientbound::OK;
     state.cdebug << userTag(packet.user_id) << "User logged out" << std::endl;
@@ -141,7 +141,7 @@ void handle_unregister_user(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                  << std::endl;
 
-    UserData user(packet.user_id, packet.password);
+    UserData user(packet.user_id, packet.password, state.file_manager);
 
     user.unregisterUser();
     response.status = ReplyUnregisterClientbound::OK;
@@ -196,7 +196,7 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "Asked to list auctions"
                  << std::endl;
 
-    UserData user(packet.user_id);
+    UserData user(packet.user_id, state.file_manager);
     std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions("HOSTED");
     response.status = ReplyListMyAuctionsClientbound::OK;
     response.auctions = auctions;
@@ -249,7 +249,7 @@ void handle_list_mybids(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "Asked to list bids"
                  << std::endl;
 
-    UserData user(packet.user_id);
+    UserData user(packet.user_id, state.file_manager);
     std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions("BIDDED");
     response.status = ReplyMyBidsClientbound::OK;
     response.auctions = auctions;
@@ -290,6 +290,55 @@ void handle_list_mybids(std::stringstream &buffer, Address &addr_from,
 
 }
 
+void handle_list_auctions(std::stringstream &buffer, Address &addr_from,
+                          AuctionServerState &state)
+{
+  ListAuctionsServerbound packet;
+  ReplyListAuctionsClientbound response;
+
+  try
+  {
+    packet.deserialize(buffer);
+    state.cdebug << "Asked to list auctions"
+                 << std::endl;
+
+    std::vector <std::pair<uint32_t, bool>> auctions = state.file_manager.getAllAuctions();
+    response.status = ReplyListAuctionsClientbound::OK;
+    response.auctions = auctions;
+    
+  }
+  
+  catch(NoAuctionsException) {
+    response.status = ReplyListAuctionsClientbound::NOK;
+    state.cdebug << "No auctions" << std::endl;
+  }
+  catch (FileOpenException &e)
+  {
+    state.cdebug <<  "Failed to open file" << std::endl;
+    response.status = ReplyListAuctionsClientbound::ERR;
+  }
+  catch (FileWriteException &e)
+  {
+    state.cdebug <<  "Failed to write to file" << std::endl;
+    response.status = ReplyListAuctionsClientbound::ERR;
+  }
+  catch (FileReadException &e)
+  {
+    state.cdebug << "Failed to read from file" << std::endl;
+    response.status = ReplyListAuctionsClientbound::ERR;
+  }
+  catch (std::exception &e)
+  {
+    std::cerr << "[ListAuctions] There was an unhandled exception that prevented "
+                 "the server from listing auctions:"
+              << e.what() << std::endl;
+    return;
+  }
+
+  send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr, addr_from.size);
+
+}
+
   // TCP
 
   void handle_open_auction(int connection_fd, AuctionServerState &state)
@@ -303,22 +352,27 @@ void handle_list_mybids(std::stringstream &buffer, Address &addr_from,
       packet.receive(connection_fd);
       state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                    << std::endl;
+        
+        UserData user(packet.user_id, state.file_manager);
 
-      if (state.loggedInUser.getId() != packet.user_id)
-      {
-        response.status = ReplyOpenAuctionClientbound::NLG;
-        state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
-      }
-      else
-      {
         AuctionData auction(state.auctionsCount++, packet.auction_name, packet.start_value, packet.time_active, packet.file_name);
 
-        state.loggedInUser.openAuction(auction);
+        user.openAuction(auction);
 
         response.status = ReplyOpenAuctionClientbound::OK;
 
         state.cdebug << userTag(packet.user_id) << "Auction started" << std::endl;
-      }
+
+    }
+    catch (UserNotLoggedInException)
+    {
+      response.status = ReplyOpenAuctionClientbound::NLG;
+      state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+    }
+    catch (UserNotRegisteredException &e)
+    {
+      state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
+      response.status = ReplyOpenAuctionClientbound::NOK;
     }
     catch (AuctionIdException &e)
     {

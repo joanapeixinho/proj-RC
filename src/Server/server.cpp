@@ -9,6 +9,8 @@
 
 #include "../common/common.hpp"
 #include "../common/protocol.hpp"
+#include "../common/exceptions.hpp"
+#include "../common/file_manager.hpp"
 
 
 extern bool is_shutting_down;
@@ -16,13 +18,15 @@ extern bool is_shutting_down;
 int main(int argc, char *argv[]) {
   try {
 
-    initServerFyleSystem();
+    // Create the directory structure
+
+    FileManager fileManager = FileManager();
+
 
     Server config(argc, argv);
 
     
-
-    AuctionServerState state(config.port, config.verbose);
+    AuctionServerState state(config.port, config.verbose, fileManager);
 
     state.registerPacketHandlers();
 
@@ -233,21 +237,4 @@ Server::Server(int argc, char *argv[]) {
   }
 
   validate_port_number(port);
-}
-
-void initServerFyleSystem () {
-    try {
-        // Create Base Directory
-        std::filesystem::create_directory(BASE_DIR);
-
-        // Create Auction Directory in Base Directory
-        std::string auctionDir = BASE_DIR + '/' + AUCTION_DIR;
-        std::filesystem::create_directory(auctionDir);
-
-        // Create User Directory in Base Directory
-        std::string userDir = BASE_DIR + '/' + USER_DIR;
-        std::filesystem::create_directory(userDir);
-    } catch (std::filesystem::filesystem_error& e) {
-        std::cerr << "Failed to create directory: " << e.what() << std::endl;
-    }
 }
