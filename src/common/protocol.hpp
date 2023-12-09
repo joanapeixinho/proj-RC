@@ -193,7 +193,7 @@ class MyBidsServerbound : public UdpPacket {
 
 class ReplyMyBidsClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, NLG , ERR};
+  enum status { OK, NOK, NLG, ERR };
   static constexpr const char *ID = "RMB";
   status status;
   std::vector<std::pair<uint32_t, bool>> auctions;
@@ -324,7 +324,7 @@ class OpenAuctionServerbound : public TcpPacket {
 
 class ReplyOpenAuctionClientbound : public TcpPacket {
  public:
-  enum status { OK, NOK, NLG };
+  enum status { OK, NOK, NLG, ERR };
   static constexpr const char *ID = "ROA";
   status status;
   uint32_t auction_id; //TODO: confirmar que é deste tipo o ID
@@ -347,7 +347,7 @@ class CloseAuctionServerbound : public TcpPacket {
 
 class ReplyCloseAuctionClientbound : public TcpPacket {
  public:
-  enum status { OK, EAU, EOW, END, NLG };
+  enum status { OK, EAU, EOW, END, NLG, ERR };
   static constexpr const char *ID = "RCL";
   status status;
 
@@ -367,7 +367,7 @@ class ShowAssetServerbound : public TcpPacket {
 
 class ReplyShowAssetClientbound : public TcpPacket {
  public:
-  enum status { OK, NOK };
+  enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RSA";
   status status;
   std::string file_name;
@@ -391,7 +391,7 @@ class BidServerbound : public TcpPacket {
 
 class ReplyBidClientbound : public TcpPacket {
  public:
-  enum status { ACC, NOK, NLG, ILG, REF };
+  enum status { ACC, NOK, NLG, ILG, REF, ERR };
   static constexpr const char *ID = "RBD";
   status status;
 
