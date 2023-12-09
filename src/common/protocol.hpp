@@ -169,7 +169,7 @@ class ListMyAuctionsServerbound : public UdpPacket {
 
 class ReplyListMyAuctionsClientbound : public UdpPacket {
  public:
-  enum status { OK, NLG, NOK };
+  enum status { OK, NLG, NOK, ERR };
   static constexpr const char *ID = "RLM";
   std::vector<std::pair<uint32_t, bool>> myAuctions;
 

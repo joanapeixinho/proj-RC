@@ -197,22 +197,18 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
                  << std::endl;
 
     UserData user(packet.user_id);
-    std::string auctions = user.listMyAuctions();
+    std::vector <std::pair<uint32_t, bool>> auctions = user.listMyAuctions();
     response.status = ReplyListMyAuctionsClientbound::OK;
     response.auctions = auctions;
-
-    //printar a lista de leiloes
     
-    
-  }
-  catch (UserNotRegisteredException &e)
-  {
-    state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
-    response.status = ReplyListMyAuctionsClientbound::UNR;
   }
   catch (UserNotLoggedInException) {
-    response.status = ReplyListMyAuctionsClientbound::NOK;
+    response.status = ReplyListMyAuctionsClientbound::NLG;
     state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+  }
+  catch(UserHasNoAuctionsException &e) {
+    response.status = ReplyListMyAuctionsClientbound::NOK;
+    state.cdebug << userTag(packet.user_id) << "User has no auctions" << std::endl;
   }
   catch (FileOpenException &e)
   {
@@ -236,8 +232,6 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
               << e.what() << std::endl;
     return;
   }
-
-
 }
 
 
