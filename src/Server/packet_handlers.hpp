@@ -23,15 +23,12 @@ class userTag {  // IOManip helper
 void handle_login_user(std::stringstream &buffer, Address &addr_from,
                        AuctionServerState &state);
 
-void handle_open_auction(std::stringstream &buffer, Address &addr_from,
-                         AuctionServerState &state);
+void handle_logout_user(std::stringstream &buffer, Address &addr_from,
+                        AuctionServerState &state);
 
 
 // TCP
-
-void handle_scoreboard(int connection_fd, AuctionServerState &state);
-
-
-void handle_state(int connection_fd, AuctionServerState &state);
+void handle_open_auction(std::stringstream &buffer, Address &addr_from,
+                         AuctionServerState &state);
 
 #endif

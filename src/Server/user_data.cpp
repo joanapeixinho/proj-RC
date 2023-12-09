@@ -22,6 +22,8 @@ UserData::UserData(uint32_t id, const std::string& password)
 
     }
 
+UserData::UserData() : id(NULL), password("") {}
+
 int UserData::getId() const {
     return id;
 }
@@ -32,12 +34,11 @@ const std::string& UserData::getPassword() const {
 
 
 void UserData::login() {
-    
   
     if (FileManager::UserInDir(std::to_string(this->id))) {
         std::string userPassword = FileManager::getUserPassword(std::to_string(this->id));
         if (userPassword == this->password) {
-            FileManager::loginUser(std::to_string(this->id), this->password);
+            FileManager::loginUser(std::to_string(this->id));
         } else {
             throw WrongPasswordException(this->password);
         }
@@ -55,7 +56,10 @@ void UserData::registerUser() {
     FileManager::registerUser(idString, password);
 }
 
-void openAuction (const AuctionData& data) {
-    FileManager::openAuction(data.getId(), std::to_string(this->id), data);
+void UserData::openAuction (const AuctionData& data) {
+    
+    std::string idString = std::to_string(id);
+
+    FileManager::openAuction(idString, data);
 }
 // Path: src/Server/user_data.hpp

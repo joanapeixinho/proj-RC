@@ -6,6 +6,9 @@
 
 #include "../common/protocol.hpp"
 
+
+//UDP
+
 void handle_login_user(std::stringstream &buffer, Address &addr_from,
                        AuctionServerState &state) {
   LoginServerbound packet;
@@ -56,6 +59,66 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
   send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr,
               addr_from.size);
 }
+
+
+void handle_logout_user(std::stringstream &buffer, Address &addr_from,
+                       AuctionServerState &state) {
+  LogoutServerbound packet;
+  ReplyLogoutClientbound response;
+
+  try {
+    packet.deserialize(buffer);
+    state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
+                 << std::endl;
+
+    UserData user(packet.user_id, packet.password);
+
+    if (user.getId() != state.loggedInUser.getId()) {
+      response.status = ReplyLogoutClientbound::NOK;
+      state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+    }
+    else
+    {
+      user.logout();
+      state.loggedInUser = UserData();
+      response.status = ReplyLogoutClientbound::OK;
+      state.cdebug << userTag(packet.user_id) << "User logged out" << std::endl;
+      
+    }
+   
+  } catch (WrongPasswordException &e) {
+    state.cdebug << userTag(packet.user_id) << "Wrong password" << std::endl;
+    response.status = ReplyLogoutClientbound::NOK;
+  } catch ( UserNotRegisteredException &e) {
+    state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
+    response.status = ReplyLogoutClientbound::UNR;
+  } catch (FileOpenException &e) {
+    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    response.status = ReplyLogoutClientbound::ERR;
+  } catch (FileWriteException &e) {
+    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    response.status = ReplyLogoutClientbound::ERR;
+  } catch (FileReadException &e) {
+    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    response.status = ReplyLogoutClientbound::ERR;
+  } catch (std::exception &e) {
+    std::cerr << "[Logout] There was an unhandled exception that prevented "
+                 "the server from logging out:"
+              << e.what() << std::endl;
+    return;
+  }
+
+  send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from 
+  .addr, addr_from.size);
+}
+
+
+
+
+
+
+
+//TCP
 
 void handle_open_auction(int connection_fd, AuctionServerState &state) {
 

@@ -126,7 +126,7 @@ class LogoutServerbound : public UdpPacket {
 // Reply to Logout Packet (RLO)
 class ReplyLogoutClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, UNR};
+  enum status { OK, NOK, UNR, ERR };
   static constexpr const char *ID = "RLI";
   status status;
   std::stringstream serialize();

@@ -42,7 +42,7 @@ public:
     static void safeLockAuction(const std::string& auctionId, std::function<void()> func);
     static bool UserInDir(const std::string& userId);
     static std::string getUserPassword(const std::string& userId);
-    static void loginUser(const std::string& userId, const std::string& password);
+    static void loginUser(const std::string& userId);
     static void FileManager::registerUser(const std::string& userId, const std::string& password);
     static void FileManager::unregisterUser(const std::string& userId);
     static void FileManager::openAuction(const std::string& userId, const AuctionData& data);

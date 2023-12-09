@@ -155,13 +155,9 @@ std::string FileManager::getUserPassword(const std::string& userId) {
     }
 }
 
-void FileManager::loginUser(const std::string& userId, const std::string& password) {
+void FileManager::loginUser(const std::string& userId) {
     safeLockUser(userId, [&]() {
     createUserLoginFile(userId);
-    });
-
-    safeLockUser(userId, [&]() {
-    createUserPassFile(userId, password);
     });
    
 }
@@ -185,7 +181,7 @@ void FileManager::unregisterUser(const std::string& userId) {
 
 void FileManager::openAuction(const std::string& userId, const AuctionData& data) {
     
-    std::string auctionId = std::to_string(data.getId());
+    std::string auctionId = data.getId();
     
     safeLockUser(userId, [&]() {
     createUserAuctionFile(userId, auctionId, "HOSTED");
