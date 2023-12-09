@@ -553,6 +553,139 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
   }
 }
 
+void BidCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to bid: you need to be logged in to bid." 
+        << std::endl;
+    return;
+  }
+
+  // Argument parsing
+  std::istringstream iss(args);
+  std::string auction_id_str;
+  std::string bid_value_str;
+  
+  if (!(iss >> auction_id_str) || !(iss >> bid_value_str)) {
+    std::cout << "Invalid arguments. Usage: bid <auction_id> <bid_value>" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is too long
+  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+              << " digits long" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is Numeric
+  if (!is_numeric(auction_id_str)) {
+    std::cout << "Invalid auction ID. It must be a number" << std::endl;
+    return;
+  }
+  // Check if bid_value_str is too long
+  if (bid_value_str.length() > BID_MAX_LEN) {
+    std::cout << "Invalid bid value. It must be at most " << BID_MAX_LEN 
+              << " digits long" << std::endl;
+    return;
+  }
+  // Check if bid_value_str is Numeric
+  if (!is_numeric(bid_value_str)) {
+    std::cout << "Invalid bid value. It must be a number" << std::endl;
+    return;
+  }
+  // Convert auction_id_str to uint32_t
+  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+  // Convert bid_value_str to uint32_t
+  uint32_t bid_value = std::stol(bid_value_str, NULL, 10);
+
+  // Populate and send packet
+  BidServerbound packet_out;
+  packet_out.user_id = state.user_id;
+  packet_out.password = state.password;
+  packet_out.auction_id = auction_id;
+  packet_out.bid_value = bid_value;
+
+  ReplyBidClientbound rbd;
+  state.sendTcpPacketAndWaitForReply(packet_out, rbd);
+
+  switch (rbd.status) {
+    case ReplyBidClientbound::status::ACC:
+      // Output bid info
+      std::cout 
+          << "Bid of " << bid_value << " on auction with ID [" 
+          << auction_id << "] accepted!" << std::endl;
+      break;
+
+    case ReplyBidClientbound::status::NOK:
+      std::cout
+          << "Failed to bid: the auction with ID [" 
+          << auction_id << "] has already ended." << std::endl;
+      break;
+
+    case ReplyBidClientbound::status::NLG:
+      std::cout 
+          << "Failed to bid: the user is not logged in." 
+          << std::endl;
+      break;
+    case ReplyBidClientbound::status::ILG:
+      std::cout 
+          << "Failed to bid: the user cannot bid on one of his own auctions." 
+          << std::endl;
+      break;
+
+    case ReplyBidClientbound::status::REF:
+    default:
+      std::cout 
+          << "Failed to bid: the bid of " << bid_value << " was lower than"
+          << " the current bid of the auction [" << auction_id << "]."
+          << std::endl;
+      break;
+  }
+}
+
+void ShowRecordCommand::handle(std::string args, UserState& state) {
+  // Check if user is logged in
+  if (!state.isLoggedIn()) {
+    std::cout 
+        << "Failed to show record: you need to be logged in to show your record." 
+        << std::endl;
+    return;
+  }
+
+  // Populate and send packet
+  ShowRecordServerbound packet_out;
+  packet_out.user_id = state.user_id;
+
+  ReplyShowRecordClientbound rsr;
+  state.sendUdpPacketAndWaitForReply(packet_out, rsr);
+
+  switch (rsr.status) {
+    case ReplyShowRecordClientbound::status::OK:
+      // Output record info
+      std::cout 
+          << "Displaying the record of the user with ID [" 
+          << state.user_id << "]:" << std::endl;
+      std::cout 
+          << "Number of auctions started: " << rsr.auctions_started << std::endl;
+      std::cout 
+          << "Number of auctions won: " << rsr.auctions_won << std::endl;
+      std::cout 
+          << "Number of auctions lost: " << rsr.auctions_lost << std::endl;
+      std::cout 
+          << "Number of bids made: " << rsr.bids_made << std::endl;
+      std::cout 
+          << "Number of bids received: " << rsr.bids_received << std::endl;
+      break;
+
+    case ReplyShowRecordClientbound::status::NLG:
+    default:
+      std::cout 
+          << "Failed to show record: the user is not logged in." 
+          << std::endl;
+      break;
+  }
+}
+
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     for (const auto& auction : auctions) {
         std::cout 
