@@ -452,10 +452,13 @@ void ReplyOpenAuctionClientbound::send(int fd) {
   stream << ReplyOpenAuctionClientbound::ID << " ";
 
   if (status == OK) {
-    stream << "OK ";
-    //stream << file_name << " " << file_data.length() << " " << file_data;
+    stream << "OK " << auction_id ;
+  } else if (status == NOK) {
+    stream << "NOK";
   } else if (status == NLG) {
     stream << "NLG";
+  } else if (status == ERR) {
+    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -469,18 +472,19 @@ void ReplyOpenAuctionClientbound::receive(int fd) {
   auto status_str = readString(fd);
   if (status_str == "OK") {
     this->status = OK;
-    
-    //TODO 
-
+    readSpace(fd);
+    this->auction_id = readInt(fd);
+  } else if (status_str == "NOK") {
+    this->status = NOK;
   } else if (status_str == "NLG") {
-   //TODO
+    this->status = NLG;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
   readPacketDelimiter(fd);
 }
-
-
 
 
 void ErrorTcpPacket::send(int fd) {
