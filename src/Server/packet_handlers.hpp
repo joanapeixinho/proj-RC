@@ -18,6 +18,18 @@ class userTag {  // IOManip helper
   }
 };
 
+class auctionTag {  // IOManip helper
+  uint32_t auction_id;
+
+ public:
+  explicit auctionTag(uint32_t __auction_id) : auction_id{__auction_id} {}
+  friend std::ostream &operator<<(std::ostream &os, const auctionTag &obj) {
+    os << "[auction " << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN)
+       << obj.auction_id << "] ";
+    return os;
+  }
+};
+
 // UDP
 
 void handle_login_user(std::stringstream &buffer, Address &addr_from,

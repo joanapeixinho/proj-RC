@@ -53,6 +53,7 @@ public:
     void FileManager::unregisterUser(const std::string& userId);
     std::vector<std::pair<uint32_t, bool>> getUserAuctions(const std::string& userId, const std::string& directory); 
     std::vector<std::pair<uint32_t, bool>> getAllAuctions();   
+    std::string getAuctionRecord(const std::string& auctionId);
     void FileManager::openAuction(const std::string& userId, const AuctionData& data);
     void FileManager::closeAuction(const std::string& userId, const std::string& auctionId);
 
