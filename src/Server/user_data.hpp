@@ -8,9 +8,8 @@
 
 class UserData {
 public:
-    UserData(uint32_t id, const std::string& password);
-    UserData(uint32_t id);
-    UserData();
+    UserData(uint32_t id, const std::string& password, FileManager& fileManager);
+    UserData(uint32_t id, FileManager& fileManager);
     
     int getId() const;
     const std::string& getPassword() const;
@@ -18,12 +17,13 @@ public:
     void logout();
     void registerUser();
     void unregisterUser();
-    std::vector <std::pair<uint32_t, bool>> listMyAuctions();
+    std::vector <std::pair<uint32_t, bool>> listMyAuctions(const std::string& directory);
     void openAuction (const AuctionData& data);
 
 private:
     uint32_t id;
     std::string password;
+    FileManager& fileManager;
 };
 
 #endif  // USERDATA_HPP

@@ -1,7 +1,7 @@
 #include "user_data.hpp"
 
-UserData::UserData(uint32_t id, const std::string& password)
-    : id(id), password(password) {    
+UserData::UserData(uint32_t id, const std::string& password, FileManager& fileManager)
+    : id(id), password(password), fileManager(fileManager) {
     //check UID IS VALID
     if (id < 100000 || id > 999999) {
         throw UserIdException(std::to_string(id));
@@ -18,10 +18,9 @@ UserData::UserData(uint32_t id, const std::string& password)
     }
 }
 
-UserData::UserData(uint32_t id)
-    : id(id) {}
+UserData::UserData(uint32_t id, FileManager& fileManager)
+    : id(id) , fileManager(fileManager) {}
 
-UserData::UserData() : id(NULL), password("") {}
 
 int UserData::getId() const {
     return id;
@@ -34,28 +33,28 @@ const std::string& UserData::getPassword() const {
 
 void UserData::login() {
   
-    if (FileManager::UserRegistered(std::to_string(this->id))) {
-        std::string userPassword = FileManager::getUserPassword(std::to_string(this->id));
+    if (fileManager.UserRegistered(std::to_string(this->id))) {
+        std::string userPassword = fileManager.getUserPassword(std::to_string(this->id));
         if (userPassword == this->password) {
-            FileManager::loginUser(std::to_string(this->id));
+            fileManager.loginUser(std::to_string(this->id));
         } else {
             throw WrongPasswordException(this->password);
         }
     } else {
         registerUser();
-        FileManager::loginUser(std::to_string(this->id));
+        fileManager.loginUser(std::to_string(this->id));
         throw UserNotRegisteredException(std::to_string(this->id));
     }
 }
 
 void UserData::logout() {
 
-    if (!FileManager::UserRegistered(std::to_string(this->id))) {
+    if (!fileManager.UserRegistered(std::to_string(this->id))) {
         throw UserNotRegisteredException(std::to_string(this->id));
-    } else if (!FileManager::UserLoggedIn(std::to_string(this->id))) {
+    } else if (!fileManager.UserLoggedIn(std::to_string(this->id))) {
         throw UserNotLoggedInException(std::to_string(this->id));
     } else {
-         FileManager::logoutUser(std::to_string(this->id));
+         fileManager.logoutUser(std::to_string(this->id));
     }
    
 }
@@ -63,30 +62,30 @@ void UserData::logout() {
 void UserData::registerUser() {
 
     std::string idString = std::to_string(id);
-    FileManager::registerUser(idString, password);
+    fileManager.registerUser(idString, password);
 }
 
 void UserData::unregisterUser() {
 
-    if (!FileManager::UserRegistered(std::to_string(this->id))) {
+    if (!fileManager.UserRegistered(std::to_string(this->id))) {
         throw UserNotRegisteredException(std::to_string(this->id));
     }
     std::string idString = std::to_string(id);
-    FileManager::unregisterUser(idString);
+    fileManager.unregisterUser(idString);
 }
 
 void UserData::openAuction (const AuctionData& data) {
     
     std::string idString = std::to_string(id);
-    FileManager::openAuction(idString, data);
+    fileManager.openAuction(idString, data);
 }
 
-std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions() {
+std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions( const std::string& directory) {
     std::vector<std::pair<uint32_t, bool>> auctions;
-    if(FileManager::UserLoggedIn(std::to_string(this->id))) {
+    if(fileManager.UserLoggedIn(std::to_string(this->id))) {
         std::string idString = std::to_string(id);
 
-        auctions = FileManager::getUserAuctions(idString);
+        auctions = fileManager.getUserAuctions(idString, directory);
         
         if (auctions.empty()) {
             throw UserHasNoAuctionsException(idString);

@@ -110,7 +110,11 @@ public:
         : std::runtime_error("User has no auctions: " + userId) {}
 };
 
-
+class NoAuctionsException : public std::runtime_error {
+public:
+    NoAuctionsException()
+        : std::runtime_error("No auctions: ") {}
+};
 
 
 

@@ -11,10 +11,12 @@
 #include "../common/protocol.hpp"
 #include "packet_handlers.hpp"
 
-AuctionServerState::AuctionServerState(std::string &port, bool __verbose)
-    : cdebug{DebugStream(__verbose)} {
+AuctionServerState::AuctionServerState(std::string &port, bool __verbose, FileManager& fileManager)
+    : cdebug{DebugStream(__verbose)} , file_manager{fileManager} { 
   this->setup_sockets();
   this->resolveServerAddress(port);
+  this->registerPacketHandlers();
+  
 }
 
 AuctionServerState::~AuctionServerState() {
@@ -38,7 +40,7 @@ void AuctionServerState::registerPacketHandlers() {
  
 
   // TCP
-  tcp_packet_handlers.insert({StateServerbound::ID, handle_state});
+  tcp_packet_handlers.insert({OpenAuctionServerbound::ID, handle_open_auction});
 }
 
 void AuctionServerState::setup_sockets() {
@@ -124,77 +126,6 @@ void AuctionServerState::resolveServerAddress(std::string &port) {
   std::cout << "Listening for connections on port " << port << std::endl;
 }
 
-void AuctionServerState::registerWords(std::string &__word_file_path) {
-  try {
-    std::filesystem::path word_file_path(std::filesystem::current_path());
-    word_file_path.append(__word_file_path);
-
-    std::cout << "Reading words from " << word_file_path << std::endl;
-
-    std::ifstream word_file(word_file_path);
-    if (!word_file.is_open()) {
-      throw UnrecoverableError("Failed to open word file");
-    }
-
-    std::string line;
-    while (std::getline(word_file, line)) {
-      auto split_index = line.find(' ');
-      Word word;
-      word.word = line.substr(0, split_index);
-
-      if (word.word.length() < WORD_MIN_LEN ||
-          word.word.length() > WORD_MAX_LEN) {
-        std::cerr << "[WARNING] Word '" << word.word << "' is not between "
-                  << WORD_MIN_LEN << " and " << WORD_MAX_LEN
-                  << " characters long. Ignoring" << std::endl;
-        continue;
-      }
-
-      if (split_index != std::string::npos) {
-        std::filesystem::path hint_file_path(word_file_path);
-        hint_file_path.remove_filename().append(line.substr(split_index + 1));
-
-        if (!hint_file_path.has_filename()) {
-          std::cerr << "[WARNING] Hint file path " << hint_file_path
-                    << ", for word '" << word.word << "' is not a file."
-                    << std::endl;
-        }
-
-        word.hint_path = hint_file_path;
-      } else {
-        std::cerr << "[WARNING] Word '" << word.word
-                  << "' does not have an hint file" << std::endl;
-        word.hint_path = std::nullopt;
-      }
-      this->words.push_back(word);
-    }
-
-    if (words.size() == 0) {
-      std::cerr << "[FATAL] There are no valid words in the provided word file"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
-
-    std::cout << "Loaded " << words.size() << " word(s)" << std::endl;
-  } catch (std::exception &e) {
-    std::cerr << "Failed to open word file: " << e.what() << std::endl;
-    exit(EXIT_FAILURE);
-  } catch (...) {
-    std::cerr << "Failed to open word file: unknown" << std::endl;
-    exit(EXIT_FAILURE);
-  }
-}
-
-Word &AuctionServerState::selectRandomWord() {
-  uint32_t index;
-  if (select_randomly) {
-    index = (uint32_t)rand() % (uint32_t)this->words.size();
-  } else {
-    index = (this->current_word_index) % (uint32_t)this->words.size();
-    this->current_word_index = index + 1;
-  }
-  return this->words[index];
-}
 
 void AuctionServerState::callUdpPacketHandler(std::string packet_id,
                                            std::stringstream &stream,
@@ -217,67 +148,4 @@ void AuctionServerState::callTcpPacketHandler(std::string packet_id,
   }
 
   handler->second(connection_fd, *this);
-}
-
-AuctionServerSync AuctionServerState::createAuction(uint32_t user_id) {
-  std::scoped_lock<std::mutex> g_lock(AuctionsLock);
-
-  auto Auction = Auctions.find(user_id);
-  if (Auction != Auctions.end()) {
-    {
-      AuctionServerSync Auction_sync = AuctionServerSync(Auction->second);
-      if (Auction_sync->isOnGoing()) {
-        if (Auction_sync->hasStarted()) {
-          throw AuctionAlreadyStartedException();
-        }
-        return Auction_sync;
-      }
-    }
-
-    std::cout << "Deleting Auction" << std::endl;
-    // Delete existing Auction, so we can create a new one below
-    Auctions.erase(Auction);
-  }
-
-  Word &word = this->selectRandomWord();
-  // Some C++ magic to create an instance of the class inside the map, without
-  // moving it, since mutexes can't be moved
-  auto inserted = Auctions.emplace(
-      std::piecewise_construct, std::forward_as_tuple(user_id),
-      std::forward_as_tuple(user_id, word.word, word.hint_path));
-
-  if (inserted.first->second.loadFromFile(true)) {
-    // Loaded from file successfully, recheck if it has started
-    if (inserted.first->second.hasStarted()) {
-      throw AuctionAlreadyStartedException();
-    }
-    return AuctionServerSync(inserted.first->second);
-  }
-
-  return AuctionServerSync(Auctions.at(user_id));
-}
-
-AuctionServerSync AuctionServerState::getAuction(uint32_t user_id) {
-  std::scoped_lock<std::mutex> g_lock(AuctionsLock);
-
-  auto Auction = Auctions.find(user_id);
-  if (Auction == Auctions.end()) {
-    // Try to load from disk
-
-    // Some C++ magic to create an instance of the class inside the map, without
-    // moving it, since mutexes can't be moved
-    auto inserted = Auctions.emplace(
-        std::piecewise_construct, std::forward_as_tuple(user_id),
-        std::forward_as_tuple(user_id, std::string(), std::nullopt));
-
-    if (!inserted.first->second.loadFromFile(false)) {
-      // Failed to load, throw exception
-      Auctions.erase(inserted.first);
-      throw NoAuctionFoundException();
-    }
-
-    return AuctionServerSync(inserted.first->second);
-  }
-
-  return AuctionServerSync(Auction->second);
 }

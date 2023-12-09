@@ -1,6 +1,14 @@
 #include "file_manager.hpp"
 
 
+FileManager::FileManager() {
+    std::filesystem::create_directory(BASE_DIR);
+    std::string UserDir = std::string(BASE_DIR) + '/' + USER_DIR;
+    std::filesystem::create_directory(UserDir);
+    std::string AuctionDir = std::string(BASE_DIR) + '/' + AUCTION_DIR;
+    std::filesystem::create_directory(AuctionDir);
+}
+
 bool FileManager::writeToFile(const std::string& filename, const std::string& data, const std::string& directory) {
     
     std::ofstream file(BASE_DIR + directory + '/' + filename);
@@ -193,19 +201,44 @@ void FileManager::unregisterUser(const std::string& userId) {
 }
 
 
-std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::string& userId) {
+std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::string& userId, const std::string& directory) {
     std::vector<std::pair<uint32_t, bool>> auctionList;
     safeLockUser(userId, [&]() {
-        for (const auto& entry : std::filesystem::directory_iterator(USER_DIR + '/' + userId + "/HOSTED")) {
+        for (const auto& entry : std::filesystem::directory_iterator(USER_DIR + '/' + userId + '/' + directory)) {
             //update auction
             UpdateAuction(entry.path().filename().string());
 
             //add auction to list
-            uint32_t auctionId = std::stoul(entry.path().filename().string());
+            std::string auctionId = entry.path().filename().string();
             bool isActive = AuctionActive(auctionId);
-            auctionList.push_back(std::make_pair(auctionId, isActive));
+            uint32_t intAuctionId = std::stoi(auctionId);
+
+            auctionList.push_back(std::make_pair(intAuctionId, isActive));
         }
     });
+
+    return auctionList;
+}
+
+std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions() {
+    std::vector<std::pair<uint32_t, bool>> auctionList;
+    for (const auto& entry : std::filesystem::directory_iterator(AUCTION_DIR)) {
+        if (std::filesystem::is_directory(entry.status())) {
+            //update auction
+            UpdateAuction(entry.path().filename().string());
+
+            //add auction to list
+            std::string auctionId = entry.path().filename().string();
+            bool isActive = AuctionActive(auctionId);
+            uint32_t intAuctionId = std::stoi(auctionId);
+
+            auctionList.push_back(std::make_pair(intAuctionId, isActive));
+        }
+    }
+
+    if (auctionList.empty()) {
+        throw NoAuctionsException();
+    }
 
     return auctionList;
 }
