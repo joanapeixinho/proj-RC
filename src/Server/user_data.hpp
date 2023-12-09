@@ -14,6 +14,7 @@ public:
     const std::string& getPassword() const;
     void login();
     void registerUser();
+    void openAuction (const AuctionData& data);
 
 private:
     uint32_t id;

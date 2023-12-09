@@ -160,6 +160,7 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+
 std::stringstream LogoutServerbound::serialize() {
   std::stringstream buffer;
   buffer << LogoutServerbound::ID << " ";
@@ -393,26 +394,26 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
   file.close();
 }
 
-void ScoreboardServerbound::send(int fd) {
+void OpenAuctionServerbound::send(int fd) {
   std::stringstream stream;
-  stream << ScoreboardServerbound::ID << std::endl;
+  stream << OpenAuctionServerbound::ID << std::endl;
   writeString(fd, stream.str());
 }
 
-void ScoreboardServerbound::receive(int fd) {
+void OpenAuctionServerbound::receive(int fd) {
   // Serverbound packets don't read their ID
   readPacketDelimiter(fd);
 }
 
-void ScoreboardClientbound::send(int fd) {
+void ReplyOpenAuctionClientbound::send(int fd) {
   std::stringstream stream;
-  stream << ScoreboardClientbound::ID << " ";
+  stream << ReplyOpenAuctionClientbound::ID << " ";
 
   if (status == OK) {
     stream << "OK ";
     stream << file_name << " " << file_data.length() << " " << file_data;
-  } else if (status == EMPTY) {
-    stream << "EMPTY";
+  } else if (status == NLG) {
+    stream << "NLG";
   } else {
     throw PacketSerializationException();
   }
@@ -420,85 +421,24 @@ void ScoreboardClientbound::send(int fd) {
   writeString(fd, stream.str());
 }
 
-void ScoreboardClientbound::receive(int fd) {
-  readPacketId(fd, ScoreboardClientbound::ID);
+void ReplyOpenAuctionClientbound::receive(int fd) {
+  readPacketId(fd, ReplyOpenAuctionClientbound::ID);
   readSpace(fd);
   auto status_str = readString(fd);
   if (status_str == "OK") {
     this->status = OK;
-    readSpace(fd);
-    file_name = readString(fd);
-    readSpace(fd);
-    uint32_t file_size = readInt(fd);
-    readSpace(fd);
-    readAndSaveToFile(fd, file_name, file_size, false);
-  } else if (status_str == "EMPTY") {
-    this->status = EMPTY;
+    
+    //TODO 
+
+  } else if (status_str == "NLG") {
+   //TODO
   } else {
     throw InvalidPacketException();
   }
   readPacketDelimiter(fd);
 }
 
-void StateServerbound::send(int fd) {
-  std::stringstream stream;
-  stream << StateServerbound::ID << " ";
-  write_user_id(stream, user_id);
-  stream << std::endl;
-  writeString(fd, stream.str());
-}
 
-void StateServerbound::receive(int fd) {
-  // Serverbound packets don't read their ID
-  readSpace(fd);
-  user_id = readuserId(fd);
-  if (user_id > user_ID_MAX) {
-    throw InvalidPacketException();
-  }
-  readPacketDelimiter(fd);
-}
-
-void StateClientbound::send(int fd) {
-  std::stringstream stream;
-  stream << StateClientbound::ID << " ";
-  if (status == ACT) {
-    stream << "ACT ";
-    stream << file_name << " " << file_data.length() << " " << file_data;
-  } else if (status == FIN) {
-    stream << "FIN ";
-    stream << file_name << " " << file_data.length() << " " << file_data;
-  } else if (status == NOK) {
-    stream << "NOK";
-  } else {
-    throw PacketSerializationException();
-  }
-  stream << std::endl;
-  writeString(fd, stream.str());
-}
-
-void StateClientbound::receive(int fd) {
-  readPacketId(fd, StateClientbound::ID);
-  readSpace(fd);
-  auto status_str = readString(fd);
-  if (status_str == "ACT") {
-    this->status = ACT;
-  } else if (status_str == "FIN") {
-    this->status = FIN;
-  } else if (status_str == "NOK") {
-    this->status = NOK;
-    readPacketDelimiter(fd);
-    return;
-  } else {
-    throw InvalidPacketException();
-  }
-  readSpace(fd);
-  file_name = readString(fd);
-  readSpace(fd);
-  uint32_t file_size = readInt(fd);
-  readSpace(fd);
-  readAndSaveToFile(fd, file_name, file_size, false);
-  readPacketDelimiter(fd);
-}
 
 
 void ErrorTcpPacket::send(int fd) {

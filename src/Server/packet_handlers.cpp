@@ -57,24 +57,31 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
               addr_from.size);
 }
 
-void handle_open_auction(std::stringstream &buffer, Address &addr_from,
-                         AuctionServerState &state) {
+void handle_open_auction(int connection_fd, AuctionServerState &state) {
 
   OpenAuctionServerbound packet;
   ReplyOpenAuctionClientbound response;
 
   try {
-    packet.deserialize(buffer);
+    packet.receive(connection_fd);
     state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
                  << std::endl;
 
-    AuctionData auction(auctionsCount++, packet.item_name, packet.initial_bid, packet.duration_seconds, packet.asset_fname);
+    if (state.loggedInUser.getId() != packet.user_id) {
+      response.status = ReplyOpenAuctionClientbound::NLG;
+      state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+    }
+    else {
+    AuctionData auction(state.auctionsCount++, packet.auction_name, packet.start_value, packet.time_active, packet.file_name);
 
     state.loggedInUser.openAuction(auction);
 
     response.status = ReplyOpenAuctionClientbound::OK;
 
     state.cdebug << userTag(packet.user_id) << "Auction started" << std::endl;
+    
+    }
+
   } catch (AuctionIdException &e) {
     state.cdebug << userTag(packet.user_id) << "Invalid auction id" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
@@ -92,23 +99,24 @@ void handle_open_auction(std::stringstream &buffer, Address &addr_from,
     response.status = ReplyOpenAuctionClientbound::NOK;
   } catch (FileOpenException &e) {
     state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
-    response.status = ReplyOpenAuctionClientbound::ERR;
+    response.status = ReplyOpenAuctionClientbound::NOK;
   } catch (FileWriteException &e) {
     state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
-    response.status = ReplyOpenAuctionClientbound::ERR;
+    response.status = ReplyOpenAuctionClientbound::NOK;
   } catch (FileReadException &e) {
     state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
-    response.status = ReplyOpenAuctionClientbound::ERR;
+    response.status = ReplyOpenAuctionClientbound::NOK;
   } catch (std::exception &e) {
 
     std::cerr << "[OpenAuction] There was an unhandled exception that prevented "
                  "the server from opening the auction:"
               << e.what() << std::endl;
+    
     return;
   }
 
-  send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr,
-              addr_from.size);
+  response.send(connection_fd);
 
 
 }
+
