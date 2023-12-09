@@ -98,6 +98,18 @@ public:
         : std::runtime_error("Maximum number of auctions reached: " + auctionId) {}
 };
     
+class AuctionNotActiveException : public std::runtime_error {
+public:
+    AuctionNotActiveException(const std::string& auctionId)
+        : std::runtime_error("Auction not active: " + auctionId) {}
+};
+
+class UserHasNoAuctionsException : public std::runtime_error {
+public:
+    UserHasNoAuctionsException(const std::string& userId)
+        : std::runtime_error("User has no auctions: " + userId) {}
+};
+
 
 
 

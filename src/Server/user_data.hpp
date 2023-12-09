@@ -9,6 +9,7 @@
 class UserData {
 public:
     UserData(uint32_t id, const std::string& password);
+    UserData(uint32_t id);
     UserData();
     
     int getId() const;
@@ -17,7 +18,7 @@ public:
     void logout();
     void registerUser();
     void unregisterUser();
-    void listMyAuctions();
+    std::vector <std::pair<uint32_t, bool>> listMyAuctions();
     void openAuction (const AuctionData& data);
 
 private:

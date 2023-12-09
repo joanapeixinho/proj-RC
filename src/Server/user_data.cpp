@@ -1,15 +1,12 @@
 #include "user_data.hpp"
 
 UserData::UserData(uint32_t id, const std::string& password)
-    : id(id), password(password) {
-    
-        //check UID IS VALID
+    : id(id), password(password) {    
+    //check UID IS VALID
     if (id < 100000 || id > 999999) {
         throw UserIdException(std::to_string(id));
     }
-
     //check password is valid
-    
     if (password.length() != 8) {
         throw UserPasswordException(password);
     }
@@ -19,8 +16,10 @@ UserData::UserData(uint32_t id, const std::string& password)
             throw UserPasswordException(password);
         }
     }
+}
 
-    }
+UserData::UserData(uint32_t id)
+    : id(id) {}
 
 UserData::UserData() : id(NULL), password("") {}
 
@@ -76,10 +75,28 @@ void UserData::unregisterUser() {
     FileManager::unregisterUser(idString);
 }
 
-
 void UserData::openAuction (const AuctionData& data) {
     
     std::string idString = std::to_string(id);
     FileManager::openAuction(idString, data);
 }
+
+std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions() {
+    std::vector<std::pair<uint32_t, bool>> auctions;
+    if(FileManager::UserLoggedIn(std::to_string(this->id))) {
+        std::string idString = std::to_string(id);
+
+        auctions = FileManager::getUserAuctions(idString);
+        
+        if (auctions.empty()) {
+            throw UserHasNoAuctionsException(idString);
+        }
+
+    } else {
+        throw UserNotLoggedInException(std::to_string(this->id));
+    }
+
+    return auctions;
+}
+  
 // Path: src/Server/user_data.hpp
