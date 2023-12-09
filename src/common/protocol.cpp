@@ -111,6 +111,7 @@ std::stringstream LoginServerbound::serialize() {
   std::stringstream buffer;
   buffer << LoginServerbound::ID << " ";
   write_user_id(buffer, user_id);
+  buffer << " "<< password;
   buffer << std::endl;
   return buffer;
 };
@@ -120,6 +121,8 @@ void LoginServerbound::deserialize(std::stringstream &buffer) {
   // Serverbound packets don't read their ID
   readSpace(buffer);
   user_id = readUserId(buffer);
+  readSpace(buffer);
+  password = readString(buffer, PASSWORD_MAX_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -132,6 +135,8 @@ std::stringstream ReplyLoginClientbound::serialize() {
     buffer << "OK ";
   } else if (status == ReplyLoginClientbound::status::NOK) {
     buffer << "NOK";
+  } else if (status == ReplyLoginClientbound::status::REG) {
+    buffer << "REG";
   } else if (status == ReplyLoginClientbound::status::ERR) {
     buffer << "ERR";
   } else {
