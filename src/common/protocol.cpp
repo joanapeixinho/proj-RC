@@ -154,9 +154,10 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   auto status_str = readString(buffer, 3);
   if (status_str == "OK") {
     status = OK;
-    //TODO 
   } else if (status_str == "NOK") {
     status = NOK;
+  } else if (status_str == "REG") {
+    status = REG;
   } else if (status_str == "ERR") {
     status = ERR;
   } else {
