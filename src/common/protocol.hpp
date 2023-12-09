@@ -360,7 +360,44 @@ class ReplyBidClientbound : public TcpPacket {
   void receive(int fd);
 };
 
+class ShowRecordServerbound : public TcpPacket {
+ public:
+  static constexpr const char *ID = "SRC";
+  uint32_t auction_id;
 
+  void send(int fd);
+  void receive(int fd);
+};
+
+struct Bid {
+  uint32_t bidder_user_id;
+  uint32_t bid_value;
+  std::string date_time;
+  uint32_t sec_time;
+};
+class ReplyShowRecordClientbound : public TcpPacket {
+ public:
+  enum status { OK, NOK };
+  static constexpr const char *ID = "RRC";
+  status status;
+  // Auction Info
+  uint32_t host_user_id;
+  std::string auction_name;
+  std::string asset_fname;
+  uint32_t start_value;
+  std::string start_date_time;
+  uint32_t time_active;
+  // Bids Info
+  std::vector<Bid> bids;
+  // If the auction is closed Info
+  bool is_active;
+  std::string end_date_time;
+  uint32_t end_sec_time;
+
+
+  void send(int fd);
+  void receive(int fd);
+};
 
 class ErrorTcpPacket : public TcpPacket {
  public:

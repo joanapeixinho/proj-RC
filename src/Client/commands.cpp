@@ -644,46 +644,75 @@ void BidCommand::handle(std::string args, UserState& state) {
 }
 
 void ShowRecordCommand::handle(std::string args, UserState& state) {
-  // Check if user is logged in
-  if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to show record: you need to be logged in to show your record." 
-        << std::endl;
+  // Argument parsing
+  std::istringstream iss(args);
+  std::string auction_id_str;
+  
+  if (!(iss >> auction_id_str)) {
+    std::cout << "Invalid arguments. Usage: show_record <auction_id>" << std::endl;
     return;
   }
+  // Check if auction_id_str is too long
+  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+              << " digits long" << std::endl;
+    return;
+  }
+  // Check if auction_id_str is Numeric
+  if (!is_numeric(auction_id_str)) {
+    std::cout << "Invalid auction ID. It must be a number" << std::endl;
+    return;
+  }
+  // Convert auction_id_str to uint32_t
+  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
 
   // Populate and send packet
   ShowRecordServerbound packet_out;
-  packet_out.user_id = state.user_id;
+  packet_out.auction_id = auction_id;
 
-  ReplyShowRecordClientbound rsr;
-  state.sendUdpPacketAndWaitForReply(packet_out, rsr);
+  ReplyShowRecordClientbound rrc;
+  state.sendTcpPacketAndWaitForReply(packet_out, rrc);
 
-  switch (rsr.status) {
+  switch (rrc.status) {
     case ReplyShowRecordClientbound::status::OK:
-      // Output record info
+      // Output Auction & Bids info
       std::cout 
-          << "Displaying the record of the user with ID [" 
-          << state.user_id << "]:" << std::endl;
-      std::cout 
-          << "Number of auctions started: " << rsr.auctions_started << std::endl;
-      std::cout 
-          << "Number of auctions won: " << rsr.auctions_won << std::endl;
-      std::cout 
-          << "Number of auctions lost: " << rsr.auctions_lost << std::endl;
-      std::cout 
-          << "Number of bids made: " << rsr.bids_made << std::endl;
-      std::cout 
-          << "Number of bids received: " << rsr.bids_received << std::endl;
+          << "Displaying the record of the auction with ID [" << auction_id << "]:" 
+          << std::endl;
+      std::cout << "Auction host: " << rrc.host_user_id << std::endl;
+      std::cout << "Auction name: " << rrc.auction_name << std::endl;
+      std::cout << "Auction asset: " << rrc.asset_fname << std::endl;
+      std::cout << "Auction start value: " << rrc.start_value << std::endl;
+      std::cout << "Auction start date: " << rrc.start_date_time << std::endl;
+      std::cout << "Auction time active: " << rrc.time_active << std::endl;
+      if (rrc.is_active) {
+        std::cout << "Auction status: Ongoing" << std::endl;
+      } else {
+        std::cout << "Auction status: Closed" << std::endl;
+        std::cout <<  "Auction end date: " << rrc.start_value << std::endl;
+        std::cout <<  "Auction end seconds: " << rrc.end_sec_time << std::endl;
+      }
+      std::cout <<  "----------- Last 50 bids: -----------" << rrc.end_sec_time << std::endl;
+      printBidsInfo(rrc.bids);
       break;
 
-    case ReplyShowRecordClientbound::status::NLG:
+    case ReplyShowRecordClientbound::status::NOK:
     default:
       std::cout 
-          << "Failed to show record: the user is not logged in." 
-          << std::endl;
+          << "Failed to show record: the auction [" 
+          << auction_id << "] does not exist." << std::endl;
       break;
   }
+}
+
+void printBidsInfo(const std::vector<Bid>& bids) {
+    for (const auto& bid : bids) {
+        std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
+        std::cout << "Bid Value: " << bid.bid_value << std::endl;
+        std::cout << "Date Time: " << bid.date_time 
+                  << ", Seconds: " << bid.sec_time << std::endl;
+        std::cout << "---------------------------------------" << std::endl;
+    }
 }
 
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
