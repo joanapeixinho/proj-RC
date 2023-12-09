@@ -193,34 +193,21 @@ void FileManager::unregisterUser(const std::string& userId) {
 }
 
 
-std::string FileManager:: getUserAuctions( const std::string& userId ) {
-    std::string auctionList;
+std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::string& userId) {
+    std::vector<std::pair<uint32_t, bool>> auctionList;
     safeLockUser(userId, [&]() {
+        for (const auto& entry : std::filesystem::directory_iterator(USER_DIR + '/' + userId + "/HOSTED")) {
+            //update auction
+            UpdateAuction(entry.path().filename().string());
 
-    
-    std::vector<std::string> files;
-    for (const auto& entry : std::filesystem::directory_iterator(USER_DIR + '/' + userId + "/HOSTED")) {
-        
-        //update auction
-        UpdateAuction(entry.path().filename().string());
-
-        //add auction to list
-        files.push_back(entry.path().filename().string());
-        
-    };
-
-    for (auto& file : files) {
-        std::string auctionId = file;
-        std::string auctionState = "0";
-        if (AuctionActive(auctionId)) {
-            auctionState = "1";
+            //add auction to list
+            uint32_t auctionId = std::stoul(entry.path().filename().string());
+            bool isActive = AuctionActive(auctionId);
+            auctionList.push_back(std::make_pair(auctionId, isActive));
         }
-        auctionList += auctionId + " " + auctionState + " ";
-    }
     });
 
     return auctionList;
-
 }
 
 void FileManager::openAuction(const std::string& userId, const AuctionData& data) {

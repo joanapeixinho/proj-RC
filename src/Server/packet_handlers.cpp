@@ -200,9 +200,10 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
     std::string auctions = user.listMyAuctions();
     response.status = ReplyListMyAuctionsClientbound::OK;
     response.auctions = auctions;
-    state.cdebug << userTag(packet.user_id) << "User logged out" << std::endl;
-  
-    // duvida -> aqui é suposto verificar a password????
+
+    //printar a lista de leiloes
+    
+    
   }
   catch (UserNotRegisteredException &e)
   {
@@ -237,6 +238,7 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
   }
 
 
+}
 
 
 
