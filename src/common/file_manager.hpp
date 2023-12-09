@@ -44,7 +44,7 @@ public:
     void safeLockAuction(const std::string& auctionId, std::function<void()> func);
     bool UserLoggedIn(const std::string& userId);
     bool UserRegistered(const std::string& userId);
-    bool AuctionActive(const std::string& auctionId);
+    bool auctionIsActive(const std::string& auctionId);
     void UpdateAuction(const std::string& auctionId);
     std::string getUserPassword(const std::string& userId);
     void loginUser(const std::string& userId);
@@ -54,7 +54,7 @@ public:
     std::vector<std::pair<uint32_t, bool>> getUserAuctions(const std::string& userId, const std::string& directory); 
     std::vector<std::pair<uint32_t, bool>> getAllAuctions();   
     AuctionData getAuction(const std::string& auctionId);
-    static std::vector<Bid> getAuctionBids(const std::string& auctionId);
+    std::vector<Bid> getAuctionBids(const std::string& auctionId);
     void FileManager::openAuction(const std::string& userId, const AuctionData& data);
     void FileManager::closeAuction(const std::string& userId, const std::string& auctionId);
 

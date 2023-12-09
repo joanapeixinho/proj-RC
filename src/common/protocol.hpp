@@ -262,12 +262,6 @@ class ReplyShowRecordClientbound : public UdpPacket {
   status status;
 
   AuctionData auction_data;
-  // Bids Info
-  std::vector<Bid> bids;
-  // If the auction is closed Info
-  std::string end_date_time;
-  uint32_t end_sec_time;
-
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);

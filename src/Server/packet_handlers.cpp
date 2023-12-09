@@ -352,16 +352,10 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
                  << std::endl;
 
     AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
-
-    std::vector<Bid> bids = auction.getBids();
-
-    if (!auction.isActive()){
-      response.end_date_time = auction.getEndTime();
-    }
     
     response.status = ReplyShowRecordClientbound::OK;
+    response.auction = auction;
 
-    // TO DO adicionar mais coisas à response
     
     
   } catch (AuctionDoesNotExistException){
