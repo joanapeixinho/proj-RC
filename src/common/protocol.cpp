@@ -102,7 +102,7 @@ uint32_t UdpPacket::readInt(std::stringstream &buffer) {
 };
 
 uint32_t UdpPacket::readUserId(std::stringstream &buffer) {
-  std::string id_str = readString(buffer, 6);
+  std::string id_str = readString(buffer, USER_ID_MAX_LEN);
   return parse_packet_user_id(id_str);
 };
 
@@ -111,7 +111,7 @@ std::stringstream LoginServerbound::serialize() {
   std::stringstream buffer;
   buffer << LoginServerbound::ID << " ";
   write_user_id(buffer, user_id);
-  buffer << " "<< password;
+  buffer << " " << password;
   buffer << std::endl;
   return buffer;
 };
@@ -171,6 +171,7 @@ std::stringstream LogoutServerbound::serialize() {
   std::stringstream buffer;
   buffer << LogoutServerbound::ID << " ";
   write_user_id(buffer, user_id);
+  buffer << " " << password;
   buffer << std::endl;
   return buffer;
 };
@@ -180,6 +181,8 @@ void LogoutServerbound::deserialize(std::stringstream &buffer) {
   // Serverbound packets don't read their ID
   readSpace(buffer);
   user_id = readUserId(buffer);
+  readSpace(buffer);
+  password = readString(buffer, PASSWORD_MAX_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -192,6 +195,8 @@ std::stringstream ReplyLogoutClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyLogoutClientbound::status::UNR) {
     buffer << "UNR";
+  } else if (status == ReplyLogoutClientbound::status::ERR) {
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -210,6 +215,8 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "UNR") {
     status = UNR;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -402,12 +409,37 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
 
 void OpenAuctionServerbound::send(int fd) {
   std::stringstream stream;
-  stream << OpenAuctionServerbound::ID << std::endl;
+  stream << OpenAuctionServerbound::ID << " " ;
+  write_user_id(stream, user_id);
+  stream << " " << password << " " << auction_name << " ";
+  stream << start_value << " " << time_active << " ";
+  stream << file_name << " " << getFileSize(file_path) << " ";
+  
   writeString(fd, stream.str());
+  stream.str(std::string()); // clears the stream
+  stream.clear(); // resets any error flags
+  sendFile(fd, file_path); // Send file_data
+  writeString(fd, "\n"); // Send packet delimiter
 }
 
 void OpenAuctionServerbound::receive(int fd) {
   // Serverbound packets don't read their ID
+  readSpace(fd);
+  user_id = readUserId(fd);
+  readSpace(fd);
+  password = readString(fd);
+  readSpace(fd);
+  auction_name = readString(fd);
+  readSpace(fd);
+  start_value = readInt(fd);
+  readSpace(fd);
+  time_active = readInt(fd);
+  readSpace(fd);
+  file_name = readString(fd);
+  readSpace(fd);
+  uint32_t file_size = readInt(fd);
+  readSpace(fd);
+  readAndSaveToFile(fd, file_name, file_size, false);
   readPacketDelimiter(fd);
 }
 
