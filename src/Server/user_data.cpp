@@ -48,18 +48,24 @@ void UserData::login() {
     }
 }
 
+void UserData::logout() {
+
+    if (!FileManager::UserInDir(std::to_string(this->id))) {
+        throw UserNotRegisteredException(std::to_string(this->id));
+    }
+    FileManager::logoutUser(std::to_string(this->id));
+}
+
 void UserData::registerUser() {
-    
-    
+
     std::string idString = std::to_string(id);
-    
     FileManager::registerUser(idString, password);
 }
+
 
 void UserData::openAuction (const AuctionData& data) {
     
     std::string idString = std::to_string(id);
-
     FileManager::openAuction(idString, data);
 }
 // Path: src/Server/user_data.hpp

@@ -91,6 +91,10 @@ void FileManager:: createUserLoginFile(const std::string& userId) {
     file.close();
 }
 
+void FileManager::removeUserLoginFile(const std::string& userId) {
+    std::filesystem::remove(std::string(USER_DIR)  + userId + "_login.txt");
+}
+
 void FileManager::removeUserFiles(const std::string& userId) {
     std::filesystem::remove(std::string(USER_DIR)  + userId + "_pass.txt");
     std::filesystem::remove(std::string(USER_DIR)  + userId + "_login.txt");
@@ -161,6 +165,15 @@ void FileManager::loginUser(const std::string& userId) {
     });
    
 }
+
+void FileManager::logoutUser(const std::string& userId) {
+    safeLockUser(userId, [&]() {
+    removeUserLoginFile(userId);
+    });
+
+}
+
+
  void FileManager::registerUser(const std::string& userId, const std::string& password) {
     safeLockUser(userId, [&]() {
     createUserDirectory(userId);

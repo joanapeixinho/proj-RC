@@ -14,6 +14,7 @@ public:
     int getId() const;
     const std::string& getPassword() const;
     void login();
+    void logout();
     void registerUser();
     void openAuction (const AuctionData& data);
 

@@ -12,7 +12,7 @@ class userTag {  // IOManip helper
  public:
   explicit userTag(uint32_t __user_id) : user_id{__user_id} {}
   friend std::ostream &operator<<(std::ostream &os, const userTag &obj) {
-    os << "[user " << std::setfill('0') << std::setw(user_ID_MAX_LEN)
+    os << "[user " << std::setfill('0') << std::setw(USER_ID_MAX_LEN)
        << obj.user_id << "] ";
     return os;
   }
@@ -26,9 +26,30 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
 void handle_logout_user(std::stringstream &buffer, Address &addr_from,
                         AuctionServerState &state);
 
+void handle_unregister_user(std::stringstream &buffer, Address &addr_from,
+                            AuctionServerState &state);
+
+void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
+                            AuctionServerState &state);
+
+void handle_list_mybids(std::stringstream &buffer, Address &addr_from,
+                        AuctionServerState &state);
+
+void handle_list_auctions(std::stringstream &buffer, Address &addr_from,
+                          AuctionServerState &state);
+
+void handle_show_record(std::stringstream &buffer, Address &addr_from,
+                        AuctionServerState &state);
+
 
 // TCP
-void handle_open_auction(std::stringstream &buffer, Address &addr_from,
-                         AuctionServerState &state);
+void handle_open_auction(int connection_fd, AuctionServerState &state);
+
+void handle_close_auction(int connection_fd, AuctionServerState &state);
+
+void handle_show_asset(int connection_fd, AuctionServerState &state);
+
+void handle_bid(int connection_fd, AuctionServerState &state);
+
 
 #endif

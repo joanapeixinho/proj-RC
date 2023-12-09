@@ -85,10 +85,8 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
       state.cdebug << userTag(packet.user_id) << "User logged out" << std::endl;
       
     }
-   
-  } catch (WrongPasswordException &e) {
-    state.cdebug << userTag(packet.user_id) << "Wrong password" << std::endl;
-    response.status = ReplyLogoutClientbound::NOK;
+
+  //duvida -> aqui é suposto verificar a password????
   } catch ( UserNotRegisteredException &e) {
     state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
     response.status = ReplyLogoutClientbound::UNR;
