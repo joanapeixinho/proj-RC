@@ -515,13 +515,42 @@ void ReplyCloseAuctionClientbound::send(int fd) {
   if (status == OK) {
     stream << "OK";
   } else if (status == EAU){
-    
-  }
+    stream << "EAU";
+  } else if (status == EOW){
+    stream << "EOW";
+  } else if (status == END) {
+    stream << "END";
+  } else if (status == NLG) {
+    stream << "NLG";
+  } else if (status == ERR) {
+    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
   stream << std::endl;
   writeString(fd, stream.str());
+}
+
+void ReplyCloseAuctionClientbound::receive(int fd) {
+  readPacketId(fd, ReplyCloseAuctionClientbound::ID);
+  readSpace(fd);
+  auto status_str = readString(fd);
+  if (status_str == "OK") {
+    this->status = OK;
+  } else if (status_str == "EAU") {
+    this->status = EAU;
+  } else if (status_str == "EOW") {
+    this->status = EOW;
+  } else if (status_str == "END") {
+    this->status = END;
+  } else if (status_str == "NLG") {
+    this->status = NLG;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(fd);
 }
 
 void ErrorTcpPacket::send(int fd) {
