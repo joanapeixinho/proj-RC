@@ -131,6 +131,23 @@ public:
         : std::runtime_error("Auction " + auctionId + " " + "does not belong to user: " + userId + "\n") {}
 };
 
+class InvalidFilePathException : public std::runtime_error {
+public:
+    InvalidFilePathException(const std::string& filePath)
+        : std::runtime_error("Invalid file path: " + filePath) {}
+};
+
+class AssetDoesNotExistException : public std::runtime_error {
+public:
+    AssetDoesNotExistException(const std::string& asset)
+        : std::runtime_error("Asset does not exist: " + asset) {}
+};
+
+class UserAlreadyLoggedInException : public std::runtime_error {
+public:
+    UserAlreadyLoggedInException(const std::string& userId)
+        : std::runtime_error("User already logged in: " + userId) {}
+};
 
 #endif
 

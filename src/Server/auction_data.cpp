@@ -7,7 +7,10 @@
                              : id(id), uid(uid), name(name), initialBid(initialBid), durationSeconds(durationSeconds), 
         assetFname(assetFname), endTime(endTime), endTimeSec(endTimeSec), startTime(startTime), bids(bids)
     {
-        startTime = std::time(nullptr);
+
+        if (id < 0 || id > AUCTION_MAX_NUMBER) {
+            throw InvalidAuctionIdException(std::to_string(id));
+        }
 
         if (name.length() > AUCTION_NAME_MAX_LENGTH) {
             throw InvalidAuctionNameException(name);
@@ -20,12 +23,14 @@
         if (durationSeconds < 0 || durationSeconds > AUCTION_DURATION_MAX_VALUE) {
             throw InvalidAuctionDurationException(std::to_string(durationSeconds));
         }
-        
-        //reached maximum auctions number
 
-        if (id > AUCTION_MAX_NUMBER) {
-            throw MaximumAuctionsException(std::to_string(id));
+        if (assetFname.length() > ASSET_NAME_MAX_LENGTH) {
+            throw InvalidAuctionAssetException(assetFname);
         }
+
+        
+        
+       
 
     }
 

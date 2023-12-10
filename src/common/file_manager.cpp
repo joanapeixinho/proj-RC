@@ -385,7 +385,6 @@ void FileManager:: closeAuction (AuctionData &auction) {
         if (auctionIsActive(auction.getIdString())) {
             createAuctionEndFile(auction.getIdString(), auction.getEndTime(), auction.getDurationSeconds());
         }
-
         else {
             throw AuctionNotActiveException(auction.getIdString());
         }
@@ -394,3 +393,20 @@ void FileManager:: closeAuction (AuctionData &auction) {
 
 }
 
+std::filesystem::path FileManager::showAsset(AuctionData& auction) {
+
+    std::filesystem::path assetPath = std::filesystem::path(AUCTION_DIR) / auction.getIdString() / auction.getAssetFname();
+    
+    if (assetPath.empty()) {
+        throw InvalidFilePathException(assetPath);
+    }
+
+    if (std::filesystem::exists(assetPath)) {
+        return assetPath;
+    }
+
+    throw AssetDoesNotExistException(assetPath);
+    return "";
+   
+   
+}

@@ -57,7 +57,7 @@ public:
     std::vector<Bid> getAuctionBids(const std::string& auctionId);
     void openAuction(const std::string& userId, const AuctionData& data);
     void closeAuction(AuctionData& auction);
-    std::string showAsset(AuctionData& auction);
+    std::filesystem::path showAsset(AuctionData& auction);
 
 private:
     std::map<std::string, std::mutex> userMutexes;
