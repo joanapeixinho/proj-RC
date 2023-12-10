@@ -751,7 +751,7 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
   packet_out.auction_id = auction_id;
 
   ReplyShowRecordClientbound rrc;
-  state.sendTcpPacketAndWaitForReply(packet_out, rrc);
+  state.sendUdpPacketAndWaitForReply(packet_out, rrc);
 
   switch (rrc.status) {
     case ReplyShowRecordClientbound::status::OK:

@@ -486,6 +486,24 @@ void ReplyOpenAuctionClientbound::receive(int fd) {
   readPacketDelimiter(fd);
 }
 
+void CloseAuctionServerbound::send(int fd) {
+  std::stringstream stream;
+  stream << CloseAuctionServerbound::ID << " ";
+  write_user_id(stream, user_id);
+  stream << " " << password << " " << auction_id << std::endl;
+  writeString(fd, stream.str());
+}
+
+void CloseAuctionServerbound::receive(int fd) {
+  // Serverbound packets don't read their ID
+  readSpace(fd);
+  user_id = readUserId(fd);
+  readSpace(fd);
+  password = readString(fd);
+  readSpace(fd);
+  auction_id = readInt(fd);
+  readPacketDelimiter(fd);
+}
 
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
