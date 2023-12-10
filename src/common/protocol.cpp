@@ -241,6 +241,42 @@ void UnregisterServerbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream ReplyUnregisterClientbound::serialize() {
+  std::stringstream buffer;
+  buffer << ReplyUnregisterClientbound::ID << " ";
+  if (status == ReplyUnregisterClientbound::status::OK) {
+    buffer << "OK";
+  } else if (status == ReplyUnregisterClientbound::status::NOK) {
+    buffer << "NOK";
+  } else if (status == ReplyUnregisterClientbound::status::UNR) {
+    buffer << "UNR";
+  } else if (status == ReplyUnregisterClientbound::status::ERR) {
+    buffer << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  buffer << std::endl;
+  return buffer;
+};
+
+void ReplyUnregisterClientbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyUnregisterClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "UNR") {
+    status = UNR;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(buffer);
+};
 
 std::stringstream ListMyAuctionsServerbound::serialize() {
   std::stringstream buffer;
