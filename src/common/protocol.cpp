@@ -465,13 +465,22 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     write_date_time(buffer, auction.getStartTime());
     buffer << auction.getDurationSeconds();
     if (auction.hasBids()) {
-      for (auto bid : auction.getBids()) {
-        buffer << " B ";
-        write_user_id(buffer, bid.bidder_user_id);
-        buffer << " " << bid.bid_value << " ";
-        write_date_time(buffer, bid.date_time);
-        buffer << " " << bid.sec_time;
+      const std::vector<Bid>& bids = auction.getBids();
+      int numBidsToRetrieve = 50;
+      int totalBids = static_cast<int>(bids.size());
+      int startIndex = std::max(totalBids - numBidsToRetrieve, 0);
+
+      for (int i = startIndex; i < totalBids; ++i) {
+          // Access bids by index
+          const Bid& currentBid = bids[i];
+          // Perform operations with currentBid
+          buffer << " B ";
+          write_user_id(buffer, currentBid.bidder_user_id);
+          buffer << " " << currentBid.bid_value << " ";
+          write_date_time(buffer, currentBid.date_time);
+          buffer << " " << currentBid.sec_time;
       }
+      
     }
     if (!auction.isActive()) {
       buffer << " E ";
@@ -490,7 +499,56 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
 };
 
 void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
-    buffer >> std::noskipws;
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyShowRecordClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+    readSpace(buffer);
+    // Read auction data
+    auction.setOwnerId(readUserId(buffer));
+    readSpace(buffer);
+    auction.setName(readString(buffer, AUCTION_NAME_MAX_LENGTH));
+    readSpace(buffer);
+    auction.setAssetFname(readString(buffer, ASSET_NAME_MAX_LENGTH));
+    readSpace(buffer);
+    auction.setInitialBid(readInt(buffer));
+    readSpace(buffer);
+    auction.setStartTime(read_date_time(buffer));
+    readSpace(buffer);
+    auction.setDurationSeconds(readInt(buffer));
+    int bidCounter = 0;
+    // Read bids and end time
+   if ( buffer.peek() != '\n'){ // Check if there are bids or end time
+      while (buffer.peek() == ' '){
+        readSpace(buffer);
+        if (buffer.peek() == 'B'){ // Read bid
+          readBid(buffer, auction);
+          bidCounter++;
+          if (bidCounter > 50){ // You cant receive more than 50 bids
+            throw InvalidPacketException();
+          }
+        } else if (buffer.peek() == 'E'){ // Read end time
+          readChar(buffer);
+          readSpace(buffer);
+          auction.setEndTime(read_date_time(buffer));
+          readSpace(buffer);
+          auction.setEndTimeSec(readInt(buffer));
+          break;
+        } else {
+          throw InvalidPacketException();
+        }
+      }
+    }
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(buffer);
 };
 
 
@@ -870,11 +928,19 @@ void wait_for_packet(UdpPacket &packet, int socket) {
 
 }
 
-void write_date_time(std::stringstream &buffer, const time_t &time) {
+void write_date_time(std::stringstream &buffer, const std::time_t &time) {
   // Convert std::time_t to std::tm
   std::tm tm_time = *std::localtime(&time);
   // Format the time as YYYY-MM-DD HH:MM:SS
   buffer << std::put_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+}
+std::time_t read_date_time(std::stringstream &buffer) {
+  std::tm tm_time;
+  buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+  if (buffer.fail()) {
+    throw InvalidPacketException();
+  }
+  return std::mktime(&tm_time);
 }
 
 void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
@@ -983,4 +1049,17 @@ std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctions
     }
 
     return auctions;
+}
+
+void readBid(std::stringstream &buffer, AuctionData& auction) {
+  auto bid = Bid();
+  readChar(buffer, ' ');
+  bid.bidder_user_id = readUserId(buffer);
+  readSpace(buffer);
+  bid.bid_value = readInt(buffer);
+  readSpace(buffer);
+  bid.date_time = read_date_time(buffer);
+  readSpace(buffer);
+  bid.sec_time = readInt(buffer);
+  auction.addBid(bid);
 }
