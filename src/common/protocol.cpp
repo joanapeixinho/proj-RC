@@ -228,22 +228,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
 };
 
 void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
-  buffer >> std::noskipws;
-  readPacketId(buffer, ReplyShowRecordClientbound::ID);
-  readSpace(buffer);
-  auto status_str = readString(buffer, 3);
-  if (status_str == "OK") {
-    status = OK;
-  } else if (status_str == "NOK") {
-    status = NOK;
-  } else if (status_str == "UNR") {
-    status = UNR;
-  } else if (status_str == "ERR") {
-    status = ERR;
-  } else {
-    throw InvalidPacketException();
-  }
-  readPacketDelimiter(buffer);
+ //TODO
 };
 
 
@@ -591,7 +576,10 @@ void wait_for_packet(UdpPacket &packet, int socket) {
   data.write(buffer, n);
 
   packet.deserialize(data);
+  
 }
+
+
 
 void write_user_id(std::stringstream &buffer, const uint32_t user_id) {
   buffer << std::setfill('0') << std::setw(USER_ID_MAX_LEN) << user_id;
