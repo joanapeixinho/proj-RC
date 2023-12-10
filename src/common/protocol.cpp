@@ -940,6 +940,29 @@ void ReplyShowAssetClientbound::receive(int fd) {
   readPacketDelimiter(fd);
 }
 
+void BidServerbound::send(int fd) {
+  std::stringstream stream;
+  stream << BidServerbound::ID << " ";
+  write_user_id(stream, user_id);
+  stream << " " << password << " ";
+  write_auction_id(stream, auction_id);
+  stream << " " << bid_value << std::endl;
+  writeString(fd, stream.str());
+}
+
+void BidServerbound::receive(int fd) {
+  // Serverbound packets don't read their ID
+  readSpace(fd);
+  user_id = readUserId(fd);
+  readSpace(fd);
+  password = readString(fd);
+  readSpace(fd);
+  auction_id = readAuctionId(fd);
+  readSpace(fd);
+  bid_value = readInt(fd);
+  readPacketDelimiter(fd);
+}
+
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
   writeString(fd, "\n");
