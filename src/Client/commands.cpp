@@ -747,12 +747,13 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
       std::cout 
           << "Displaying the record of the auction with ID [" << auction_id << "]:" 
           << std::endl;
-      std::cout << "Auction host: " << rrc.host_user_id << std::endl;
-      std::cout << "Auction name: " << rrc.auction_name << std::endl;
-      std::cout << "Auction asset: " << rrc.asset_fname << std::endl;
-      std::cout << "Auction start value: " << rrc.start_value << std::endl;
-      std::cout << "Auction start date: " << rrc.start_date_time << std::endl;
-      std::cout << "Auction time active: " << rrc.time_active << std::endl;
+      std::cout << "Auction host: " << rrc.auction_data.getUid() << std::endl;
+      std::cout << "Auction name: " << rrc.auction_data.getName() << std::endl;
+      std::cout << "Auction asset: " << rrc.auction_data.getAssetFname() << std::endl;
+      std::cout << "Auction start value: " << rrc.auction_data.getInitialBid() << std::endl;
+      
+      std::cout << "Auction start date: " << rrc.auction_data << std::endl;
+      std::cout << "Auction time active: " << rrc.auction_data << std::endl;
       if (rrc.is_active) {
         std::cout << "Auction status: Ongoing" << std::endl;
       } else {
@@ -779,6 +780,8 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
       break;
   }
 }
+
+
 
 void printBidsInfo(const std::vector<Bid>& bids) {
     for (const auto& bid : bids) {
