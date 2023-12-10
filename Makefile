@@ -64,7 +64,6 @@ CXXFLAGS += -Wunreachable-code
 CXXFLAGS += -Wunused
 LDFLAGS += -pthread
 
-
 .PHONY: all clean fmt fmt-check package
 
 all: $(TARGET_EXECS)
@@ -75,8 +74,11 @@ fmt: $(SOURCES) $(HEADERS)
 fmt-check: $(SOURCES) $(HEADERS)
 	clang-format -n --Werror $^
 
-src/server/server: $(SERVER_OBJECTS) $(SERVER_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
-src/client/user: $(CLIENT_OBJECTS) $(CLIENT_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
+src/Server/server: $(SERVER_OBJECTS) $(SERVER_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
+	$(CXX) $(LDFLAGS) -o src/Server/server $(SERVER_OBJECTS) $(COMMON_OBJECTS)
+	
+src/Client/User: $(CLIENT_OBJECTS) $(CLIENT_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
+	$(CXX) $(LDFLAGS) -o src/Client/User $(CLIENT_OBJECTS) $(COMMON_OBJECTS)
 
 AS: src/Server/server
 	cp src/Server/server AS
@@ -86,9 +88,7 @@ user: src/Client/User
 clean:
 	rm -f $(OBJECTS) $(TARGETS) $(TARGET_EXECS) project.zip
 
-clean-gamedata:
-	rm -rf .gamedata
 
 package:
-	cp README.md readme.txt
+	cp  readme.txt
 	zip project.zip $(SOURCES) $(HEADERS) Makefile .clang-format readme.txt *.xlsx
