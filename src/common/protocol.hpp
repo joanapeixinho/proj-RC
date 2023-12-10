@@ -277,6 +277,8 @@ class TcpPacket {
   uint32_t readInt(const int fd);
   uint32_t readUserId(const int fd);
   uint32_t readAuctionId(const int fd);
+  std::string readFileName(const int fd);
+  uint32_t readFileSize(const int fd);
   void readAndSaveToFile(const int fd, const std::string &file_name,
                          const size_t file_size, const bool cancellable);
 
@@ -296,8 +298,8 @@ class OpenAuctionServerbound : public TcpPacket {
   uint32_t start_value;
   uint32_t time_active;
   std::string file_name;
+  uint32_t file_size;
   std::filesystem::path file_path;
-  long int file_size;
   
 
   void send(int fd);
@@ -353,7 +355,7 @@ class ReplyShowAssetClientbound : public TcpPacket {
   static constexpr const char *ID = "RSA";
   status status;
   std::string file_name;
-  long int file_size;
+  uint32_t file_size;
   std::filesystem::path file_path;
 
   void send(int fd);
