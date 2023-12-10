@@ -963,6 +963,50 @@ void BidServerbound::receive(int fd) {
   readPacketDelimiter(fd);
 }
 
+void ReplyBidClientbound::send(int fd) {
+  std::stringstream stream;
+  stream << ReplyBidClientbound::ID << " ";
+  if (status == ACC){
+    stream << "ACC";
+  } else if (status == NOK){
+    stream << "NOK";
+  } else if (status == NLG){
+    stream << "NLG";
+  } else if (status == ILG){
+    stream << "ILG";
+  } else if (status == REF){
+    stream << "REF";
+  } else if (status == ERR){
+    stream << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  stream << std::endl;
+  writeString(fd, stream.str());
+}
+
+void ReplyBidClientbound::receive(int fd) {
+  readPacketId(fd, ReplyBidClientbound::ID);
+  readSpace(fd);
+  auto status_str = readString(fd);
+  if (status_str == "ACC") {
+    this->status = ACC;
+  } else if (status_str == "NOK") {
+    this->status = NOK;
+  } else if (status_str == "NLG") {
+    this->status = NLG;
+  } else if (status_str == "ILG") {
+    this->status = ILG;
+  } else if (status_str == "REF") {
+    this->status = REF;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(fd);
+}
+
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
   writeString(fd, "\n");
