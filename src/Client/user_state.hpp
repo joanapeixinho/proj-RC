@@ -4,7 +4,7 @@
 #include <netdb.h>
 
 // #include "client_Auction.hpp"
-
+#include "common/protocol.hpp"
 
 
 class UserState {

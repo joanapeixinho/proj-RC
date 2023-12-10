@@ -82,6 +82,7 @@ class UdpPacket {
                                      uint32_t max_len);
   uint32_t readInt(std::stringstream &buffer);
   uint32_t readUserId(std::stringstream &buffer);
+  uint32_t readAuctionId(std::stringstream &buffer);
 
  public:
   virtual std::stringstream serialize() = 0;
@@ -207,6 +208,7 @@ class ReplyMyBidsClientbound : public UdpPacket {
 class ListAuctionsServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LST";
+  
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -229,15 +231,6 @@ class ReplyListAuctionsClientbound : public UdpPacket {
 class ErrorUdpPacket : public UdpPacket {
  public:
   static constexpr const char *ID = "ERR";
-
-  std::stringstream serialize();
-  void deserialize(std::stringstream &buffer);
-};
-
-class MyAuctionsServerbound : public UdpPacket {
- public:
-  static constexpr const char *ID = "LMA";
-  uint32_t user_id;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -401,9 +394,13 @@ void send_packet(UdpPacket &packet, int socket, struct sockaddr *address,
 
 void wait_for_packet(UdpPacket &packet, int socket);
 
+void write_auction_id(std::stringstream &buffer, const uint32_t auction_id);
+
 void write_user_id(std::stringstream &buffer, const uint32_t user_id);
 
 uint32_t parse_packet_user_id(std::string &id_str);
+
+uint32_t parse_packet_auction_id(std::string &id_str);
 
 void sendFile(int connection_fd, std::filesystem::path image_path);
 

@@ -106,6 +106,11 @@ uint32_t UdpPacket::readUserId(std::stringstream &buffer) {
   return parse_packet_user_id(id_str);
 };
 
+uint32_t UdpPacket::readAuctionId(std::stringstream &buffer) {
+  std::string id_str = readString(buffer, AUCTION_ID_MAX_LEN);
+  return parse_packet_auction_id(id_str);
+};
+
 // Packet type seriliazation and deserialization methods
 std::stringstream LoginServerbound::serialize() {
   std::stringstream buffer;
@@ -386,9 +391,83 @@ void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream ListAuctionsServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << ListAuctionsServerbound::ID << std::endl;
+  return buffer;
+};
+
+void ListAuctionsServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  // Serverbound packets don't read their ID
+  readPacketDelimiter(buffer);
+};
+
+std::stringstream ReplyListAuctionsClientbound::serialize() {
+  std::stringstream buffer;
+  buffer << ReplyListAuctionsClientbound::ID << " ";
+  if (status == ReplyListAuctionsClientbound::status::OK) {
+    buffer << "OK " << formatAuctions(auctions);
+  } else if (status == ReplyListAuctionsClientbound::status::NOK) {
+    buffer << "NOK";
+  } else if (status == ReplyListAuctionsClientbound::status::ERR) {
+    buffer << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  buffer << std::endl;
+  return buffer;
+};
+
+void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyListAuctionsClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+    readSpace(buffer);
+    auctions = parseAuctions(buffer.str());
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(buffer);
+};
+
+std::stringstream ShowRecordServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << ShowRecordServerbound::ID << " ";
+  write_auction_id(buffer, auction_id);
+  buffer << std::endl;
+  return buffer;
+};
+
+void ShowRecordServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  // Serverbound packets don't read their ID
+  readSpace(buffer);
+  auction_id = readAuctionId(buffer);
+  readPacketDelimiter(buffer);
+};
+
 std::stringstream ReplyShowRecordClientbound::serialize() {
-   //TODO
-   return std::stringstream();
+  std::stringstream buffer;
+  buffer << ReplyShowRecordClientbound::ID << " ";
+  if (status == ReplyShowRecordClientbound::status::OK) {
+    buffer << "OK " << auction.;
+  } else if (status == ReplyShowRecordClientbound::status::NOK) {
+    buffer << "NOK";
+  } else if (status == ReplyShowRecordClientbound::status::ERR) {
+    buffer << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  buffer << std::endl;
+  return buffer;
 };
 
 void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
@@ -772,7 +851,10 @@ void wait_for_packet(UdpPacket &packet, int socket) {
 
 }
 
-
+void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
+  buffer << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN) << auction_id;
+  buffer.copyfmt(std::ios(NULL));  // reset formatting
+}
 
 void write_user_id(std::stringstream &buffer, const uint32_t user_id) {
   buffer << std::setfill('0') << std::setw(USER_ID_MAX_LEN) << user_id;
@@ -780,7 +862,7 @@ void write_user_id(std::stringstream &buffer, const uint32_t user_id) {
 }
 
 uint32_t parse_packet_user_id(std::string &id_str) {
-  if (id_str.length() != 6) {
+  if (id_str.length() != USER_ID_MAX_LEN) {
     throw InvalidPacketException();
   }
   for (char c : id_str) {
@@ -791,6 +873,26 @@ uint32_t parse_packet_user_id(std::string &id_str) {
   try {
     int i = std::stoi(id_str);
     if (i < 0 || i > (int)USER_ID_MAX) {
+      throw InvalidPacketException();
+    }
+    return (uint32_t)i;
+  } catch (...) {
+    throw InvalidPacketException();
+  }
+}
+
+uint32_t parse_packet_auction_id(std::string &id_str) {
+  if (id_str.length() != AUCTION_ID_MAX_LEN) {
+    throw InvalidPacketException();
+  }
+  for (char c : id_str) {
+    if (!isdigit(c)) {
+      throw InvalidPacketException();
+    }
+  }
+  try {
+    int i = std::stoi(id_str);
+    if (i < 0 || i > AUCTION_MAX_NUMBER) {
       throw InvalidPacketException();
     }
     return (uint32_t)i;
