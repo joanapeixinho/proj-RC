@@ -9,6 +9,8 @@
 #include <vector>
 
 #include "user_state.hpp"
+#include "../common/protocol.hpp"
+#include "../common/constants.hpp"
 
 class CommandHandler;
 
@@ -142,10 +144,11 @@ class ShowRecordCommand : public CommandHandler {
 
 bool is_numeric(std::string& str);
 
-bool is_aphanumeric(std::string& str);
+bool is_alphanumeric(std::string& str);
 
 uint32_t parse_user_id(std::string& args);
 
 void display_file(std::string filename);
+
 
 #endif

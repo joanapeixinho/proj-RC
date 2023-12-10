@@ -32,6 +32,14 @@ void UserState::login(uint32_t id, std::string &pwd) {
   this->password = pwd;
 }
 
+uint32_t UserState::getUserId() {
+  return this->user_id;
+}
+
+std::string UserState::getPassword() {
+  return this->password;
+}
+
 bool UserState::isLoggedIn() {
   return this->user_id != 0;
 }

@@ -273,7 +273,7 @@ AuctionData FileManager::getAuction(const std::string& auctionId) {
         std::getline(ss, startDatetime, ' ');
         double initialBid = std::stod(startValue);
         int durationSeconds = std::stoi(timeActive);
-        std::time_t startTime = std::stol(startFulltime);
+        std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
 
         if (!auctionIsActive(auctionId)) {
             std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + '/' + auctionId);
@@ -282,7 +282,7 @@ AuctionData FileManager::getAuction(const std::string& auctionId) {
             std::getline(ss, endDatetime, ' ');
             std::getline(ss, endSecTime, ' ');
             std::time_t endTimeSec = std::stoi(endSecTime);
-            std::time_t endTime = std::stol(endDatetime);
+            std::time_t endTime = static_cast<uint32_t>(std::stoi(endDatetime));
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             AuctionData data(std::stoi(auctionId),std::stoi(uid),  name, initialBid,
                              durationSeconds, assetFname, endTime, endTimeSec, startTime, bids);
@@ -353,7 +353,7 @@ void FileManager::UpdateAuction(const std::string& auctionId) {
             std::getline(ss, timeActive, ' ');
             std::getline(ss, startDatetime, ' ');
             std::getline(ss, startFulltime, ' ');
-            std::time_t startTime = std::stol(startFulltime);
+            std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
             int durationSeconds = std::stoi(timeActive);
             std::time_t endTime = startTime + durationSeconds;
             std::time_t now = std::time(nullptr);
