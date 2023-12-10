@@ -354,9 +354,7 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
     response.status = ReplyShowRecordClientbound::OK;
     response.auction = auction;
 
-    
-    
-  } catch (AuctionDoesNotExistException){
+  } catch (AuctionDoesNotExistException &e){
     state.cdebug << auctionTag(packet.auction_id) << "Auction does not exist" << std::endl;
     response.status = ReplyShowRecordClientbound::NOK;
   } catch (FileOpenException &e)
