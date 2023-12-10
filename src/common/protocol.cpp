@@ -223,6 +223,130 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream UnregisterServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << ListAuctionsServerbound::ID << " ";
+  write_user_id(buffer, user_id);
+  buffer << " " << password << std::endl;
+  return buffer;
+};
+
+void UnregisterServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  // Serverbound packets don't read their ID
+  readSpace(buffer);
+  user_id = readUserId(buffer);
+  readSpace(buffer);
+  password = readString(buffer, PASSWORD_MAX_LEN);
+  readPacketDelimiter(buffer);
+};
+
+std::stringstream ReplyUnregisterClientbound::serialize() {
+  std::stringstream buffer;
+  buffer << ReplyUnregisterClientbound::ID << " ";
+  if (status == ReplyUnregisterClientbound::status::OK) {
+    buffer << "OK";
+  } else if (status == ReplyUnregisterClientbound::status::NOK) {
+    buffer << "NOK";
+  } else if (status == ReplyUnregisterClientbound::status::UNR) {
+    buffer << "UNR";
+  } else if (status == ReplyUnregisterClientbound::status::ERR) {
+    buffer << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  buffer << std::endl;
+  return buffer;
+};
+
+void ReplyUnregisterClientbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyUnregisterClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "UNR") {
+    status = UNR;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(buffer);
+};
+
+std::stringstream ListMyAuctionsServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << LogoutServerbound::ID << " ";
+  write_user_id(buffer, user_id);
+  buffer << std::endl;
+  return buffer;
+};
+
+void ListMyAuctionsServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  // Serverbound packets don't read their ID
+  readSpace(buffer);
+  user_id = readUserId(buffer);
+  readPacketDelimiter(buffer);
+};
+
+std::stringstream ReplyListMyAuctionsClientbound::serialize() {
+  std::stringstream buffer;
+  buffer << ReplyListMyAuctionsClientbound::ID << " ";
+  if (status == ReplyListMyAuctionsClientbound::status::OK) {
+    buffer << "OK ";
+  } else if (status == ReplyListMyAuctionsClientbound::status::NOK) {
+    buffer << "NOK";
+  } else if (status == ReplyListMyAuctionsClientbound::status::NLG) {
+    buffer << "NLG";
+  } else if (status == ReplyListMyAuctionsClientbound::status::ERR) {
+    buffer << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  buffer << std::endl;
+  return buffer;
+};
+
+void ReplyListMyAuctionsClientbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyListMyAuctionsClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "NLG") {
+    status = NLG;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(buffer);
+};
+
+std::stringstream MyBidsServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << MyBidsServerbound::ID << " ";
+  write_user_id(buffer, user_id);
+  buffer << std::endl;
+  return buffer;
+};
+
+void MyBidsServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  // Serverbound packets don't read their ID
+  readSpace(buffer);
+  user_id = readUserId(buffer);
+  readPacketDelimiter(buffer);
+};
+
 std::stringstream ReplyShowRecordClientbound::serialize() {
    //TODO
    return std::stringstream();
@@ -516,13 +640,42 @@ void ReplyCloseAuctionClientbound::send(int fd) {
   if (status == OK) {
     stream << "OK";
   } else if (status == EAU){
-    
-  }
+    stream << "EAU";
+  } else if (status == EOW){
+    stream << "EOW";
+  } else if (status == END) {
+    stream << "END";
+  } else if (status == NLG) {
+    stream << "NLG";
+  } else if (status == ERR) {
+    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
   stream << std::endl;
   writeString(fd, stream.str());
+}
+
+void ReplyCloseAuctionClientbound::receive(int fd) {
+  readPacketId(fd, ReplyCloseAuctionClientbound::ID);
+  readSpace(fd);
+  auto status_str = readString(fd);
+  if (status_str == "OK") {
+    this->status = OK;
+  } else if (status_str == "EAU") {
+    this->status = EAU;
+  } else if (status_str == "EOW") {
+    this->status = EOW;
+  } else if (status_str == "END") {
+    this->status = END;
+  } else if (status_str == "NLG") {
+    this->status = NLG;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(fd);
 }
 
 void ErrorTcpPacket::send(int fd) {
