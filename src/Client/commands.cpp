@@ -817,7 +817,7 @@ void printBidsInfo(const std::vector<Bid> bids) {
     for (const auto bid : bids) {
         std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
         std::cout << "Bid Value: " << bid.bid_value << std::endl;
-        std::cout << "Date Time: " << bid.date_time 
+        std::cout << "Date Time: " << formatTime(bid.date_time, "%Y-%m-%d %H:%M:%S")
                   << ", Seconds: " << bid.sec_time << std::endl;
         std::cout << "---------------------------------------" << std::endl;
     }
