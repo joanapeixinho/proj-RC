@@ -223,6 +223,25 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream UnregisterServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << ListAuctionsServerbound::ID << " ";
+  write_user_id(buffer, user_id);
+  buffer << " " << password << std::endl;
+  return buffer;
+};
+
+void UnregisterServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  // Serverbound packets don't read their ID
+  readSpace(buffer);
+  user_id = readUserId(buffer);
+  readSpace(buffer);
+  password = readString(buffer, PASSWORD_MAX_LEN);
+  readPacketDelimiter(buffer);
+};
+
+
 std::stringstream ListMyAuctionsServerbound::serialize() {
   std::stringstream buffer;
   buffer << LogoutServerbound::ID << " ";
