@@ -331,6 +331,22 @@ void ReplyListMyAuctionsClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream MyBidsServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << MyBidsServerbound::ID << " ";
+  write_user_id(buffer, user_id);
+  buffer << std::endl;
+  return buffer;
+};
+
+void MyBidsServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  // Serverbound packets don't read their ID
+  readSpace(buffer);
+  user_id = readUserId(buffer);
+  readPacketDelimiter(buffer);
+};
+
 std::stringstream ReplyShowRecordClientbound::serialize() {
    //TODO
 };
