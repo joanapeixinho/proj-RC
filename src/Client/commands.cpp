@@ -759,30 +759,30 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
       std::cout 
           << "Displaying the record of the auction with ID [" << auction_id << "]:" 
           << std::endl;
-      std::cout << "Auction host: " << rrc.auction_data.getUid() << std::endl;
-      std::cout << "Auction name: " << rrc.auction_data.getName() << std::endl;
-      std::cout << "Auction asset: " << rrc.auction_data.getAssetFname() << std::endl;
-      std::cout << "Auction start value: " << rrc.auction_data.getInitialBid() << std::endl;
+      std::cout << "Auction host: " << rrc.auction.getUid() << std::endl;
+      std::cout << "Auction name: " << rrc.auction.getName() << std::endl;
+      std::cout << "Auction asset: " << rrc.auction.getAssetFname() << std::endl;
+      std::cout << "Auction start value: " << rrc.auction.getInitialBid() << std::endl;
       
       std::cout 
           << "Auction start date: " 
-        	<< formatTime(rrc.auction_data.getStartTime(), "%Y-%m-%d %H:%M:%S") 
+        	<< formatTime(rrc.auction.getStartTime(), "%Y-%m-%d %H:%M:%S") 
           << std::endl;
       std::cout 
-          << "Auction time active: " << rrc.auction_data.getDurationSeconds()
+          << "Auction time active: " << rrc.auction.getDurationSeconds()
           << std::endl;
-      if (rrc.auction_data.isActive()) {
+      if (rrc.auction.isActive()) {
         std::cout << "Auction status: Ongoing" << std::endl;
       } else {
         std::cout << "Auction status: Closed" << std::endl;
         std::cout 
             <<  "Auction end date: " 
-            << formatTime(rrc.auction_data.getEndTime(), "%Y-%m-%d %H:%M:%S")
+            << formatTime(rrc.auction.getEndTime(), "%Y-%m-%d %H:%M:%S")
             << std::endl;
-        std::cout <<  "Auction end seconds: " << rrc.auction_data.getEndTimeSec() << std::endl;
+        std::cout <<  "Auction end seconds: " << rrc.auction.getEndTimeSec() << std::endl;
       }
       std::cout <<  "----------- Last 50 bids: -----------" << std::endl;
-      printBidsInfo(rrc.auction_data.getBids());
+      printBidsInfo(rrc.auction.getBids());
       break;
 
     case ReplyShowRecordClientbound::status::NOK:
