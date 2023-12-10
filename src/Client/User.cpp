@@ -9,7 +9,6 @@
 #include <getopt.h>
 
 #include "User.hpp"
-#include "../common/common.hpp"
 
 extern bool is_shutting_down;
 

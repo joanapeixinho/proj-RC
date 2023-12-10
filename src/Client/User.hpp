@@ -8,7 +8,9 @@
 #include "commands.hpp"
 #include "../common/constants.hpp"
 #include "../common/protocol.hpp"
+#include "../common/common.hpp"
 #include "user_state.hpp"
+
 
 class ClientConfig {
  public:

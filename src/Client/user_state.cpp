@@ -5,7 +5,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "../common/common.hpp"
+#include "user_state.hpp"
 
 UserState::UserState(std::string &hostname, std::string &port) {
   this->setupSockets();

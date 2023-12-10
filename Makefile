@@ -6,7 +6,7 @@ INCLUDE_DIRS := src/Client src/Server src/
 INCLUDES = $(addprefix -I, $(INCLUDE_DIRS))
 
 TARGETS = src/Client/User src/Server/server
-TARGET_EXECS = player GS
+TARGET_EXECS = user AS
 
 CLIENT_SOURCES := $(wildcard src/Client/*.cpp)
 COMMON_SOURCES := $(wildcard src/common/*.cpp)
@@ -76,12 +76,12 @@ fmt-check: $(SOURCES) $(HEADERS)
 	clang-format -n --Werror $^
 
 src/server/server: $(SERVER_OBJECTS) $(SERVER_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
-src/client/player: $(CLIENT_OBJECTS) $(CLIENT_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
+src/client/user: $(CLIENT_OBJECTS) $(CLIENT_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
 
-GS: src/server/server
-	cp src/server/server GS
-player: src/client/player
-	cp src/client/player player
+AS: src/Server/server
+	cp src/Server/server AS
+user: src/Client/User
+	cp src/Client/User user
 
 clean:
 	rm -f $(OBJECTS) $(TARGETS) $(TARGET_EXECS) project.zip

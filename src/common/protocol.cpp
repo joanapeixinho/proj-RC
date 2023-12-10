@@ -353,7 +353,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
 };
 
 void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
- //TODO
+    buffer >> std::noskipws;
 };
 
 
