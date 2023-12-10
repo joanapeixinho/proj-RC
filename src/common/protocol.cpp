@@ -655,6 +655,11 @@ uint32_t TcpPacket::readUserId(const int fd) {
   return parse_packet_user_id(id_str);
 }
 
+uint32_t TcpPacket::readAuctionId(const int fd) {
+  std::string id_str = readString(fd);
+  return parse_packet_auction_id(id_str);
+}
+
 void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
                                   const size_t file_size,
                                   const bool cancellable) {
@@ -741,12 +746,14 @@ void OpenAuctionServerbound::send(int fd) {
   write_user_id(stream, user_id);
   stream << " " << password << " " << auction_name << " ";
   stream << start_value << " " << time_active << " ";
-  stream << file_name << " " << getFileSize(file_path) << " ";
+  stream << file_name << " " << file_size << " ";
   
   writeString(fd, stream.str());
+
   stream.str(std::string()); // clears the stream
   stream.clear(); // resets any error flags
   sendFile(fd, file_path); // Send file_data
+
   writeString(fd, "\n"); // Send packet delimiter
 }
 
@@ -765,7 +772,7 @@ void OpenAuctionServerbound::receive(int fd) {
   readSpace(fd);
   file_name = readString(fd);
   readSpace(fd);
-  uint32_t file_size = readInt(fd);
+  file_size = readInt(fd);
   readSpace(fd);
   readAndSaveToFile(fd, file_name, file_size, false);
   readPacketDelimiter(fd);
@@ -776,7 +783,8 @@ void ReplyOpenAuctionClientbound::send(int fd) {
   stream << ReplyOpenAuctionClientbound::ID << " ";
 
   if (status == OK) {
-    stream << "OK " << auction_id ;
+    stream << "OK ";
+    write_auction_id(stream, auction_id);
   } else if (status == NOK) {
     stream << "NOK";
   } else if (status == NLG) {
@@ -797,7 +805,7 @@ void ReplyOpenAuctionClientbound::receive(int fd) {
   if (status_str == "OK") {
     this->status = OK;
     readSpace(fd);
-    this->auction_id = readInt(fd);
+    this->auction_id = readAuctionId(fd);
   } else if (status_str == "NOK") {
     this->status = NOK;
   } else if (status_str == "NLG") {
@@ -814,7 +822,9 @@ void CloseAuctionServerbound::send(int fd) {
   std::stringstream stream;
   stream << CloseAuctionServerbound::ID << " ";
   write_user_id(stream, user_id);
-  stream << " " << password << " " << auction_id << std::endl;
+  stream << " " << password << " ";
+  write_auction_id(stream, auction_id);
+  stream << std::endl;
   writeString(fd, stream.str());
 }
 
@@ -825,7 +835,7 @@ void CloseAuctionServerbound::receive(int fd) {
   readSpace(fd);
   password = readString(fd);
   readSpace(fd);
-  auction_id = readInt(fd);
+  auction_id = readAuctionId(fd);
   readPacketDelimiter(fd);
 }
 
@@ -870,6 +880,21 @@ void ReplyCloseAuctionClientbound::receive(int fd) {
   } else {
     throw InvalidPacketException();
   }
+  readPacketDelimiter(fd);
+}
+
+void ShowAssetServerbound::send(int fd) {
+  std::stringstream stream;
+  stream << ShowAssetServerbound::ID << " ";
+  write_auction_id(stream, auction_id);
+  stream << std::endl;
+  writeString(fd, stream.str());
+}
+
+void ShowAssetServerbound::receive(int fd) {
+  // Serverbound packets don't read their ID
+  readSpace(fd);
+  auction_id = readAuctionId(fd);
   readPacketDelimiter(fd);
 }
 

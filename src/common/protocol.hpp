@@ -276,6 +276,7 @@ class TcpPacket {
   std::string readString(const int fd);
   uint32_t readInt(const int fd);
   uint32_t readUserId(const int fd);
+  uint32_t readAuctionId(const int fd);
   void readAndSaveToFile(const int fd, const std::string &file_name,
                          const size_t file_size, const bool cancellable);
 
