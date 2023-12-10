@@ -812,8 +812,8 @@ std::string formatTime(std::time_t timeValue, const std::string& format) {
     return formattedTime.str();
 }
 
-void printBidsInfo(const std::vector<Bid>& bids) {
-    for (const auto& bid : bids) {
+void printBidsInfo(const std::vector<Bid> bids) {
+    for (const auto bid : bids) {
         std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
         std::cout << "Bid Value: " << bid.bid_value << std::endl;
         std::cout << "Date Time: " << bid.date_time 

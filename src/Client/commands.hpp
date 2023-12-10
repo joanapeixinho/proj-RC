@@ -151,7 +151,7 @@ void display_file(std::string filename);
 
 std::string formatTime(std::time_t timeValue, const std::string& format);
 
-void printBidsInfo(std::vector<Bid>& bids);
+void printBidsInfo(std::vector<Bid> bids);
 
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions);
 
