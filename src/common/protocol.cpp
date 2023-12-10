@@ -386,6 +386,18 @@ void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream ListAuctionsServerbound::serialize() {
+  std::stringstream buffer;
+  buffer << ListAuctionsServerbound::ID << std::endl;
+  return buffer;
+};
+
+void ListAuctionsServerbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ListAuctionsServerbound::ID);
+  readPacketDelimiter(buffer);
+};
+
 std::stringstream ReplyShowRecordClientbound::serialize() {
    //TODO
    return std::stringstream();

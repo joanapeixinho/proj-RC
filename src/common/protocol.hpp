@@ -207,6 +207,7 @@ class ReplyMyBidsClientbound : public UdpPacket {
 class ListAuctionsServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "LST";
+  
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
