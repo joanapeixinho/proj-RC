@@ -104,7 +104,7 @@ void LoginCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if Password is AlphaNumeric
-  if (!is_aplhanumeric(password)) {
+  if (!is_alphanumeric(password)) {
     std::cout << "Invalid password. It must be alphanumeric" << std::endl;
     return;
   }
@@ -148,6 +148,9 @@ void LoginCommand::handle(std::string args, UserState& state) {
 }
 
 void LogoutCommand::handle(std::string args, UserState& state) {
+
+  //avoid unused parameter warning
+  (void) args;
   // Check if user is logged in
   if (!state.isLoggedIn()) {
     std::cout 
@@ -158,8 +161,8 @@ void LogoutCommand::handle(std::string args, UserState& state) {
 
     // Populate and send packet
   LogoutServerbound packet_out;
-  packet_out.user_id = state.user_id;
-  packet_out.password = state.password;
+  packet_out.user_id = state.getUserId();
+  packet_out.password = state.getPassword();
 
   ReplyLogoutClientbound lou;
   state.sendUdpPacketAndWaitForReply(packet_out, lou);
@@ -195,6 +198,9 @@ void LogoutCommand::handle(std::string args, UserState& state) {
 }
 
 void UnregisterCommand::handle(std::string args, UserState& state) {
+
+  //avoid unused parameter warning
+  (void) args;
   // Check if user is logged in
   if (!state.isLoggedIn()) {
     std::cout 
@@ -205,8 +211,8 @@ void UnregisterCommand::handle(std::string args, UserState& state) {
 
   // Populate and send packet
   UnregisterServerbound packet_out;
-  packet_out.user_id = state.user_id;
-  packet_out.password = state.password;
+  packet_out.user_id = state.getUserId();
+  packet_out.password = state.getPassword();
 
   ReplyUnregisterClientbound lou;
   state.sendUdpPacketAndWaitForReply(packet_out, lou);
@@ -242,6 +248,8 @@ void UnregisterCommand::handle(std::string args, UserState& state) {
 }
 
 void ExitCommand::handle(std::string args, UserState& state) {
+  //avoid unused parameter warning
+  (void) args;
   // Check if user is logged in
   if (state.isLoggedIn()) {
     std::cout 
@@ -275,13 +283,13 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if asset_name is too long
-  if (auction_name.length() > AUCTION_NAME_MAX_LEN) {
-    std::cout << "Invalid auction name. It must be at most " << AUCTION_NAME_MAX_LEN 
+  if (auction_name.length() > AUCTION_NAME_MAX_LENGTH) {
+    std::cout << "Invalid auction name. It must be at most " << AUCTION_NAME_MAX_LENGTH 
               << " characters long" << std::endl;
     return;
   }
   // Check if asset_name is AlphaNumeric
-  if (!is_aplhanumeric(auction_name)) {
+  if (!is_alphanumeric(auction_name)) {
     std::cout << "Invalid auction name. It must be alphanumeric" << std::endl;
     return;
   }
@@ -292,22 +300,22 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if timeactive_str is too long
-  if (timeactive_str.length() > AUCTION_DURATION_MAX_LEN) {
-    std::cout << "Invalid auction duration. It must be at most " << AUCTION_DURATION_MAX_LEN 
+  if (timeactive_str.length() > AUCTION_DURATION_MAX_VALUE) {
+    std::cout << "Invalid auction duration. It must be at most " << AUCTION_DURATION_MAX_VALUE 
               << " characters long" << std::endl;
     return;
   }
 
   // Convert start_value_str to uint32_t
-  long start_value = std::stol(start_value_str, NULL, 10);
-  long timeactive = std::stol(timeactive_str, NULL, 10);
+  uint32_t start_value = static_cast<uint32_t>(std::stoi(start_value_str, NULL, 10));
+  uint32_t timeactive = static_cast<uint32_t>(std::stoi(timeactive_str, NULL, 10));
 
 
 
   // Populate and send packet
   OpenAuctionServerbound packet_out;
-  packet_out.user_id = state.user_id;
-  packet_out.password = state.password;
+  packet_out.user_id = state.getUserId();
+  packet_out.password = state.getPassword();
   packet_out.auction_name = auction_name;
   packet_out.start_value = start_value;
   packet_out.time_active = timeactive;
@@ -377,12 +385,12 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
 
   // Populate and send packet
   CloseAuctionServerbound packet_out;
-  packet_out.user_id = state.user_id;
-  packet_out.password = state.password;
+  packet_out.user_id = state.getUserId();
+  packet_out.password = state.getPassword();
   packet_out.auction_id = auction_id;
 
   ReplyCloseAuctionClientbound rcl;
@@ -429,6 +437,10 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
 }
 
 void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
+  
+  //avoid unused parameter warning
+  (void) args;
+
   // Check if user is logged in
   if (!state.isLoggedIn()) {
     std::cout 
@@ -439,7 +451,7 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
 
   // Populate and send packet
   ListMyAuctionsServerbound packet_out;
-  packet_out.user_id = state.user_id;
+  packet_out.user_id = state.getUserId();
 
   ReplyListMyAuctionsClientbound rma;
   state.sendUdpPacketAndWaitForReply(packet_out, rma);
@@ -448,7 +460,7 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
     case ReplyListMyAuctionsClientbound::status::OK:
       // Output autions info
       std::cout << "Displaying the auctions started by you:" << std::endl;
-      printAuctions(rma.myAuctions);
+      printAuctions(rma.auctions);
       break;
 
     case ReplyListMyAuctionsClientbound::status::NLG:
@@ -484,7 +496,7 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
 
   // Populate and send packet
   MyBidsServerbound packet_out;
-  packet_out.user_id = state.user_id;
+  packet_out.user_id = state.getUserId();
 
   ReplyMyBidsClientbound rmb;
   state.sendUdpPacketAndWaitForReply(packet_out, rmb);
@@ -579,7 +591,7 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
 
   // Populate and send packet
   ShowAssetServerbound packet_out;
@@ -655,14 +667,14 @@ void BidCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
   // Convert bid_value_str to uint32_t
-  uint32_t bid_value = std::stol(bid_value_str, NULL, 10);
+  uint32_t bid_value = static_cast<uint32_t>(std::stoi(bid_value_str, NULL, 10));
 
   // Populate and send packet
   BidServerbound packet_out;
-  packet_out.user_id = state.user_id;
-  packet_out.password = state.password;
+  packet_out.user_id = state.getUserId();
+  packet_out.password = state.getPassword();
   packet_out.auction_id = auction_id;
   packet_out.bid_value = bid_value;
 
@@ -732,7 +744,7 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = std::stol(auction_id_str, NULL, 10);
+  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
 
   // Populate and send packet
   ShowRecordServerbound packet_out;
@@ -802,7 +814,7 @@ void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     }
 }
 
-bool is_aplhanumeric(std::string& str) {
+bool is_alphanumeric(std::string& str) {
   for (char c : str) {
     if (!isalnum(c)) {
       return false;
@@ -823,8 +835,7 @@ bool is_numeric(std::string& str) {
 
 uint32_t parse_user_id(std::string& args) {
   size_t converted = 0;
-  // stol -> String TO Long int; converted -> number of characters converted to int
-  long user_id = std::stol(args, &converted, 10);
+  long user_id = static_cast<uint32_t>(std::stoi(args, &converted, 10));
   if (converted != args.length() || user_id <= 0 ||
       user_id > USER_ID_MAX) {
     throw std::runtime_error("invalid user id");

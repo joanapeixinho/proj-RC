@@ -313,7 +313,7 @@ uint32_t TcpPacket::readInt(const int fd) {
   std::string int_str = readString(fd);
   try {
     size_t converted = 0;
-    int64_t result = std::stoll(int_str, &converted, 10);
+    int64_t result = static_cast<uint32_t>(std::stoi(int_str, &converted, 10));
     if (converted != int_str.length() || std::iswspace((wint_t)int_str.at(0)) ||
         result < 0 || result > INT32_MAX) {
       throw InvalidPacketException();

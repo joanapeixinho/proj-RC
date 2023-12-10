@@ -11,6 +11,8 @@ class UserState {
   int tcp_socket_fd = -1;
   struct addrinfo* server_udp_addr = NULL;
   struct addrinfo* server_tcp_addr = NULL;
+  uint32_t user_id;
+  std::string password;
 
   void setupSockets();
   void resolveServerAddress(std::string& hostname, std::string& port);
@@ -31,9 +33,10 @@ class UserState {
                                     UdpPacket& in_packet);
   void sendTcpPacketAndWaitForReply(TcpPacket& out_packet,
                                     TcpPacket& in_packet);
-  private:
-    uint32_t user_id;
-    std::string password;                                 
+  uint32_t getUserId();
+  std::string getPassword();
+
+                                  
 };
 
 
