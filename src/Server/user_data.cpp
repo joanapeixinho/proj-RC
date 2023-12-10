@@ -26,7 +26,7 @@ UserData::UserData(uint32_t id, const std::string &password, FileManager &fileMa
 UserData::UserData(uint32_t id, FileManager &fileManager)
     : id(id), fileManager(fileManager) {}
 
-int UserData::getId() const
+uint32_t UserData::getId() const
 {
     return id;
 }

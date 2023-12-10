@@ -15,13 +15,13 @@ struct Bid {
   uint32_t bidder_user_id;
   uint32_t bid_value;
   std::time_t date_time;
-  int sec_time;
+  uint32_t sec_time;
 };
 
 class AuctionData {
 public:
     AuctionData() = default;
-    AuctionData(uint32_t id, uint32_t uid, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, int endTimeSec , std::time_t startTime, std::vector<Bid> bids);
+    AuctionData(uint32_t id, uint32_t uid, std::string& name, uint32_t initialBid, uint32_t durationSeconds, const std::string& assetFname, std::time_t endTime, uint32_t endTimeSec , std::time_t startTime, std::vector<Bid> bids);
     void openAuction();
     std::string getIdString() const;
     uint32_t getId() const;
@@ -29,11 +29,11 @@ public:
     std::string toString() const; 
     std::string getAssetFname() const;   
     const std::string& getName() const;
-    double getInitialBid() const;
-    int getDurationSeconds() const;
+    uint32_t getInitialBid() const;
+    uint32_t getDurationSeconds() const;
     std::time_t getStartTime() const;
     std::time_t getEndTime() const;
-    int getEndTimeSec() const;
+    uint32_t getEndTimeSec() const;
     std::vector<Bid> getBids() const;
     bool hasBids() const;
     bool isActive() const;
@@ -43,25 +43,25 @@ public:
 
     void setOwnerId(uint32_t uid);
     void setName(const std::string& name);
-    void setInitialBid(int initialBid);
-    void setDurationSeconds(int durationSeconds);
+    void setInitialBid(uint32_t initialBid);
+    void setDurationSeconds(uint32_t durationSeconds);
     void setStartTime(std::time_t startTime);
     void setAssetFname(const std::string& assetFname);
     void setEndTime(std::time_t endTime);
-    void setEndTimeSec(int endTimeSec);
+    void setEndTimeSec(uint32_t endTimeSec);
     void addBid(Bid bid);
 
 
 private:
-    int id;
-    int uid;
+    uint32_t id;
+    uint32_t uid;
     std::string name;
-    double initialBid;
-    int durationSeconds;
+    uint32_t initialBid;
+    uint32_t durationSeconds;
     std::time_t startTime;
     std::string assetFname;
     std::time_t endTime;
-    int endTimeSec;
+    uint32_t endTimeSec;
     std::vector<Bid> bids;
     bool active;
 };

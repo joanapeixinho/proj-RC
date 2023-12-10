@@ -2,7 +2,7 @@
 
 
  AuctionData::AuctionData(uint32_t id, uint32_t uid , std::string& name,
-                             double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, int endTimeSec, std::time_t startTime
+                             uint32_t initialBid, uint32_t durationSeconds, const std::string& assetFname, std::time_t endTime, uint32_t endTimeSec, std::time_t startTime
                              , std::vector<Bid> bids)
                              : id(id), uid(uid), name(name), initialBid(initialBid), durationSeconds(durationSeconds), 
         assetFname(assetFname), endTime(endTime), endTimeSec(endTimeSec), startTime(startTime), bids(bids)
@@ -55,11 +55,11 @@ const std::string& AuctionData::getName() const {
     return name;
 }
 
-double AuctionData::getInitialBid() const {
+uint32_t AuctionData::getInitialBid() const {
     return initialBid;
 }
 
-int AuctionData::getDurationSeconds() const {
+uint32_t AuctionData::getDurationSeconds() const {
     return durationSeconds;
 }
 
@@ -87,7 +87,7 @@ std::time_t AuctionData::getEndTime() const {
     return endTime;
 }
 
-int AuctionData::getEndTimeSec() const {
+uint32_t AuctionData::getEndTimeSec() const {
     return endTimeSec;
 }	
 
@@ -124,11 +124,11 @@ void AuctionData::setName(const std::string& name) {
     this->name = name;
 }
 
-void AuctionData::setInitialBid(int initialBid) {
+void AuctionData::setInitialBid(uint32_t initialBid) {
     this->initialBid = initialBid;
 }
 
-void AuctionData::setDurationSeconds(int durationSeconds) {
+void AuctionData::setDurationSeconds(uint32_t durationSeconds) {
     this->durationSeconds = durationSeconds;
 }
 
@@ -144,7 +144,7 @@ void AuctionData::setEndTime(std::time_t endTime) {
     this->endTime = endTime;
 }
 
-void AuctionData::setEndTimeSec(int endTimeSec) {
+void AuctionData::setEndTimeSec(uint32_t endTimeSec) {
     this->endTimeSec = endTimeSec;
 }
 

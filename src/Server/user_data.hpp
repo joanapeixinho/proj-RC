@@ -10,7 +10,7 @@ class UserData {
 public:
     UserData(uint32_t id, const std::string& password, FileManager& fileManager);
     UserData(uint32_t id, FileManager& fileManager);
-    int getId() const;
+    uint32_t getId() const;
     std::string getIdString() const;
     const std::string& getPassword() const;
     void login();

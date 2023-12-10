@@ -466,11 +466,12 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     buffer << auction.getDurationSeconds();
     if (auction.hasBids()) {
       const std::vector<Bid>& bids = auction.getBids();
-      int numBidsToRetrieve = 50;
-      int totalBids = static_cast<int>(bids.size());
-      int startIndex = std::max(totalBids - numBidsToRetrieve, 0);
+      std::vector<Bid>::size_type numBidsToRetrieve = 50;
+      std::vector<Bid>::size_type totalBids = bids.size();
+      std::vector<Bid>::size_type startIndex = 
+          totalBids > numBidsToRetrieve ? totalBids - numBidsToRetrieve : 0;
 
-      for (int i = startIndex; i < totalBids; ++i) {
+      for (std::vector<Bid>::size_type i = startIndex; i < totalBids; ++i) {
           // Access bids by index
           const Bid& currentBid = bids[i];
           // Perform operations with currentBid

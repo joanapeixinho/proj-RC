@@ -174,7 +174,7 @@ void FileManager::createAuctionAssetFile(const std::string &auctionId, const std
     }
 }
 
-void FileManager::createAuctionEndFile(const std::string &auctionId, const std::time_t &endTime, const int &activeSeconds)
+void FileManager::createAuctionEndFile(const std::string &auctionId, const std::time_t &endTime, const uint32_t &activeSeconds)
 {
     std::stringstream ss;
     ss << std::put_time(std::localtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
@@ -325,8 +325,8 @@ AuctionData FileManager::getAuction(const std::string &auctionId)
         std::getline(ss, startValue, ' ');
         std::getline(ss, timeActive, ' ');
         std::getline(ss, startDatetime, ' ');
-        double initialBid = std::stod(startValue);
-        int durationSeconds = std::stoi(timeActive);
+        uint32_t initialBid = std::stoul(startValue);
+        uint32_t durationSeconds = std::stoul(timeActive);
         std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
 
         if (!auctionIsActive(auctionId)) {
@@ -335,7 +335,7 @@ AuctionData FileManager::getAuction(const std::string &auctionId)
             std::string endDatetime, endSecTime;
             std::getline(ssEnd, endDatetime, ' ');
             std::getline(ssEnd, endSecTime, ' ');
-            int endTimeSec = std::stoi(endSecTime);
+            uint32_t endTimeSec = std::stoul(endSecTime);
             std::time_t endTime =(std::stoi(endDatetime));
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(static_cast<uint32_t>(std::stoi(auctionId)), static_cast<uint32_t>(std::stoi(uid)), name, initialBid,
@@ -419,7 +419,7 @@ void FileManager::UpdateAuction(const std::string &auctionId)
         std::getline(ss, startDatetime, ' ');
         std::getline(ss, startFulltime, ' ');
         std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
-        int durationSeconds = std::stoi(timeActive);
+        uint32_t durationSeconds = std::stoul(timeActive);
         std::time_t endTime = startTime + durationSeconds;
         std::time_t now = std::time(nullptr);
         if (now > endTime)
