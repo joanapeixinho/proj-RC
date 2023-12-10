@@ -524,6 +524,21 @@ void CloseAuctionServerbound::receive(int fd) {
   readPacketDelimiter(fd);
 }
 
+void ReplyCloseAuctionClientbound::send(int fd) {
+  std::stringstream stream;
+  stream << ReplyCloseAuctionClientbound::ID << " ";
+  if (status == OK) {
+    stream << "OK";
+  } else if (status == EAU){
+    
+  }
+  } else {
+    throw PacketSerializationException();
+  }
+  stream << std::endl;
+  writeString(fd, stream.str());
+}
+
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
   writeString(fd, "\n");

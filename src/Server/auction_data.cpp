@@ -29,11 +29,17 @@
 
     }
 
-std::string AuctionData :: getId() const {
-        std::ostringstream oss;
-        oss << std::setw(3) << std::setfill('0') << id;
-        return oss.str();
-    }
+std::string AuctionData::getId() const {
+    std::ostringstream oss;
+    oss << std::setw(AUCTION_ID_MAX_LEN) << std::setfill('0') << id;
+    return oss.str();
+}
+
+std::string AuctionData::getUid() const {
+    std::ostringstream oss;
+    oss << std::setw(USER_ID_MAX_LEN) << std::setfill('0') << uid;
+    return oss.str();
+}
 
 const std::string& AuctionData::getName() const {
     return name;
@@ -69,6 +75,14 @@ std::time_t AuctionData::getStartTime() const {
 
 std::time_t AuctionData::getEndTime() const {
     return endTime;
+}
+
+int AuctionData::getEndTimeSec() const {
+    return endTimeSec;
+}	
+
+std::vector<Bid> AuctionData::getBids() const {
+    return bids;
 }
 
 bool AuctionData::isActive() const {
