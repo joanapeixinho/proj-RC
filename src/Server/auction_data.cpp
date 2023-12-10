@@ -77,6 +77,14 @@ std::time_t AuctionData::getEndTime() const {
     return endTime;
 }
 
+int AuctionData::getEndTimeSec() const {
+    return endTimeSec;
+}	
+
+std::vector<Bid> AuctionData::getBids() const {
+    return bids;
+}
+
 bool AuctionData::isActive() const {
     
 }

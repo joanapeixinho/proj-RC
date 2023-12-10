@@ -764,17 +764,25 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
       std::cout << "Auction asset: " << rrc.auction_data.getAssetFname() << std::endl;
       std::cout << "Auction start value: " << rrc.auction_data.getInitialBid() << std::endl;
       
-      std::cout << "Auction start date: " << rrc.auction_data << std::endl;
-      std::cout << "Auction time active: " << rrc.auction_data << std::endl;
-      if (rrc.is_active) {
+      std::cout 
+          << "Auction start date: " 
+        	<< formatTime(rrc.auction_data.getStartTime(), "%Y-%m-%d %H:%M:%S") 
+          << std::endl;
+      std::cout 
+          << "Auction time active: " << rrc.auction_data.getDurationSeconds()
+          << std::endl;
+      if (rrc.auction_data.isActive()) {
         std::cout << "Auction status: Ongoing" << std::endl;
       } else {
         std::cout << "Auction status: Closed" << std::endl;
-        std::cout <<  "Auction end date: " << rrc.start_value << std::endl;
-        std::cout <<  "Auction end seconds: " << rrc.end_sec_time << std::endl;
+        std::cout 
+            <<  "Auction end date: " 
+            << formatTime(rrc.auction_data.getEndTime(), "%Y-%m-%d %H:%M:%S")
+            << std::endl;
+        std::cout <<  "Auction end seconds: " << rrc.auction_data.getEndTimeSec() << std::endl;
       }
-      std::cout <<  "----------- Last 50 bids: -----------" << rrc.end_sec_time << std::endl;
-      printBidsInfo(rrc.bids);
+      std::cout <<  "----------- Last 50 bids: -----------" << std::endl;
+      printBidsInfo(rrc.auction_data.getBids());
       break;
 
     case ReplyShowRecordClientbound::status::NOK:
@@ -793,7 +801,16 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
   }
 }
 
+std::string formatTime(std::time_t timeValue, const std::string& format) {
+    // Convert time_t to struct tm
+    std::tm* timeInfo = std::gmtime(&timeValue); // Use gmtime for UTC time
 
+    // Format the time
+    std::ostringstream formattedTime;
+    formattedTime << std::put_time(timeInfo, format.c_str());
+
+    return formattedTime.str();
+}
 
 void printBidsInfo(const std::vector<Bid>& bids) {
     for (const auto& bid : bids) {

@@ -31,6 +31,8 @@ public:
     int getDurationSeconds() const;
     std::time_t getStartTime() const;
     std::time_t getEndTime() const;
+    int getEndTimeSec() const;
+    std::vector<Bid> getBids() const;
     bool isActive() const;
 
 private:
@@ -42,7 +44,7 @@ private:
     std::time_t startTime;
     std::string assetFname;
     std::time_t endTime;
-    std::time_t endTimeSec;
+    int endTimeSec;
     std::vector<Bid> bids;
 };
 
