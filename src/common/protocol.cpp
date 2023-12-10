@@ -660,6 +660,43 @@ uint32_t TcpPacket::readAuctionId(const int fd) {
   return parse_packet_auction_id(id_str);
 }
 
+uint32_t TcpPacket::readFileSize(const int fd) {
+  std::string file_size_str = readString(fd);
+  if (file_size_str.length() > ASSET_FILE_SIZE_MAX_LEN) {
+    throw InvalidPacketException();
+  }
+  for (char c : file_size_str) {
+    if (!isdigit(c)) {
+      throw InvalidPacketException();
+    }
+  }
+  try {
+    int file_size = std::stoi(file_size_str);
+    if (file_size < 0 || file_size > (int)ASSET_MAX_BYTES) {
+      throw InvalidPacketException();
+    }
+    return (uint32_t)file_size;
+  } catch (...) {
+    throw InvalidPacketException();
+  }
+}
+
+std::string TcpPacket::readFileName(const int fd) {
+  std::string str = readString(fd);
+  if(str.length() > ASSET_NAME_MAX_LENGTH){
+    throw InvalidPacketException();
+  }
+  for (uint32_t i = 0; i < str.length(); ++i) {
+    char c = str[i];
+    if (!isalpha((unsigned char)c) && c != '-' && c != '_' && c != '.') {
+      throw InvalidPacketException();
+    }
+
+    str[i] = (char)tolower((unsigned char)str[i]);
+  }
+  return str;
+}
+
 void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
                                   const size_t file_size,
                                   const bool cancellable) {
@@ -770,9 +807,9 @@ void OpenAuctionServerbound::receive(int fd) {
   readSpace(fd);
   time_active = readInt(fd);
   readSpace(fd);
-  file_name = readString(fd);
+  file_name = readFileName(fd);
   readSpace(fd);
-  file_size = readInt(fd);
+  file_size = readFileSize(fd);
   readSpace(fd);
   readAndSaveToFile(fd, file_name, file_size, false);
   readPacketDelimiter(fd);
@@ -925,9 +962,9 @@ void ReplyShowAssetClientbound::receive(int fd) {
   if (status_str == "OK") {
     this->status = OK;
     readSpace(fd);
-    this->file_name = readString(fd);
+    this->file_name = readFileName(fd);
     readSpace(fd);
-    this->file_size = readInt(fd);
+    this->file_size = readFileSize(fd);
     readSpace(fd);
     readAndSaveToFile(fd, file_name, file_size, false);
   } else if (status_str == "NOK") {
@@ -1006,6 +1043,8 @@ void ReplyBidClientbound::receive(int fd) {
   }
   readPacketDelimiter(fd);
 }
+
+
 
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
