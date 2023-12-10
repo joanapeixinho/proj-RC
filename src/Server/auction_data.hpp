@@ -15,7 +15,7 @@ struct Bid {
   uint32_t bidder_user_id;
   uint32_t bid_value;
   std::string date_time;
-  uint32_t sec_time;
+  int sec_time;
 };
 
 class AuctionData {

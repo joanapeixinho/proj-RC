@@ -225,6 +225,7 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
 
 std::stringstream ReplyShowRecordClientbound::serialize() {
    //TODO
+   return std::stringstream();
 };
 
 void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
@@ -576,7 +577,7 @@ void wait_for_packet(UdpPacket &packet, int socket) {
   data.write(buffer, n);
 
   packet.deserialize(data);
-  
+
 }
 
 
