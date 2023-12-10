@@ -58,6 +58,7 @@ public:
     void openAuction(const std::string& userId, const AuctionData& data);
     void closeAuction(AuctionData& auction);
     std::filesystem::path showAsset(AuctionData& auction);
+    void bid(AuctionData& auction, uint32_t bidValue);
 
 private:
     std::map<std::string, std::mutex> userMutexes;

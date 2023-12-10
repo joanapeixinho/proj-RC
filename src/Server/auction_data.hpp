@@ -37,6 +37,7 @@ public:
     std::vector<Bid> getBids() const;
     bool isActive() const;
     uint32_t getOwnerId() const;
+    uint32_t getHighestBidValue() const;
 
 private:
     int id;

@@ -169,4 +169,34 @@ std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions(const std::strin
     return auctions;
 }
 
+void UserData::bid(AuctionData &auction, uint32_t bidValue, const std::string &password)
+{
+
+    if (!fileManager.UserLoggedIn(std::to_string(this->id)))
+    {
+        throw UserNotLoggedInException(std::to_string(this->id));
+    }
+    else if (!passwordIsCorrect(password))
+    {
+        throw WrongPasswordException(password);
+    }
+    else if (auction.getOwnerId() == this->id)
+    {
+        throw UserIsOwnerException(this->getIdString());
+    }
+    else if (bidValue < 0)
+    {
+        throw BidValueException(std::to_string(bidValue));
+    }
+    else if (bidValue <= auction.getHighestBidValue() )
+    {
+        throw LargerBidAlreadyExistsException(std::to_string(bidValue));
+    }
+    else
+    {
+        fileManager.bid(auction, bidValue);
+    }
+}
+
+
 // Path: src/Server/user_data.hpp

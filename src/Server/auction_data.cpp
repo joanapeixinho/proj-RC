@@ -27,9 +27,6 @@
         if (assetFname.length() > ASSET_NAME_MAX_LENGTH) {
             throw InvalidAuctionAssetException(assetFname);
         }
-
-        
-        
        
 
     }
@@ -99,6 +96,14 @@ std::vector<Bid> AuctionData::getBids() const {
 }
 
 bool AuctionData::isActive() const {
-    
+    return endTime > std::time(nullptr);
+}
+
+uint32_t AuctionData::getHighestBidValue() const {
+    if (bids.empty()) {
+        return initialBid;
+    } else {
+        return bids.back().bid_value;
+    }
 }
 
