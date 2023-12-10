@@ -26,6 +26,12 @@ int UserData::getId() const {
     return id;
 }
 
+string UserData::getIdString() const {
+    std::ostringstream oss;
+    oss << std::setw(USER_ID_MAX_LEN) << std::setfill('0') << id;
+    return oss.str();
+}
+
 const std::string& UserData::getPassword() const {
     return password;
 }
@@ -78,6 +84,16 @@ void UserData::openAuction (const AuctionData& data) {
     
     std::string idString = std::to_string(id);
     fileManager.openAuction(idString, data);
+}
+
+void UserData::closeAuction (AuctionData& auction) {
+    
+   //check if auction belongs to user 
+    if (auction.getOwnerId() != this->id) {
+        throw AuctionDoesNotBelongToUserException(auction.getIdString(), this->getIdString());
+    }
+    fileManager.closeAuction(auction);
+
 }
 
 std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions( const std::string& directory) {

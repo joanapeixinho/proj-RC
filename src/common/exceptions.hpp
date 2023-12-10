@@ -125,5 +125,11 @@ public:
         : std::runtime_error("Auction does not exist: " + auctionId) {}
 };
 
+class AuctionDoesNotBelongToUserException : public std::runtime_error {
+public:
+    AuctionDoesNotBelongToUserException(const std::string& auctionId, const std::string& userId)
+        : std::runtime_error("Auction " + auctionId + " " + "does not belong to user: " + userId + "\n") {}
+};
+
 #endif
 

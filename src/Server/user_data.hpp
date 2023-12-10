@@ -12,6 +12,7 @@ public:
     UserData(uint32_t id, FileManager& fileManager);
     
     int getId() const;
+    string getIdString() const;
     const std::string& getPassword() const;
     void login();
     void logout();
@@ -19,6 +20,7 @@ public:
     void unregisterUser();
     std::vector <std::pair<uint32_t, bool>> listMyAuctions(const std::string& directory);
     void openAuction (const AuctionData& data);
+    void closeAuction (AuctionData& auction);
 
 private:
     uint32_t id;

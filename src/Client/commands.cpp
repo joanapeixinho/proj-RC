@@ -760,7 +760,7 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
       std::cout 
           << "Displaying the record of the auction with ID [" << auction_id << "]:" 
           << std::endl;
-      std::cout << "Auction host: " << rrc.auction.getUid() << std::endl;
+      std::cout << "Auction host: " << rrc.auction.getUidString() << std::endl;
       std::cout << "Auction name: " << rrc.auction.getName() << std::endl;
       std::cout << "Auction asset: " << rrc.auction.getAssetFname() << std::endl;
       std::cout << "Auction start value: " << rrc.auction.getInitialBid() << std::endl;
