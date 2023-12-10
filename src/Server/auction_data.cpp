@@ -100,7 +100,11 @@ bool AuctionData::hasBids() const {
 }
 
 bool AuctionData::isActive() const {
-    return endTime > std::time(nullptr);
+    return active;
+}
+
+void AuctionData::setInactive() {
+    active = false;
 }
 
 uint32_t AuctionData::getHighestBidValue() const {

@@ -25,6 +25,7 @@ class FileManager {
 public:
     FileManager();
     void createUserDirectory(const std::string& userId);
+    void addToUserDirectory(const std::string& userId, const std::string& auctionId, const std::string& directory);
     void removeUserDirectory(const std::string& userId);
     void createUserPassFile(const std::string& userId, const std::string& password);
     void createUserLoginFile(const std::string& userId);
@@ -34,7 +35,7 @@ public:
     void removeUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
     void createUserAuctionFile(const std::string& userId, const std::string& auctionId, const std::string& directory);
     void createAuctionStartFile(const std::string& auctionId, const AuctionData& data);
-    void createAuctionAssetFile(const std::string& auctionId, const std::string& assetData);
+    void createAuctionAssetFile(const std::string& auctionId, const std::string& assetFname);
     void createAuctionEndFile(const std::string& auctionId, const std::time_t& endTime, const int& activeSeconds);
     void createBidsDirectory(const std::string& auctionId);
     void createBidFile(const std::string& auctionId, const std::string& bidValue);

@@ -92,15 +92,16 @@ void FileManager::safeLockAuction(const std::string &auctionId, std::function<vo
 
 void FileManager::createUserDirectory(const std::string &userId)
 {
-    std::string UserDir = std::string(USER_DIR) + std::string("/") + userId;
+    std::string UserDir = std::string(BASE_DIR) + "/" + std::string(USER_DIR) + "/" + userId;
     std::filesystem::create_directory(UserDir);
     std::filesystem::create_directory(UserDir + "/HOSTED");
     std::filesystem::create_directory(UserDir + "/BIDDED");
 }
 
+
 void FileManager::createUserPassFile(const std::string &userId, const std::string &password)
 {
-    std::ofstream file(USER_DIR + std::string("/") + userId + "_pass.txt");
+    std::ofstream file(BASE_DIR + "/" + USER_DIR + "/" + userId + "_pass.txt");
     file << password;
     if (!file.good())
     {
@@ -111,56 +112,56 @@ void FileManager::createUserPassFile(const std::string &userId, const std::strin
 
 void FileManager::createUserLoginFile(const std::string &userId)
 {
-    std::ofstream file(USER_DIR + std::string("/") + userId + "_login.txt");
+    std::ofstream file(BASE_DIR + "/" + USER_DIR + "/" + userId + "_login.txt");
     file.close();
 }
 
 void FileManager::removeUserLoginFile(const std::string &userId)
 {
-    std::filesystem::remove(std::string(USER_DIR) + userId + "_login.txt");
+    std::filesystem::remove(BASE_DIR + "/" + std::string(USER_DIR) + userId + "_login.txt");
 }
 
 void FileManager::removeUserFiles(const std::string &userId)
 {
-    std::filesystem::remove(std::string(USER_DIR) + userId + "_pass.txt");
-    std::filesystem::remove(std::string(USER_DIR) + userId + "_login.txt");
+    std::filesystem::remove( BASE_DIR + "/" + std::string(USER_DIR) + userId + "_pass.txt");
+    std::filesystem::remove(BASE_DIR + "/" +  std::string(USER_DIR) + userId + "_login.txt");
 }
 
 void FileManager::createAuctionDirectory(const std::string &auctionId)
 {
-    std::filesystem::create_directory(AUCTION_DIR + std::string("/") + auctionId);
+    std::filesystem::create_directory(BASE_DIR + "/" +  AUCTION_DIR + std::string("/") + auctionId);
 }
 
 void FileManager::createUserAuctionFile(const std::string &userId, const std::string &auctionId, const std::string &directory)
 {
-    std::ofstream file(USER_DIR + std::string("/") + userId + std::string("/") + directory + std::string("/") + auctionId);
+    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + std::string("/") + directory + std::string("/") + auctionId);
     file.close();
 }
 
 void FileManager::removeUserAuctionFile(const std::string &userId, const std::string &auctionId, const std::string &directory)
 {
-    std::filesystem::remove(USER_DIR + std::string("/") + userId + std::string("/") + directory + std::string("/") + auctionId);
+    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + std::string("/") + directory + std::string("/") + auctionId);
 }
 
 void FileManager::createAuctionStartFile(const std::string &auctionId, const AuctionData &data)
 {
-    if (!writeToFile("START (" + auctionId + ").txt", data.toString(), AUCTION_DIR + std::string("/") + auctionId))
+    if (!writeToFile("START (" + auctionId + ").txt", data.toString(),std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId))
     {
         std::cerr << "Unable to create START file for auction: " << auctionId << std::endl;
     }
 }
 
-void FileManager::createAuctionAssetFile(const std::string &auctionId, const std::string &assetData)
+void FileManager::createAuctionAssetFile(const std::string &auctionId, const std::string &assetFname)
 {
     /* The file was created when we read the socket */
-    std::filesystem::path destination_filePath = std::filesystem::path(AUCTION_DIR) / auctionId / ASSET_DIR / assetData;
+    std::filesystem::path destination_filePath = std::filesystem::path BASE_DIR/ (AUCTION_DIR) / auctionId / assetFname;
     try
     {
         // Check if the source file exists and is a regular file
-        if (std::filesystem::exists(assetData) && std::filesystem::is_regular_file(assetData))
+        if (std::filesystem::exists(assetFname) && std::filesystem::is_regular_file(assetFname))
         {
             // Move the file to the destination directory
-            std::filesystem::rename(assetData, destination_filePath);
+            std::filesystem::rename(assetFname, destination_filePath);
             std::cout << "File moved successfully." << std::endl;
         }
         else
@@ -179,7 +180,7 @@ void FileManager::createAuctionEndFile(const std::string &auctionId, const std::
     std::stringstream ss;
     ss << std::put_time(std::localtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
     ss << activeSeconds;
-    if (!writeToFile("END (" + auctionId + ").txt", ss.str(), AUCTION_DIR + std::string("/") + auctionId))
+    if (!writeToFile("END (" + auctionId + ").txt", ss.str(), std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId))
     {
         throw FileWriteException("END (" + auctionId + ").txt");
     }
@@ -187,12 +188,12 @@ void FileManager::createAuctionEndFile(const std::string &auctionId, const std::
 
 void FileManager::createBidsDirectory(const std::string &auctionId)
 {
-    std::filesystem::create_directory(AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
+    std::filesystem::create_directory(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
 }
 
 void FileManager::createBidFile(const std::string &auctionId, const std::string &bidValue)
 {
-    std::ofstream file(AUCTION_DIR + std::string("/") + auctionId + "/BIDS/(" + bidValue + ").txt");
+    std::ofstream file(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS/(" + bidValue + ").txt");
     file.close();
 }
 
@@ -200,7 +201,7 @@ std::string FileManager::getUserPassword(const std::string &userId)
 {
     if (UserRegistered(userId))
     {
-        return readFromFile(userId + "_pass.txt", USER_DIR);
+        return readFromFile(userId + "_pass.txt", std::string(BASE_DIR) + "/" + USER_DIR);
     }
     throw UserNotRegisteredException(userId);
     return "";
@@ -208,18 +209,19 @@ std::string FileManager::getUserPassword(const std::string &userId)
 
 bool FileManager::UserLoggedIn(const std::string &userId)
 {
-    return std::filesystem::exists(USER_DIR + std::string("/") + userId + "_login.txt");
+    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + "_login.txt");
 }
 
 bool FileManager::UserRegistered(const std::string &userId)
 {
-    return std::filesystem::exists(USER_DIR + std::string("/") + userId + "_pass.txt");
+    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + "_pass.txt");
 }
 
 /*Returns True if END file exists and therefore auction is active*/
 bool FileManager::auctionIsActive(const std::string &auctionId)
 {
-    return !std::filesystem::exists(AUCTION_DIR + std::string("/") + auctionId + "/END (" + auctionId + ").txt");
+
+    return !std::filesystem::exists(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/END (" + auctionId + ").txt");
 }
 
 void FileManager::loginUser(const std::string &userId)
@@ -253,26 +255,30 @@ void FileManager::unregisterUser(const std::string &userId)
 std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::string &userId, const std::string &directory)
 {
     std::vector<std::pair<uint32_t, bool>> auctionList;
-    for (const auto &entry : std::filesystem::directory_iterator(USER_DIR + std::string("/") + userId + std::string("/") + directory))
+    for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + std::string("/") + directory))
     {
-        // update auction
         std::string auctionId = entry.path().filename().string();
-        UpdateAuction(auctionId);
+        
+        safeLockAuction(auctionId, [&]() {
+            // update auction
+            UpdateAuction(auctionId);
 
-        // check if auction is active
-        bool isActive = auctionIsActive(auctionId);
-        uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
+            // check if auction is active
+            bool isActive = auctionIsActive(auctionId);
+            uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
 
-        // add to list
-        auctionList.push_back(std::make_pair(intAuctionId, isActive));
-
-        return auctionList;
+            // add to list
+            auctionList.push_back(std::make_pair(intAuctionId, isActive));
+        });
     }
+
+    return auctionList;
+}
 
     std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions()
     {
         std::vector<std::pair<uint32_t, bool>> auctionList;
-        for (const auto &entry : std::filesystem::directory_iterator(AUCTION_DIR))
+        for (const auto &entry : std::filesystem::directory_iterator( std::string(BASE_DIR) + "/" + AUCTION_DIR))
         {
             if (std::filesystem::is_directory(entry.status()))
             {
@@ -280,9 +286,10 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
                 std::string auctionId = entry.path().filename().string();
                 safeLockAuction(auctionId, [&]()
                                 {
-                UpdateAuction(auctionId);
-                bool isActive = auctionIsActive(auctionId);
-                uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
+                        
+                    UpdateAuction(auctionId);
+                    bool isActive = auctionIsActive(auctionId);
+                    uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
 
                 auctionList.push_back(std::make_pair(intAuctionId, isActive)); });
             }
@@ -299,22 +306,18 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
     AuctionData FileManager::getAuction(const std::string &auctionId)
     {
         AuctionData data;
+
         safeLockAuction(auctionId, [&]()
                         {
-
-
-       
-
         //check if start file exists
-
-        if (!std::filesystem::exists(AUCTION_DIR + std::string("/") + auctionId + "/START (" + auctionId + ").txt")) {
+        if (!std::filesystem::exists(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/START (" + auctionId + ").txt")) {
             throw AuctionDoesNotExistException(auctionId);
         }
 
         //update Auction
         UpdateAuction(auctionId);
 
-        std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
+        std::string startFile = readFromFile("START (" + auctionId + ").txt", std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId);
         std::stringstream ss(startFile);
         std::string uid, name, assetFname, startValue, timeActive, startDatetime, startFulltime;
         std::getline(ss, uid, ' ');
@@ -328,7 +331,7 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
         std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
 
         if (!auctionIsActive(auctionId)) {
-            std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
+            std::string endFile = readFromFile("END (" + auctionId + ").txt", std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId);
             std::stringstream ssEnd(endFile);
             std::string endDatetime, endSecTime;
             std::getline(ssEnd, endDatetime, ' ');
@@ -338,6 +341,8 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(static_cast<uint32_t>(std::stoi(auctionId)),static_cast<uint32_t>(std::stoi(uid)),  name, initialBid,
                              durationSeconds, assetFname, endTime, endTimeSec, startTime, bids);
+
+            data.setInactive();
         } else {
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(static_cast<uint32_t>(std::stoi(auctionId)),static_cast<uint32_t>(std::stoi(uid)), name, initialBid,
@@ -346,124 +351,147 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
 
         return data;
     }
+}
 
-    std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
+std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
+{
+    std::vector<Bid> bids;
+    for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS"))
     {
-        std::vector<Bid> bids;
-        for (const auto &entry : std::filesystem::directory_iterator(AUCTION_DIR + std::string("/") + auctionId + "/BIDS"))
+        std::string bidValue = entry.path().filename().string();
+        std::string bidFile = readFromFile(bidValue, std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
+        std::stringstream ss(bidFile);
+        std::string bidder_user_id, bid_value, date_time, sec_time;
+        std::getline(ss, bidder_user_id, ' ');
+        std::getline(ss, bid_value, ' ');
+        std::getline(ss, date_time, ' ');
+        std::getline(ss, sec_time, ' ');
+        Bid bid;
+        bid.bidder_user_id = static_cast<uint32_t>(std::stoi(bidder_user_id));
+        bid.bid_value = static_cast<uint32_t>(std::stoi(bid_value));
+        bid.date_time = date_time;
+        bid.sec_time = std::stoi(sec_time);
+        bids.push_back(bid);
+    }
+
+    return bids;
+}
+
+void FileManager::openAuction(const std::string &userId, const AuctionData &data)
+{
+
+    std::string auctionId = data.getIdString();
+
+    safeLockUser(userId, [&]()
+                 { createUserAuctionFile(userId, auctionId, "HOSTED"); });
+    safeLockAuction(auctionId, [&]()
+                    { createAuctionDirectory(auctionId); });
+    safeLockAuction(auctionId, [&]()
+                    { createAuctionStartFile(auctionId, data); });
+    safeLockAuction(auctionId, [&]()
+                    { createBidsDirectory(auctionId); });
+    safeLockAuction(auctionId, [&]()
+                    { createAuctionAssetFile(auctionId, data.getAssetFname()); });
+}
+
+/* check START FILE to see if the endtime has passed */
+/* if it has, create END FILE */
+
+void FileManager::UpdateAuction(const std::string &auctionId)
+{
+
+    if (auctionIsActive(auctionId))
+    {
+        std::string startFile = readFromFile("START (" + auctionId + ").txt",std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId);
+        std::stringstream ss(startFile);
+        std::string uid, name, assetFname, startValue, timeActive, startDatetime, startFulltime;
+        std::getline(ss, uid, ' ');
+        std::getline(ss, name, ' ');
+        std::getline(ss, assetFname, ' ');
+        std::getline(ss, startValue, ' ');
+        std::getline(ss, timeActive, ' ');
+        std::getline(ss, startDatetime, ' ');
+        std::getline(ss, startFulltime, ' ');
+        std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
+        int durationSeconds = std::stoi(timeActive);
+        std::time_t endTime = startTime + durationSeconds;
+        std::time_t now = std::time(nullptr);
+        if (now > endTime)
         {
-            std::string bidValue = entry.path().filename().string();
-            std::string bidFile = readFromFile(bidValue, AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
-            std::stringstream ss(bidFile);
-            std::string bidder_user_id, bid_value, date_time, sec_time;
-            std::getline(ss, bidder_user_id, ' ');
-            std::getline(ss, bid_value, ' ');
-            std::getline(ss, date_time, ' ');
-            std::getline(ss, sec_time, ' ');
-            Bid bid;
-            bid.bidder_user_id = static_cast<uint32_t>(std::stoi(bidder_user_id));
-            bid.bid_value = static_cast<uint32_t>(std::stoi(bid_value));
-            bid.date_time = date_time;
-            bid.sec_time = std::stoi(sec_time);
-            bids.push_back(bid);
+            createAuctionEndFile(auctionId, endTime, durationSeconds);
         }
-
-        return bids;
     }
+}
 
-    void FileManager::openAuction(const std::string &userId, const AuctionData &data)
-    {
+void FileManager::closeAuction(AuctionData &auction)
+{
 
-        std::string auctionId = data.getIdString();
-
-        safeLockUser(userId, [&]()
-                     { createUserAuctionFile(userId, auctionId, "HOSTED"); });
-        safeLockAuction(auctionId, [&]()
-                        { createAuctionDirectory(auctionId); });
-        safeLockAuction(auctionId, [&]()
-                        { createAuctionStartFile(auctionId, data); });
-        safeLockAuction(auctionId, [&]()
-                        { createBidsDirectory(auctionId); });
-        safeLockAuction(auctionId, [&]()
-                        { createAuctionAssetFile(auctionId, data.getAssetFname()); });
-    }
-
-    /* check START FILE to see if the endtime has passed */
-    /* if it has, create END FILE */
-
-    void FileManager::UpdateAuction(const std::string &auctionId)
-    {
-        safeLockAuction(auctionId, [&]()
-                        {
-        if (auctionIsActive(auctionId)) {
-            std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
-            std::stringstream ss(startFile);
-            std::string uid, name, assetFname, startValue, timeActive, startDatetime, startFulltime;
-            std::getline(ss, uid, ' ');
-            std::getline(ss, name, ' ');
-            std::getline(ss, assetFname, ' ');
-            std::getline(ss, startValue, ' ');
-            std::getline(ss, timeActive, ' ');
-            std::getline(ss, startDatetime, ' ');
-            std::getline(ss, startFulltime, ' ');
-            std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
-            int durationSeconds = std::stoi(timeActive);
-            std::time_t endTime = startTime + durationSeconds;
-            std::time_t now = std::time(nullptr);
-            if (now > endTime) {
-                createAuctionEndFile(auctionId, endTime, durationSeconds);
-            }
-        } });
-    }
-
-    void FileManager::closeAuction(AuctionData & auction)
-    {
-
-        safeLockAuction(auction.getIdString(), [&]()
-                        {
+    safeLockAuction(auction.getIdString(), [&]()
+                    {
         if (auctionIsActive(auction.getIdString())) {
             createAuctionEndFile(auction.getIdString(), auction.getEndTime(), auction.getDurationSeconds());
+            auction.setInactive();
         }
         else {
             throw AuctionNotActiveException(auction.getIdString());
         } });
-    }
+}
 
-    std::filesystem::path FileManager::showAsset(AuctionData & auction)
-    {
+std::filesystem::path FileManager::showAsset(AuctionData &auction)
+{
+    std::filesystem::path assetPath;
 
-        UpdateAuction(auction.getIdString());
-
-        std::filesystem::path assetPath = std::filesystem::path(AUCTION_DIR) / auction.getIdString() / auction.getAssetFname();
-
-        if (assetPath.empty())
-        {
-            throw InvalidFilePathException(assetPath);
-        }
-
-        if (std::filesystem::exists(assetPath))
-        {
-            return assetPath;
-        }
-
-        throw AssetDoesNotExistException(assetPath);
-        return "";
-    }
-
-    void FileManager::bid(AuctionData & auction, uint32_t bidValue)
-    {
-
+    safeLockAuction(auction.getIdString(), [&]() {
         // update auction
         UpdateAuction(auction.getIdString());
-        safeLockAuction(auction.getIdString(), [&]()
-                        {
+
+        assetPath = std::filesystem::path BASE_DIR / (AUCTION_DIR) / auction.getIdString() / auction.getAssetFname();
+    });
+
+    if (assetPath.empty())
+    {
+        throw InvalidFilePathException(assetPath);
+    }
+
+    if (std::filesystem::exists(assetPath))
+    {
+        return assetPath;
+    }
+
+    throw AssetDoesNotExistException(assetPath);
+    return "";
+}
+
+void FileManager::bid(AuctionData &auction, uint32_t bidValue)
+{
+
+    // update auction
+    safeLockAuction(auction.getIdString(), [&]()
+    UpdateAuction(auction.getIdString());
+                    {
 
         if (auctionIsActive(auction.getIdString())) {
             std::string bidValueString = std::to_string(bidValue);
             createBidFile(auction.getIdString(), bidValueString);
         }
         else {
-            throw AuctionNotActiveException(auction.getIdString());
-        } });
-    }
 
+            throw AuctionNotActiveException(auction.getIdString());
+        } 
+        
+        });
+
+        //ADD TO AUCTION BIDS
+        std::string bidValueString = std::to_string(bidValue);
+        safeLockAuction(auction.getIdString(), [&]()
+        {
+            createBidFile(auction.getIdString(), bidValueString);
+        });
+
+        //ADD TO USER BIDDED
+        std::string userId = std::to_string(bidValue);
+        safeLockUser(userId, [&]()
+        {
+            createUserAuctionFile(userId, auction.getIdString(), "BIDDED");
+        });
+}
