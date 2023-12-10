@@ -554,3 +554,48 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
     response.send(connection_fd);
 
   }
+
+
+
+  //TODO :
+
+  void handle_show_asset(int connection_fd, AuctionServerState &state)
+  {
+
+    ShowAssetServerbound packet;
+    ReplyShowAssetClientbound response;
+
+    try
+    {
+      packet.receive(connection_fd);
+      
+      AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
+
+      state.file_manager.showAsset(auction); //FALTA IMPLEMENTAR O SHOWASSET
+
+      response.status = ReplyShowAssetClientbound::OK;
+
+      state.cdebug << auctionTag(packet.auction_id) << "Asset shown" << std::endl;
+
+    }
+    catch (AuctionDoesNotExistException &e)
+    {
+      state.cdebug << auctionTag(packet.auction_id) << "Auction does not exist" << std::endl;
+      response.status = ReplyShowAssetClientbound::NOK;
+    }
+    catch (FileOpenException &e)
+    {
+      state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+      response.status = ReplyShowAssetClientbound::ERR;
+    }
+    catch (FileWriteException &e)
+    {
+      state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+      response.status = ReplyShowAssetClientbound::ERR;
+    }
+    catch (FileReadException &e)
+    {
+      state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+      response.status = ReplyShowAssetClientbound::ERR;
+    }
+    catch (std::exception

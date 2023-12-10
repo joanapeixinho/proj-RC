@@ -131,5 +131,6 @@ public:
         : std::runtime_error("Auction " + auctionId + " " + "does not belong to user: " + userId + "\n") {}
 };
 
+
 #endif
 
