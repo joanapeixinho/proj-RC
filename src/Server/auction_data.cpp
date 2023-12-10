@@ -27,9 +27,6 @@
         if (assetFname.length() > ASSET_NAME_MAX_LENGTH) {
             throw InvalidAuctionAssetException(assetFname);
         }
-
-        
-        
        
 
     }
@@ -103,7 +100,16 @@ bool AuctionData::hasBids() const {
 }
 
 bool AuctionData::isActive() const {
-    //TODO
+    return endTime > std::time(nullptr);
+}
+
+uint32_t AuctionData::getHighestBidValue() const {
+    if (bids.empty()) {
+        return initialBid;
+    } else {
+        return bids.back().bid_value;
+    }
+
 }
 
 void AuctionData::setOwnerId(uint32_t uid) {

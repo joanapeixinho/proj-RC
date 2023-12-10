@@ -149,5 +149,17 @@ public:
         : std::runtime_error("User already logged in: " + userId) {}
 };
 
+class LargerBidAlreadyExistsException : public std::runtime_error {
+public:
+    LargerBidAlreadyExistsException(const std::string& bidValue)
+        : std::runtime_error("Larger bid already exists: " + bidValue) {}
+};
+
+class UserIsOwnerException : public std::runtime_error {
+public:
+    UserIsOwnerException(const std::string& userId)
+        : std::runtime_error("Cannot bid on own auction: " + userId) {}
+};
+
 #endif
 

@@ -413,7 +413,7 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
     {
       throw InvalidAuctionAssetException(packet.file_name);
     }
-    
+
     user.openAuction(auction, packet.password);
 
     response.auction_id = auction.getId();
@@ -619,6 +619,101 @@ void handle_show_asset(int connection_fd, AuctionServerState &state)
 
     std::cerr << "[ShowAsset] There was an unhandled exception that prevented "
                  "the server from showing the asset:"
+              << e.what() << std::endl;
+
+    return;
+  }
+
+  response.send(connection_fd);
+}
+
+void handle_bid(int connection_fd, AuctionServerState &state)
+{
+
+  BidServerbound packet;
+  ReplyBidClientbound response;
+
+  try
+  {
+    packet.receive(connection_fd);
+
+    UserData user(packet.user_id, packet.password, state.file_manager);
+
+    AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
+
+    user.bid(auction, packet.bid_value, packet.password);
+
+    response.status = ReplyBidClientbound::ACC;
+
+    state.cdebug << auctionTag(packet.auction_id) << "Bid made" << std::endl;
+  }
+  catch (WrongPasswordException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Wrong password" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  catch (UserNotLoggedInException &e)
+  {
+    response.status = ReplyBidClientbound::NLG;
+    state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+  }
+  catch (UserNotRegisteredException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  catch (AuctionIdException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Invalid auction id" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  catch (AuctionDoesNotExistException &e)
+  {
+    state.cdebug << auctionTag(packet.auction_id) << "Auction does not exist" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  
+  catch (AuctionNotActiveException &e)
+  {
+    state.cdebug << auctionTag(packet.auction_id) << "Auction not active" << std
+
+                  << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+
+  catch (BidValueException &e)
+  {
+    state.cdebug << auctionTag(packet.auction_id) << "Bid value too low" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  catch (UserIsOwnerException &e) {
+    state.cdebug << auctionTag(packet.auction_id) << "Cannot bid on own auction" << std::endl;
+    response.status = ReplyBidClientbound::ILG;
+  }
+  catch ( LargerBidAlreadyExistsException &e) {
+    state.cdebug << auctionTag(packet.auction_id) << "Larger bid already exists" << std::endl;
+    response.status = ReplyBidClientbound::REF;
+  }
+  catch (FileOpenException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  catch (FileWriteException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  catch (FileReadException &e)
+  {
+    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    response.status = ReplyBidClientbound::NOK;
+  }
+  catch (std::exception &e)
+  {
+
+    std::cerr << "[Bid] There was an unhandled exception that prevented "
+                 "the server from bidding:"
               << e.what() << std::endl;
 
     return;

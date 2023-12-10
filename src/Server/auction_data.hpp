@@ -38,6 +38,7 @@ public:
     bool hasBids() const;
     bool isActive() const;
     uint32_t getOwnerId() const;
+    uint32_t getHighestBidValue() const;
 
     void setOwnerId(uint32_t uid);
     void setName(const std::string& name);

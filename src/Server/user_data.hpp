@@ -21,6 +21,7 @@ public:
     void openAuction (const AuctionData& data, const std::string& password);
     void closeAuction (AuctionData& auction);
     bool passwordIsCorrect(const std::string& password);
+    void bid(AuctionData& auction, uint32_t bidValue, const std::string& password);
 
 private:
     uint32_t id;
