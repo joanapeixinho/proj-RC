@@ -414,4 +414,6 @@ std::string formatAuctions(const std::vector<std::pair<uint32_t, bool>>& auction
 
 std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctionsString);
 
+void readBid(std::stringstream &buffer, AuctionData& auction);
+
 #endif
