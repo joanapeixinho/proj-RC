@@ -3,6 +3,7 @@
 #define FILE_MANAGER_H
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <filesystem>
 #include <sstream>
