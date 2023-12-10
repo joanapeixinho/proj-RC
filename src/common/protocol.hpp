@@ -11,9 +11,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "constants.hpp"
 #include "file_manager.hpp"
-#include "../Server/auction_data.hpp"
 
 // Thrown when the PacketID does not match what was expected
 class UnexpectedPacketException : public std::runtime_error {
@@ -245,6 +243,19 @@ class MyAuctionsServerbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
+
+class ReplyShowRecordClientbound : public UdpPacket {
+ public:
+  enum status { OK, NOK, ERR };
+  static constexpr const char *ID = "RRC";
+  status status;
+
+  AuctionData auction;
+
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
+
 class ShowRecordServerbound : public UdpPacket {
  public:
   static constexpr const char *ID = "SRC";
@@ -255,17 +266,6 @@ class ShowRecordServerbound : public UdpPacket {
 };
 
 
-class ReplyShowRecordClientbound : public UdpPacket {
- public:
-  enum status { OK, NOK, ERR };
-  static constexpr const char *ID = "RRC";
-  status status;
-
-  AuctionData auction_data;
-
-  std::stringstream serialize();
-  void deserialize(std::stringstream &buffer);
-};
 
 
 class TcpPacket {

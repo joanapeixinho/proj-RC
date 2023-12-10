@@ -227,6 +227,25 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
    //TODO
 };
 
+void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyShowRecordClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "UNR") {
+    status = UNR;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(buffer);
+};
+
 
 
 std::stringstream ErrorUdpPacket::serialize() {
