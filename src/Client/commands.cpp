@@ -486,6 +486,7 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
 }
 
 void MyBidsCommand::handle(std::string args, UserState& state) {
+  (void) args;
   // Check if user is logged in
   if (!state.isLoggedIn()) {
     std::cout 
@@ -532,7 +533,7 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
 }
 
 void ListCommand::handle(std::string args, UserState& state) {
-
+  (void) args;
   // Populate and send packet
   ListAuctionsServerbound packet_out;
 
