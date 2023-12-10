@@ -303,6 +303,8 @@ class OpenAuctionServerbound : public TcpPacket {
   uint32_t time_active;
   std::string file_name;
   std::filesystem::path file_path;
+  long int file_size;
+  
 
   void send(int fd);
   void receive(int fd);
@@ -356,8 +358,7 @@ class ReplyShowAssetClientbound : public TcpPacket {
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RSA";
   status status;
-  std::string file_name;
-  std::string file_path;
+  std::filesystem::path file_path;
 
   void send(int fd);
   void receive(int fd);
