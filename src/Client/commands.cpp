@@ -507,7 +507,7 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
       std::cout 
           << "Displaying the auctions where you made a bid:" 
           << std::endl;
-      printAuctions(rmb.myBidsAuctions);
+      printAuctions(rmb.auctions);
       break;
 
     case ReplyMyBidsClientbound::status::NLG:

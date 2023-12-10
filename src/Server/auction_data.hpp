@@ -20,6 +20,7 @@ struct Bid {
 
 class AuctionData {
 public:
+    AuctionData() = default;
     AuctionData(uint32_t id, uint32_t uid, std::string& name, double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, std::time_t endTimeSec , std::time_t startTime, std::vector<Bid> bids);
     void openAuction();
     std::string getId() const;

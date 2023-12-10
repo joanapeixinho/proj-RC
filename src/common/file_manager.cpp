@@ -127,17 +127,17 @@ void FileManager::createAuctionStartFile(const std::string& auctionId, const Auc
 
 void FileManager::createAuctionAssetFile(const std::string& auctionId, const std::string& assetData) {
     /* The file was created when we read the socket */
-    std::filesystem::path destination_filePath = fs::path(AUCTION_DIR) / auctionId / ASSET_DIR / assetData;
+    std::filesystem::path destination_filePath =  std::filesystem::path(AUCTION_DIR) / auctionId / ASSET_DIR / assetData;
     try {
         // Check if the source file exists and is a regular file
-        if (fs::exists(assetData) && fs::is_regular_file(assetData)) {
+        if (std::filesystem::exists(assetData) && std::filesystem::is_regular_file(assetData)) {
             // Move the file to the destination directory
-            fs::rename(assetData, destination_filePath);
+            std::filesystem::rename(assetData, destination_filePath);
             std::cout << "File moved successfully." << std::endl;
         } else {
             std::cerr << "Source file does not exist or is not a regular file." << std::endl;
         }
-    } catch (const fs::filesystem_error& e) {
+    } catch (const std::filesystem::filesystem_error& e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
 }

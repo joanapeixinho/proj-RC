@@ -10,7 +10,6 @@
 
 #include "user_state.hpp"
 #include "../common/protocol.hpp"
-#include "../common/constants.hpp"
 
 class CommandHandler;
 
@@ -140,7 +139,7 @@ class ShowRecordCommand : public CommandHandler {
   ShowRecordCommand() : CommandHandler("show_record", "sr", "AID", "Show Record") {}
 };
 
-// void write_word(std::ostream& stream, char* word, uint32_t word_len);
+
 
 bool is_numeric(std::string& str);
 
