@@ -394,7 +394,42 @@ std::stringstream ListAuctionsServerbound::serialize() {
 
 void ListAuctionsServerbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
-  readPacketId(buffer, ListAuctionsServerbound::ID);
+  // Serverbound packets don't read their ID
+  readPacketDelimiter(buffer);
+};
+
+std::stringstream ReplyListAuctionsClientbound::serialize() {
+  std::stringstream buffer;
+  buffer << ReplyListAuctionsClientbound::ID << " ";
+  if (status == ReplyListAuctionsClientbound::status::OK) {
+    buffer << "OK " << formatAuctions(auctions);
+  } else if (status == ReplyListAuctionsClientbound::status::NOK) {
+    buffer << "NOK";
+  } else if (status == ReplyListAuctionsClientbound::status::ERR) {
+    buffer << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  buffer << std::endl;
+  return buffer;
+};
+
+void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyListAuctionsClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+    readSpace(buffer);
+    auctions = parseAuctions(buffer.str());
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
   readPacketDelimiter(buffer);
 };
 
