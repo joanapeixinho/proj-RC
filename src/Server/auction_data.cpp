@@ -2,7 +2,7 @@
 
 
  AuctionData::AuctionData(uint32_t id, uint32_t uid , std::string& name,
-                             double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, std::time_t endTimeSec, std::time_t startTime
+                             double initialBid, int durationSeconds, const std::string& assetFname, std::time_t endTime, int endTimeSec, std::time_t startTime
                              , std::vector<Bid> bids)
                              : id(id), uid(uid), name(name), initialBid(initialBid), durationSeconds(durationSeconds), 
         assetFname(assetFname), endTime(endTime), endTimeSec(endTimeSec), startTime(startTime), bids(bids)
@@ -95,6 +95,10 @@ std::vector<Bid> AuctionData::getBids() const {
     return bids;
 }
 
+bool AuctionData::hasBids() const {
+    return bids.size() > 0;
+}
+
 bool AuctionData::isActive() const {
     return endTime > std::time(nullptr);
 }
@@ -105,5 +109,6 @@ uint32_t AuctionData::getHighestBidValue() const {
     } else {
         return bids.back().bid_value;
     }
+
 }
 

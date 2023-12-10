@@ -458,7 +458,26 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyShowRecordClientbound::ID << " ";
   if (status == ReplyShowRecordClientbound::status::OK) {
-    buffer << "OK " << auction.;
+    buffer << "OK ";
+    write_user_id(buffer, auction.getOwnerId());
+    buffer << " " << auction.getName() << " " << auction.getAssetFname();
+    buffer << " " << auction.getInitialBid() << " ";
+    write_date_time(buffer, auction.getStartTime());
+    buffer << auction.getDurationSeconds();
+    if (auction.hasBids()) {
+      for (auto bid : auction.getBids()) {
+        buffer << " B ";
+        write_user_id(buffer, bid.bidder_user_id);
+        buffer << " " << bid.bid_value << " ";
+        write_date_time(buffer, bid.date_time);
+        buffer << " " << bid.sec_time;
+      }
+    }
+    if (!auction.isActive()) {
+      buffer << " E ";
+      write_date_time(buffer, auction.getEndTime());
+      buffer << " " << auction.getEndTimeSec();
+    }
   } else if (status == ReplyShowRecordClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyShowRecordClientbound::status::ERR) {
@@ -849,6 +868,13 @@ void wait_for_packet(UdpPacket &packet, int socket) {
 
   packet.deserialize(data);
 
+}
+
+void write_date_time(std::stringstream &buffer, const time_t &time) {
+  // Convert std::time_t to std::tm
+  std::tm tm_time = *std::localtime(&time);
+  // Format the time as YYYY-MM-DD HH:MM:SS
+  buffer << std::put_time(&tm_time, "%Y-%m-%d %H:%M:%S");
 }
 
 void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
