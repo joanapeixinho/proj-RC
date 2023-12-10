@@ -39,6 +39,17 @@ public:
     bool isActive() const;
     uint32_t getOwnerId() const;
 
+    void setOwnerId(uint32_t uid);
+    void setName(const std::string& name);
+    void setInitialBid(int initialBid);
+    void setDurationSeconds(int durationSeconds);
+    void setStartTime(std::time_t startTime);
+    void setAssetFname(const std::string& assetFname);
+    void setEndTime(std::time_t endTime);
+    void setEndTimeSec(int endTimeSec);
+    void addBid(Bid bid);
+
+
 private:
     int id;
     int uid;

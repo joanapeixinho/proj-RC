@@ -490,7 +490,36 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
 };
 
 void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
-    buffer >> std::noskipws;
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyShowRecordClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+    readSpace(buffer);
+    try {
+      auction.setOwnerId(readUserId(buffer));
+      readSpace(buffer);
+      auction.setName(readString(buffer, AUCTION_NAME_MAX_LENGTH));
+      readSpace(buffer);
+      auction.setAssetFname(readString(buffer, ASSET_NAME_MAX_LENGTH));
+      readSpace(buffer);
+      auction.setInitialBid(readInt(buffer));
+      readSpace(buffer);
+      auction.setStartTime(read_date_time(buffer));
+      readSpace(buffer);
+      auction.setDurationSeconds(readInt(buffer));
+
+    } catch (...) {
+      throw InvalidPacketException();
+    }
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
 };
 
 
@@ -870,11 +899,19 @@ void wait_for_packet(UdpPacket &packet, int socket) {
 
 }
 
-void write_date_time(std::stringstream &buffer, const time_t &time) {
+void write_date_time(std::stringstream &buffer, const std::time_t &time) {
   // Convert std::time_t to std::tm
   std::tm tm_time = *std::localtime(&time);
   // Format the time as YYYY-MM-DD HH:MM:SS
   buffer << std::put_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+}
+std::time_t read_date_time(std::stringstream &buffer) {
+  std::tm tm_time;
+  buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+  if (buffer.fail()) {
+    throw InvalidPacketException();
+  }
+  return std::mktime(&tm_time);
 }
 
 void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {

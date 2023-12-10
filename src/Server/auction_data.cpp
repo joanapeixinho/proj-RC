@@ -106,3 +106,38 @@ bool AuctionData::isActive() const {
     //TODO
 }
 
+void AuctionData::setOwnerId(uint32_t uid) {
+    this->uid = uid;
+}
+
+void AuctionData::setName(const std::string& name) {
+    this->name = name;
+}
+
+void AuctionData::setInitialBid(int initialBid) {
+    this->initialBid = initialBid;
+}
+
+void AuctionData::setDurationSeconds(int durationSeconds) {
+    this->durationSeconds = durationSeconds;
+}
+
+void AuctionData::setStartTime(std::time_t startTime) {
+    this->startTime = startTime;
+}
+
+void AuctionData::setAssetFname(const std::string& assetFname) {
+    this->assetFname = assetFname;
+}
+
+void AuctionData::setEndTime(std::time_t endTime) {
+    this->endTime = endTime;
+}
+
+void AuctionData::setEndTimeSec(int endTimeSec) {
+    this->endTimeSec = endTimeSec;
+}
+
+void AuctionData::addBid(Bid bid) {
+    bids.push_back(bid);
+}
