@@ -898,6 +898,48 @@ void ShowAssetServerbound::receive(int fd) {
   readPacketDelimiter(fd);
 }
 
+void ReplyShowAssetClientbound::send(int fd) {
+  std::stringstream stream;
+  stream << ReplyShowAssetClientbound::ID << " ";
+  if (status == OK) {
+    stream << "OK " << file_name << " " << file_size << " ";
+    writeString(fd, stream.str());
+    sendFile(fd, file_path);
+    writeString(fd, "\n");
+    return;
+  } else if (status == NOK) {
+    stream << "NOK";
+  } else if (status == ERR) {
+    stream << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  stream << std::endl;
+  writeString(fd, stream.str());
+}
+
+void ReplyShowAssetClientbound::receive(int fd) {
+  readPacketId(fd, ReplyShowAssetClientbound::ID);
+  readSpace(fd);
+  auto status_str = readString(fd);
+  if (status_str == "OK") {
+    this->status = OK;
+    readSpace(fd);
+    this->file_name = readString(fd);
+    readSpace(fd);
+    this->file_size = readInt(fd);
+    readSpace(fd);
+    readAndSaveToFile(fd, file_name, file_size, false);
+  } else if (status_str == "NOK") {
+    this->status = NOK;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(fd);
+}
+
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
   writeString(fd, "\n");

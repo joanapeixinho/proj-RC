@@ -352,6 +352,8 @@ class ReplyShowAssetClientbound : public TcpPacket {
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RSA";
   status status;
+  std::string file_name;
+  long int file_size;
   std::filesystem::path file_path;
 
   void send(int fd);
