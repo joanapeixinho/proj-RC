@@ -235,15 +235,6 @@ class ErrorUdpPacket : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-class MyAuctionsServerbound : public UdpPacket {
- public:
-  static constexpr const char *ID = "LMA";
-  uint32_t user_id;
-
-  std::stringstream serialize();
-  void deserialize(std::stringstream &buffer);
-};
-
 
 class ReplyShowRecordClientbound : public UdpPacket {
  public:
