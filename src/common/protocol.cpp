@@ -347,6 +347,45 @@ void MyBidsServerbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
+std::stringstream ReplyMyBidsClientbound::serialize() {
+  std::stringstream buffer;
+  buffer << ReplyMyBidsClientbound::ID << " ";
+  if (status == ReplyMyBidsClientbound::status::OK) {
+    buffer << "OK " << formatAuctions(auctions);
+  } else if (status == ReplyMyBidsClientbound::status::NOK) {
+    buffer << "NOK";
+  } else if (status == ReplyMyBidsClientbound::status::NLG) {
+    buffer << "NLG";
+  } else if (status == ReplyMyBidsClientbound::status::ERR) {
+    buffer << "ERR";
+  } else {
+    throw PacketSerializationException();
+  }
+  buffer << std::endl;
+  return buffer;
+};
+
+void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
+  buffer >> std::noskipws;
+  readPacketId(buffer, ReplyMyBidsClientbound::ID);
+  readSpace(buffer);
+  auto status_str = readString(buffer, 3);
+  if (status_str == "OK") {
+    status = OK;
+    readSpace(buffer);
+    auctions = parseAuctions(buffer.str());
+  } else if (status_str == "NOK") {
+    status = NOK;
+  } else if (status_str == "NLG") {
+    status = NLG;
+  } else if (status_str == "ERR") {
+    status = ERR;
+  } else {
+    throw InvalidPacketException();
+  }
+  readPacketDelimiter(buffer);
+};
+
 std::stringstream ReplyShowRecordClientbound::serialize() {
    //TODO
 };
@@ -788,4 +827,31 @@ uint32_t getFileSize(std::filesystem::path file_path) {
   } catch (...) {
     throw PacketSerializationException();
   }
+}
+
+std::string formatAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
+    std::ostringstream formattedString;
+    for (size_t i = 0; i < auctions.size(); ++i) {
+        formattedString << std::setfill('0') << std::setw(3) << auctions[i].first << " ";
+        formattedString << auctions[i].second;
+        if (i != auctions.size() - 1) {
+            formattedString << " ";
+        }
+    }
+    return formattedString.str();
+}
+
+std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctionsString) {
+    std::istringstream iss(auctionsString);
+    std::vector<std::pair<uint32_t, bool>> auctions;
+
+    uint32_t auctionId;
+    bool auctionStatus;
+
+    while (iss >> auctionId >> std::boolalpha >> auctionStatus) {
+        // emplace_back adds element to the end of the vector
+        auctions.emplace_back(auctionId, auctionStatus);
+    }
+
+    return auctions;
 }

@@ -408,4 +408,8 @@ void sendFile(int connection_fd, std::filesystem::path image_path);
 
 uint32_t getFileSize(std::filesystem::path file_path);
 
+std::string formatAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions);
+
+std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctionsString);
+
 #endif
