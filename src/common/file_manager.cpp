@@ -147,7 +147,7 @@ void FileManager::createAuctionEndFile(const std::string& auctionId, const std::
     ss << std::put_time(std::localtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
     ss << activeSeconds;
     if (!writeToFile("END (" + auctionId + ").txt", ss.str(), AUCTION_DIR + std::string("/") + auctionId)) {
-        std::cerr << "Unable to create END file for auction: " << auctionId << std::endl;
+        throw FileWriteException("END (" + auctionId + ").txt");
     }
 }
 
@@ -262,6 +262,16 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions() {
 AuctionData FileManager::getAuction(const std::string& auctionId) {
     AuctionData data;
     safeLockAuction(auctionId, [&]() {
+
+
+       
+
+        //check if start file exists
+
+        if (!std::filesystem::exists(AUCTION_DIR + std::string("/") + auctionId + "/START (" + auctionId + ").txt")) {
+            throw AuctionDoesNotExistException(auctionId);
+        }
+
         //update Auction
         UpdateAuction(auctionId);
 
@@ -295,6 +305,7 @@ AuctionData FileManager::getAuction(const std::string& auctionId) {
                              durationSeconds, assetFname, 0, 0, startTime, bids);
         }
     });
+
     return data;
 }
 
@@ -322,7 +333,7 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string& auctionId) {
 
 void FileManager::openAuction(const std::string& userId, const AuctionData& data) {
     
-    std::string auctionId = data.getId();
+    std::string auctionId = data.getIdString();
     
     safeLockUser(userId, [&]() {
     createUserAuctionFile(userId, auctionId, "HOSTED");
@@ -366,5 +377,20 @@ void FileManager::UpdateAuction(const std::string& auctionId) {
             }
         }
     });
+}
+
+void FileManager:: closeAuction (AuctionData &auction) {
+
+    safeLockAuction(auction.getIdString(), [&]() {
+        if (auctionIsActive(auction.getIdString())) {
+            createAuctionEndFile(auction.getIdString(), auction.getEndTime(), auction.getDurationSeconds());
+        }
+
+        else {
+            throw AuctionNotActiveException(auction.getIdString());
+        }
+    });
+
+
 }
 

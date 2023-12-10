@@ -26,6 +26,9 @@
 #define AUCTION_ID_MAX_LEN (3)
 #define AUCTION_MAX_NUMBER (999)
 
+#define ASSET_NAME_MAX_LENGTH (24)
+#define ASSET_MAX_BYTES (1000000)
+
 #define BID_MAX_LEN (6)
 #define BID_MAX_VALUE (999999)
 

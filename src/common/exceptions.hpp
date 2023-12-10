@@ -1,6 +1,9 @@
 // exceptions.hpp
-#include <stdexcept>
+#ifndef EXCEPTIONS_H
+#define EXCEPTIONS_H
+
 #include <string>
+#include <stdexcept>
 
 class FileOpenException : public std::runtime_error {
 public:
@@ -122,4 +125,12 @@ public:
         : std::runtime_error("Auction does not exist: " + auctionId) {}
 };
 
+class AuctionDoesNotBelongToUserException : public std::runtime_error {
+public:
+    AuctionDoesNotBelongToUserException(const std::string& auctionId, const std::string& userId)
+        : std::runtime_error("Auction " + auctionId + " " + "does not belong to user: " + userId + "\n") {}
+};
+
+
+#endif
 

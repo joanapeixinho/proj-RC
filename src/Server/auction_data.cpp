@@ -29,16 +29,24 @@
 
     }
 
-std::string AuctionData::getId() const {
+std::string AuctionData::getIdString() const {
     std::ostringstream oss;
     oss << std::setw(AUCTION_ID_MAX_LEN) << std::setfill('0') << id;
     return oss.str();
 }
 
-std::string AuctionData::getUid() const {
+uint32_t AuctionData::getId() const {
+    return id;
+}
+
+std::string AuctionData::getUidString() const {
     std::ostringstream oss;
     oss << std::setw(USER_ID_MAX_LEN) << std::setfill('0') << uid;
     return oss.str();
+}
+
+uint32_t AuctionData::getOwnerId() const {
+    return uid;
 }
 
 const std::string& AuctionData::getName() const {

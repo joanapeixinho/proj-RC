@@ -56,7 +56,8 @@ public:
     AuctionData getAuction(const std::string& auctionId);
     std::vector<Bid> getAuctionBids(const std::string& auctionId);
     void openAuction(const std::string& userId, const AuctionData& data);
-    void closeAuction(const std::string& userId, const std::string& auctionId);
+    void closeAuction(AuctionData& auction);
+    std::string showAsset(AuctionData& auction);
 
 private:
     std::map<std::string, std::mutex> userMutexes;
