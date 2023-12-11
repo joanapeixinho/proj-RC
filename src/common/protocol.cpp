@@ -10,6 +10,7 @@
 #include <string>
 
 #include "common.hpp"
+#include "protocol.hpp"
 
 extern bool is_shutting_down;
 
