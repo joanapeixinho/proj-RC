@@ -200,7 +200,7 @@ std::string FileManager::getUserPassword(const std::string &userId)
 {
     if (UserRegistered(userId))
     {
-        return readFromFile(userId + "_pass.txt", std::string(BASE_DIR) + "/" + USER_DIR);
+        return readFromFile(userId + "_pass.txt", std::string(BASE_DIR) + "/" + USER_DIR + "/" + std::string(userId));
     }
     throw UserNotRegisteredException(userId);
     return "";
