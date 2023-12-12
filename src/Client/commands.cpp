@@ -98,7 +98,7 @@ void LoginCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if Password is too long
-  if (password.length() == 0 || password.length() > PASSWORD_MAX_LEN) {
+  if (password.length() == 0 || password.length() > PASSWORD_MAX_LEN || password.length() < 1) {
     std::cout << "Invalid password. It must be between 1 and " << PASSWORD_MAX_LEN 
               << " characters long" << std::endl;
     return;
