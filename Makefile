@@ -4,6 +4,7 @@ LD = g++
 
 INCLUDE_DIRS := src/Client src/Server src/
 INCLUDES = $(addprefix -I, $(INCLUDE_DIRS))
+ASDIR = ASDIR
 
 TARGETS = src/Client/User src/Server/server
 TARGET_EXECS = user AS
@@ -89,6 +90,9 @@ user: src/Client/User
 
 clean:
 	rm -f $(OBJECTS) $(TARGETS) $(TARGET_EXECS) project.zip
+
+clean-asdir:
+	rm -rf $(ASDIR)/*
 
 package:
 	cp readme.txt
