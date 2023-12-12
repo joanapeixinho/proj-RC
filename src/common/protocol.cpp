@@ -180,8 +180,6 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "REG") {
     status = REG;
-  } else if (status_str == "ERR") {
-    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -235,8 +233,6 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "UNR") {
     status = UNR;
-  } else if (status_str == "ERR") {
-    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -288,8 +284,6 @@ void ReplyUnregisterClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "UNR") {
     status = UNR;
-  } else if (status_str == "ERR") {
-    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -339,8 +333,6 @@ void ReplyListMyAuctionsClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "NLG") {
     status = NLG;
-  } else if (status_str == "ERR") {
-    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -392,8 +384,6 @@ void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "NLG") {
     status = NLG;
-  } else if (status_str == "ERR") {
-    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -437,8 +427,6 @@ void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
     auctions = parseAuctions(buffer.str());
   } else if (status_str == "NOK") {
     status = NOK;
-  } else if (status_str == "ERR") {
-    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -549,8 +537,6 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     }
   } else if (status_str == "NOK") {
     status = NOK;
-  } else if (status_str == "ERR") {
-    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -832,8 +818,6 @@ void ReplyOpenAuctionClientbound::send(int fd) {
     stream << "NOK";
   } else if (status == NLG) {
     stream << "NLG";
-  } else if (status == ERR) {
-    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -853,8 +837,6 @@ void ReplyOpenAuctionClientbound::receive(int fd) {
     this->status = NOK;
   } else if (status_str == "NLG") {
     this->status = NLG;
-  } else if (status_str == "ERR") {
-    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -895,8 +877,6 @@ void ReplyCloseAuctionClientbound::send(int fd) {
     stream << "END";
   } else if (status == NLG) {
     stream << "NLG";
-  } else if (status == ERR) {
-    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -918,8 +898,6 @@ void ReplyCloseAuctionClientbound::receive(int fd) {
     this->status = END;
   } else if (status_str == "NLG") {
     this->status = NLG;
-  } else if (status_str == "ERR") {
-    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -952,8 +930,6 @@ void ReplyShowAssetClientbound::send(int fd) {
     return;
   } else if (status == NOK) {
     stream << "NOK";
-  } else if (status == ERR) {
-    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -975,8 +951,6 @@ void ReplyShowAssetClientbound::receive(int fd) {
     readAndSaveToFile(fd, file_name, file_size, false);
   } else if (status_str == "NOK") {
     this->status = NOK;
-  } else if (status_str == "ERR") {
-    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -1019,8 +993,6 @@ void ReplyBidClientbound::send(int fd) {
     stream << "ILG";
   } else if (status == REF){
     stream << "REF";
-  } else if (status == ERR){
-    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -1042,8 +1014,6 @@ void ReplyBidClientbound::receive(int fd) {
     this->status = ILG;
   } else if (status_str == "REF") {
     this->status = REF;
-  } else if (status_str == "ERR") {
-    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
