@@ -1,17 +1,17 @@
 #include "auction_data.hpp"
 
 
- AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
+AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
                          uint32_t inputInitialBid, uint32_t inputDurationSeconds,
-                         const std::string& inputAssetFname, std::time_t inputEndTime,
-                         uint32_t inputEndTimeSec, std::time_t inputStartTime,
+                         const std::string& inputAssetFname, std::time_t inputStartTime,
+                         std::time_t inputEndTime, uint32_t inputEndTimeSec,
                          const std::vector<Bid>& inputBids) : id(inputId), uid(inputUid), name(inputName), initialBid(inputInitialBid),
       durationSeconds(inputDurationSeconds), assetFname(inputAssetFname),
-      endTime(inputEndTime), endTimeSec(inputEndTimeSec), startTime(inputStartTime),
+      startTime(inputStartTime), endTime(inputEndTime), endTimeSec(inputEndTimeSec),
       bids(inputBids) 
 {
     // Validações
-    if (id < 0 || id > AUCTION_MAX_NUMBER) {
+    if (id > AUCTION_MAX_NUMBER) {
         throw InvalidAuctionIdException(std::to_string(id));
     }
 
@@ -19,11 +19,11 @@
         throw InvalidAuctionNameException(name);
     }
 
-    if (initialBid < 0 || initialBid > AUCTION_INITIAL_BID_MAX_VALUE) {
+    if (initialBid > AUCTION_INITIAL_BID_MAX_VALUE) {
         throw InvalidAuctionInitialBidException(std::to_string(initialBid));
     }
 
-    if (durationSeconds < 0 || durationSeconds > AUCTION_DURATION_MAX_VALUE) {
+    if (durationSeconds > AUCTION_DURATION_MAX_VALUE) {
         throw InvalidAuctionDurationException(std::to_string(durationSeconds));
     }
 
@@ -118,38 +118,34 @@ uint32_t AuctionData::getHighestBidValue() const {
 
 }
 
-void AuctionData::setOwnerId(uint32_t uid) {
-    this->uid = uid;
+void AuctionData::setOwnerId(uint32_t inputUid) {
+    uid = inputUid;
 }
 
-void AuctionData::setName(const std::string& name) {
-    this->name = name;
+void AuctionData::setName(const std::string& inputName) {
+    name = inputName;
 }
 
-void AuctionData::setInitialBid(uint32_t initialBid) {
-    this->initialBid = initialBid;
+void AuctionData::setInitialBid(uint32_t inputInitialBid) {
+    initialBid = inputInitialBid;
 }
 
-void AuctionData::setDurationSeconds(uint32_t durationSeconds) {
-    this->durationSeconds = durationSeconds;
+void AuctionData::setDurationSeconds(uint32_t inputDurationSeconds) {
+    durationSeconds = inputDurationSeconds;
 }
 
-void AuctionData::setStartTime(std::time_t startTime) {
-    this->startTime = startTime;
+void AuctionData::setStartTime(std::time_t inputStartTime) {
+    startTime = inputStartTime;
 }
 
-void AuctionData::setAssetFname(const std::string& assetFname) {
-    this->assetFname = assetFname;
+void AuctionData::setAssetFname(const std::string& inputAssetFname) {
+    assetFname = inputAssetFname;
 }
 
-void AuctionData::setEndTime(std::time_t endTime) {
-    this->endTime = endTime;
+void AuctionData::setEndTime(std::time_t inputEndTime) {
+    endTime = inputEndTime;
 }
 
-void AuctionData::setEndTimeSec(uint32_t endTimeSec) {
-    this->endTimeSec = endTimeSec;
-}
-
-void AuctionData::addBid(Bid bid) {
-    bids.push_back(bid);
+void AuctionData::setEndTimeSec(uint32_t inputEndTimeSec) {
+    endTimeSec = inputEndTimeSec;
 }

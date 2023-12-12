@@ -20,12 +20,12 @@ struct Bid {
 
 class AuctionData {
 public:
-    AuctionData() = default;
-    AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
-                 uint32_t initialBid, uint32_t durationSeconds,
-                 const std::string& assetFname, std::time_t endTime,
-                 uint32_t endTimeSec, std::time_t startTime,
-                 const std::vector<Bid>& bids);    void openAuction();
+  AuctionData() = default;
+  AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
+                         uint32_t inputInitialBid, uint32_t inputDurationSeconds,
+                         const std::string& inputAssetFname, std::time_t inputStartTime,
+                         std::time_t inputEndTime, uint32_t inputEndTimeSec,
+                         const std::vector<Bid>& inputBids);    
     std::string getIdString() const;
     uint32_t getId() const;
     std::string getUidString() const;
@@ -43,7 +43,6 @@ public:
     uint32_t getOwnerId() const;
     uint32_t getHighestBidValue() const;
     void setInactive();
-
     void setOwnerId(uint32_t uid);
     void setName(const std::string& name);
     void setInitialBid(uint32_t initialBid);
