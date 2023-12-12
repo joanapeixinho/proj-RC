@@ -156,7 +156,7 @@ std::stringstream ReplyLoginClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyLoginClientbound::ID << " ";
   if (status == ReplyLoginClientbound::status::OK) {
-    buffer << "OK ";
+    buffer << "OK";
   } else if (status == ReplyLoginClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyLoginClientbound::status::REG) {
@@ -214,7 +214,7 @@ std::stringstream ReplyLogoutClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyLogoutClientbound::ID << " ";
   if (status == ReplyLogoutClientbound::status::OK) {
-    buffer << "OK ";
+    buffer << "OK";
   } else if (status == ReplyLogoutClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyLogoutClientbound::status::UNR) {
@@ -322,7 +322,7 @@ std::stringstream ReplyListMyAuctionsClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyListMyAuctionsClientbound::ID << " ";
   if (status == ReplyListMyAuctionsClientbound::status::OK) {
-    buffer << "OK ";
+    buffer << "OK";
   } else if (status == ReplyListMyAuctionsClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyListMyAuctionsClientbound::status::NLG) {
@@ -477,7 +477,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyShowRecordClientbound::ID << " ";
   if (status == ReplyShowRecordClientbound::status::OK) {
-    buffer << "OK ";
+    buffer << "OK";
     write_user_id(buffer, auction.getOwnerId());
     buffer << " " << auction.getName() << " " << auction.getAssetFname();
     buffer << " " << auction.getInitialBid() << " ";
