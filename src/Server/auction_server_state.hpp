@@ -85,7 +85,7 @@ class AuctionServerState {
   struct addrinfo* server_udp_addr = NULL;
   struct addrinfo* server_tcp_addr = NULL;
   DebugStream cdebug;
-  int auctionsCount = 0;
+  u_int32_t auctionsCount = 0;
   FileManager& file_manager;
 
 
