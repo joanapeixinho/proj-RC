@@ -4,7 +4,7 @@ UserData::UserData(uint32_t __id, const std::string &__password, FileManager &__
     : id(__id), password(__password), fileManager(__fileManager)
 {
     // check UID IS VALID
-    if (id < 100000 || id > 999999)
+    if (id > USER_ID_MAX)
     {
         throw UserIdException(std::to_string(id));
     }

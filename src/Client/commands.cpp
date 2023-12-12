@@ -98,7 +98,7 @@ void LoginCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if Password is too long
-  if (password.length() == 0 || password.length() > PASSWORD_MAX_LEN) {
+  if (password.length() == 0 || password.length() > PASSWORD_MAX_LEN || password.length() < 1) {
     std::cout << "Invalid password. It must be between 1 and " << PASSWORD_MAX_LEN 
               << " characters long" << std::endl;
     return;
@@ -138,13 +138,17 @@ void LoginCommand::handle(std::string args, UserState& state) {
       std::cout << "New user registered successfully!" << std::endl;
       break;
 
+    case ReplyLoginClientbound::status::ERR:
 
+      std::cout
+          << "Failed to login: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
+      break;
     default:
       std::cout 
-          << "Something went wrong. Please try again."" 
-          << std::endl;
+          << "Something went wrong. Please try again." << std::endl;
       break;
-  }
+    }
 }
 
 void LogoutCommand::handle(std::string args, UserState& state) {
@@ -182,10 +186,16 @@ void LogoutCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyLogoutClientbound::status::UNR:
-    default:
       std::cout 
           << "Failed to logout: the user is not registered." 
           << std::endl;
+      break;
+
+    case ReplyLogoutClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to logout: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -225,10 +235,15 @@ void UnregisterCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyUnregisterClientbound::status::UNR:
-    default:
       std::cout 
           << "Failed to un-register: the user is not registered." 
           << std::endl;
+      break;
+
+    case ReplyUnregisterClientbound::status::ERR:
+      std::cout
+          << "Failed to un-register: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -327,10 +342,16 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyOpenAuctionClientbound::status::NLG:
-    default:
       std::cout 
           << "Failed to open auction: the user is not logged in." 
           << std::endl;
+      break;
+
+    case ReplyOpenAuctionClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to open auction: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -400,10 +421,16 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyCloseAuctionClientbound::status::NLG:
-    default:
       std::cout 
           << "Failed to close auction: the user is not logged in." 
           << std::endl;
+      break;
+
+    case ReplyCloseAuctionClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to close auction: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -442,10 +469,16 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
       break;
     
     case ReplyListMyAuctionsClientbound::status::NOK:
-    default:
       std::cout
           << "Failed to list auctions: the user has 0 ongoing auctions."
           << std::endl;
+      break;
+
+    case ReplyListMyAuctionsClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to list auctions: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -483,10 +516,16 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
       break;
     
     case ReplyMyBidsClientbound::status::NOK:
-    default:
       std::cout
           << "Failed to list bids: the user has 0 ongoing bids."
           << std::endl;
+      break;
+
+    case ReplyMyBidsClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to list bids: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -507,10 +546,16 @@ void ListCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyListAuctionsClientbound::status::NOK:
-    default:
       std::cout
           << "Failed to list auctions: there are no ongoing auctions."
           << std::endl;
+      break;
+
+    case ReplyListAuctionsClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to list auctions: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -564,10 +609,16 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyShowAssetClientbound::status::NOK:
-    default:
       std::cout
           << "Failed to show asset: the auction with ID [" 
           << auction_id << "] does not exist." << std::endl;
+      break;
+
+    case ReplyShowAssetClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to show asset: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -653,11 +704,17 @@ void BidCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyBidClientbound::status::REF:
-    default:
       std::cout 
           << "Failed to bid: the bid of " << bid_value << " was lower than"
           << " the current bid of the auction [" << auction_id << "]."
           << std::endl;
+      break;
+
+    case ReplyBidClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to bid: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
@@ -725,10 +782,16 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyShowRecordClientbound::status::NOK:
-    default:
       std::cout 
           << "Failed to show record: the auction [" 
           << auction_id << "] does not exist." << std::endl;
+      break;
+      
+    case ReplyShowRecordClientbound::status::ERR:
+    default:
+      std::cout
+          << "Failed to show record: an unknown error occurred on the server "
+          << "side. Please try again." << std::endl;
       break;
   }
 }
