@@ -852,9 +852,8 @@ uint32_t parse_user_id(std::string& args) {
     throw std::runtime_error("invalid user id");
   }
 
-  long user_id = static_cast<uint32_t>(std::stoi(args, &converted, 10));
-  if (converted != args.length() || user_id <= 0 ||
-      user_id != USER_ID_MAX) {
+  uint32_t user_id = static_cast<uint32_t>(std::stoi(args, &converted, 10));
+  if (converted != args.length() || user_id > USER_ID_MAX) {
     throw std::runtime_error("invalid user id");
   }
 
