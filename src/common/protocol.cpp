@@ -518,7 +518,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
       while (buffer.peek() == ' '){
         readSpace(buffer);
         if (buffer.peek() == 'B'){ // Read bid
-          readBid(buffer, auction);
+          auction.addBid(readBid(buffer));
           bidCounter++;
           if (bidCounter > 50){ // You cant receive more than 50 bids
             throw InvalidPacketException();
@@ -1200,8 +1200,8 @@ std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctions
     return auctions;
 }
 
-void UdpPacket::readBid(std::stringstream &buffer, AuctionData& auction) {
-  auto bid = Bid();
+Bid UdpPacket::readBid(std::stringstream &buffer) {
+  Bid bid = Bid();
   readChar(buffer, ' ');
   bid.bidder_user_id = readUserId(buffer);
   readSpace(buffer);
@@ -1210,5 +1210,5 @@ void UdpPacket::readBid(std::stringstream &buffer, AuctionData& auction) {
   bid.date_time = read_date_time(buffer);
   readSpace(buffer);
   bid.sec_time = readInt(buffer);
-  auction.addBid(bid);
+  return bid;
 }
