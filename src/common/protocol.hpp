@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "file_manager.hpp"
+#include "auction_data.hpp"
 
 // Thrown when the PacketID does not match what was expected
 class UnexpectedPacketException : public std::runtime_error {

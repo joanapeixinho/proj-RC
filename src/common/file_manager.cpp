@@ -339,13 +339,13 @@ AuctionData FileManager::getAuction(const std::string &auctionId)
             std::time_t endTime =(std::stoi(endDatetime));
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(static_cast<uint32_t>(std::stoi(auctionId)), static_cast<uint32_t>(std::stoi(uid)), name, initialBid,
-                   durationSeconds, assetFname, endTime, endTimeSec, startTime, bids);
+                   durationSeconds, assetFname, startTime, endTime, endTimeSec, bids);
 
             data.setInactive();
         } else {
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(static_cast<uint32_t>(std::stoi(auctionId)),static_cast<uint32_t>(std::stoi(uid)), name, initialBid,
-                             durationSeconds, assetFname, 0, 0, startTime, bids);
+                             durationSeconds, assetFname, startTime, 0, 0, bids);
         } });
 
     return data;

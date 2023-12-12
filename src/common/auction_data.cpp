@@ -1,13 +1,13 @@
 #include "auction_data.hpp"
 
 
-AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
+AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
                          uint32_t inputInitialBid, uint32_t inputDurationSeconds,
                          const std::string& inputAssetFname, std::time_t inputStartTime,
                          std::time_t inputEndTime, uint32_t inputEndTimeSec,
-                         const std::vector<Bid>& inputBids) : id(inputId), uid(inputUid), name(inputName), initialBid(inputInitialBid),
-      durationSeconds(inputDurationSeconds), assetFname(inputAssetFname),
-      startTime(inputStartTime), endTime(inputEndTime), endTimeSec(inputEndTimeSec),
+                         const std::vector<Bid> &inputBids) :  id(inputId), uid(inputUid), name(inputName), initialBid(inputInitialBid),
+      durationSeconds(inputDurationSeconds), startTime(inputStartTime), assetFname(inputAssetFname),
+      endTime(inputEndTime), endTimeSec(inputEndTimeSec),
       bids(inputBids) 
 {
     // Validações
