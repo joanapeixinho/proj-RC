@@ -43,6 +43,15 @@ class ErrorUdpPacketException : public std::runtime_error {
             "different Auction server.") {}
 };
 
+class ErrorTcpPacketException : public std::runtime_error {
+ public:
+  ErrorTcpPacketException()
+      : std::runtime_error(
+            "The server detected an error in the command sent by this user, so "
+            "the operation was aborted. Please try again or connect to a "
+            "different Auction server.") {}
+};
+
 // Thrown when serialization error occurs
 class PacketSerializationException : public std::runtime_error {
  public:

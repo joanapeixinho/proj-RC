@@ -4,7 +4,6 @@
 #include <csignal>
 
 #include "../common/constants.hpp"
-#include "auction_server.hpp"
 #include "auction_server_state.hpp"
 #include "worker_pool.hpp"
 

@@ -1,7 +1,7 @@
 #include "user_data.hpp"
 
-UserData::UserData(uint32_t id, const std::string &password, FileManager &fileManager)
-    : id(id), password(password), fileManager(fileManager)
+UserData::UserData(uint32_t __id, const std::string &__password, FileManager &__fileManager)
+    : id(__id), password(__password), fileManager(__fileManager)
 {
     // check UID IS VALID
     if (id < 100000 || id > 999999)
@@ -23,8 +23,8 @@ UserData::UserData(uint32_t id, const std::string &password, FileManager &fileMa
     }
 }
 
-UserData::UserData(uint32_t id, FileManager &fileManager)
-    : id(id), fileManager(fileManager) {}
+UserData::UserData(uint32_t __id, FileManager &__fileManager)
+    : id(__id), fileManager(__fileManager) {}
 
 uint32_t UserData::getId() const
 {
@@ -43,10 +43,10 @@ const std::string &UserData::getPassword() const
     return password;
 }
 
-bool UserData::passwordIsCorrect(const std::string &password)
+bool UserData::passwordIsCorrect(const std::string &_password)
 {
     std::string userPassword = fileManager.getUserPassword(std::to_string(this->id));
-    if (userPassword == password)
+    if (userPassword == _password)
     {
         return true;
     }
@@ -117,16 +117,16 @@ void UserData::unregisterUser()
     fileManager.unregisterUser(idString);
 }
 
-void UserData::openAuction(const AuctionData &data, const std::string &password)
+void UserData::openAuction(const AuctionData &data, const std::string &_password)
 {
 
     if (!fileManager.UserLoggedIn(std::to_string(this->id)))
     {
         throw UserNotLoggedInException(std::to_string(this->id));
     }
-    else if (!passwordIsCorrect(password))
+    else if (!passwordIsCorrect(_password))
     {
-        throw WrongPasswordException(password);
+        throw WrongPasswordException(_password);
     }
     else
     {
@@ -169,22 +169,22 @@ std::vector<std::pair<uint32_t, bool>> UserData::listMyAuctions(const std::strin
     return auctions;
 }
 
-void UserData::bid(AuctionData &auction, uint32_t bidValue, const std::string &password)
+void UserData::bid(AuctionData &auction, uint32_t bidValue, const std::string &_password)
 {
 
     if (!fileManager.UserLoggedIn(std::to_string(this->id)))
     {
         throw UserNotLoggedInException(std::to_string(this->id));
     }
-    else if (!passwordIsCorrect(password))
+    else if (!passwordIsCorrect(_password))
     {
-        throw WrongPasswordException(password);
+        throw WrongPasswordException(_password);
     }
     else if (auction.getOwnerId() == this->id)
     {
         throw UserIsOwnerException(this->getIdString());
     }
-    else if (bidValue < 0)
+    else if (bidValue > BID_MAX_VALUE)
     {
         throw BidValueException(std::to_string(bidValue));
     }

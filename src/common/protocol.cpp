@@ -572,9 +572,24 @@ void TcpPacket::writeString(int fd, const std::string &str) {
 
 void TcpPacket::readPacketId(int fd, const char *packet_id) {
   char current_char;
+  const char *errorID = ErrorUdpPacket::ID;
+  int errorID_counter = 0;
   while (*packet_id != '\0') {
     if (read(fd, &current_char, 1) != 1 || current_char != *packet_id) {
-      throw UnexpectedPacketException();
+      // Check if the unexpected packet is an error packet
+      if (current_char != errorID[errorID_counter]) {
+        
+        // If it is not an error packet, throw an exception
+        throw UnexpectedPacketException();
+      } else { // While the packet seems to be an error packet, keep reading
+        errorID_counter++;
+      }
+      // If it's confirmed that the packet is an error packet, throw an exception
+      if (errorID_counter == 3) {
+        // Without the packet delimiter, the error packet would invalid
+        readPacketDelimiter(fd); 
+        throw ErrorTcpPacketException();
+      }
     }
     ++packet_id;
   }

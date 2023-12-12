@@ -19,7 +19,7 @@ AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string&
         throw InvalidAuctionNameException(name);
     }
 
-    if (initialBid > AUCTION_INITIAL_BID_MAX_VALUE) {
+    if (initialBid > BID_MAX_VALUE) {
         throw InvalidAuctionInitialBidException(std::to_string(initialBid));
     }
 
@@ -148,4 +148,8 @@ void AuctionData::setEndTime(std::time_t inputEndTime) {
 
 void AuctionData::setEndTimeSec(uint32_t inputEndTimeSec) {
     endTimeSec = inputEndTimeSec;
+}
+
+void AuctionData::addBid(Bid bid) {
+    bids.push_back(bid);
 }
