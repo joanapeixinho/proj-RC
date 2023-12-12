@@ -849,8 +849,7 @@ bool is_numeric(std::string& str) {
 uint32_t parse_user_id(std::string& args) {
   size_t converted = 0;
   long user_id = static_cast<uint32_t>(std::stoi(args, &converted, 10));
-  if (converted != args.length() || user_id <= 0 ||
-      user_id > USER_ID_MAX) {
+  if (converted != args.length() || user_id != USER_ID_MAX) {
     throw std::runtime_error("invalid user id");
   }
 
