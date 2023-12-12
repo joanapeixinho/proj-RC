@@ -7,8 +7,8 @@
 #include <ctime>
 #include <vector>
 
-#include "../common/constants.hpp"
-#include "../common/file_manager.hpp"
+#include "constants.hpp"
+#include "exceptions.hpp"
 
 
 struct Bid {
@@ -21,8 +21,11 @@ struct Bid {
 class AuctionData {
 public:
     AuctionData() = default;
-    AuctionData(uint32_t id, uint32_t uid, std::string& name, uint32_t initialBid, uint32_t durationSeconds, const std::string& assetFname, std::time_t endTime, uint32_t endTimeSec , std::time_t startTime, std::vector<Bid> bids);
-    void openAuction();
+    AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
+                 uint32_t initialBid, uint32_t durationSeconds,
+                 const std::string& assetFname, std::time_t endTime,
+                 uint32_t endTimeSec, std::time_t startTime,
+                 const std::vector<Bid>& bids);    void openAuction();
     std::string getIdString() const;
     uint32_t getId() const;
     std::string getUidString() const;

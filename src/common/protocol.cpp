@@ -1226,7 +1226,7 @@ std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctions
     return auctions;
 }
 
-void readBid(std::stringstream &buffer, AuctionData& auction) {
+void UdpPacket::readBid(std::stringstream &buffer, AuctionData& auction) {
   auto bid = Bid();
   readChar(buffer, ' ');
   bid.bidder_user_id = readUserId(buffer);

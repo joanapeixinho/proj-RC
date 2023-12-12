@@ -12,10 +12,10 @@
 #include <mutex>
 #include <functional>
 #include <ctime>
-//include common
-#include "../common/exceptions.hpp"
-#include "../Server/auction_data.hpp"
-#include "../common/constants.hpp"
+
+#include "exceptions.hpp"
+#include "constants.hpp"
+#include "auction_data.hpp"
 
 
 

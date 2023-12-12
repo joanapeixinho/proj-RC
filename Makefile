@@ -29,6 +29,9 @@ LDFLAGS = -std=c++17
 CXXFLAGS += $(INCLUDES)
 LDFLAGS += $(INCLUDES)
 
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 vpath # clears VPATH
 vpath %.hpp $(INCLUDE_DIRS)
 
@@ -43,8 +46,6 @@ endif
 ifeq ($(strip $(DEBUG)), yes)
 	CXXFLAGS += -g
 endif
-
-#LDFLAGS = -fsanitize=address -lasan
 
 CXXFLAGS += -fdiagnostics-color=always
 CXXFLAGS += -Wall
@@ -74,21 +75,21 @@ fmt: $(SOURCES) $(HEADERS)
 fmt-check: $(SOURCES) $(HEADERS)
 	clang-format -n --Werror $^
 
-src/Server/server: $(SERVER_OBJECTS) $(SERVER_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
-	$(CXX) $(LDFLAGS) -o src/Server/server $(SERVER_OBJECTS) $(COMMON_OBJECTS)
-	
-src/Client/User: $(CLIENT_OBJECTS) $(CLIENT_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
-	$(CXX) $(LDFLAGS) -o src/Client/User $(CLIENT_OBJECTS) $(COMMON_OBJECTS)
+src/Server/server: $(SERVER_OBJECTS) $(COMMON_OBJECTS)
+	$(CXX) $(LDFLAGS) -o $@ $^
+
+src/Client/User: $(CLIENT_OBJECTS) $(COMMON_OBJECTS)
+	$(CXX) $(LDFLAGS) -o $@ $^
 
 AS: src/Server/server
-	cp src/Server/server AS
+	cp $< $@
+
 user: src/Client/User
-	cp src/Client/User user
+	cp $< $@
 
 clean:
 	rm -f $(OBJECTS) $(TARGETS) $(TARGET_EXECS) project.zip
 
-
 package:
-	cp  readme.txt
+	cp readme.txt
 	zip project.zip $(SOURCES) $(HEADERS) Makefile .clang-format readme.txt *.xlsx

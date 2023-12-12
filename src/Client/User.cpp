@@ -62,7 +62,6 @@ void registerCommands(CommandManager &manager) {
   manager.registerCommand(std::make_shared<ShowAssetCommand>());    // TCP
   manager.registerCommand(std::make_shared<BidCommand>());          // TCP
   manager.registerCommand(std::make_shared<ShowRecordCommand>());   // TCP
-  manager.registerCommand(std::make_shared<HelpCommand>(manager));
 }
 
 ClientConfig::ClientConfig(int argc, char *argv[]) {

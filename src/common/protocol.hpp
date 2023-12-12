@@ -83,6 +83,7 @@ class UdpPacket {
   uint32_t readInt(std::stringstream &buffer);
   uint32_t readUserId(std::stringstream &buffer);
   uint32_t readAuctionId(std::stringstream &buffer);
+  void readBid(std::stringstream &buffer, AuctionData& auction);
 
  public:
   virtual std::stringstream serialize() = 0;
