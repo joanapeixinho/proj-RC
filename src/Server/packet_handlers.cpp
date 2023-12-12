@@ -35,6 +35,10 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
     state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
     response.status = ReplyLoginClientbound::REG;
   }
+  catch (UserAlreadyLoggedInException &e) {
+    state.cdebug << userTag(packet.user_id) << "User already logged in" << std::endl;
+    response.status = ReplyLoginClientbound::ERR;
+  }
   catch (UserIdException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Invalid user id" << std::endl;
@@ -520,7 +524,7 @@ void handle_close_auction(int connection_fd, AuctionServerState &state)
   catch (UserNotRegisteredException &e)
   {
     state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
-    //response.status = ReplyCloseAuctionClientbound::ERR; (Maybe NLG?)
+    response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (AuctionDoesNotExistException &e)
   {
