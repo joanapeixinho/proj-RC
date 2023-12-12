@@ -37,10 +37,20 @@ AuctionServerState::~AuctionServerState() {
 void AuctionServerState::registerPacketHandlers() {
   // UDP
   udp_packet_handlers.insert({LoginServerbound::ID, handle_login_user});
- 
+  udp_packet_handlers.insert({LogoutServerbound::ID, handle_logout_user});
+  udp_packet_handlers.insert({UnregisterServerbound::ID, handle_unregister_user});
+  udp_packet_handlers.insert({ListMyAuctionsServerbound::ID, handle_list_myauctions});
+  udp_packet_handlers.insert({MyBidsServerbound::ID, handle_list_mybids});
+  udp_packet_handlers.insert({ListAuctionsServerbound::ID, handle_list_auctions});
+  udp_packet_handlers.insert({ShowRecordServerbound::ID, handle_show_record});
+
 
   // TCP
   tcp_packet_handlers.insert({OpenAuctionServerbound::ID, handle_open_auction});
+  tcp_packet_handlers.insert({CloseAuctionServerbound::ID, handle_close_auction});
+  tcp_packet_handlers.insert({ShowAssetServerbound::ID, handle_show_asset});
+  tcp_packet_handlers.insert({BidServerbound::ID, handle_bid});
+
 }
 
 void AuctionServerState::setup_sockets() {
