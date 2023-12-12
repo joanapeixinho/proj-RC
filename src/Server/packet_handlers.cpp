@@ -104,17 +104,17 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
   catch (FileOpenException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyLogoutClientbound::ERR;
+    response.status = ReplyLogoutClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyLogoutClientbound::ERR;
+    response.status = ReplyLogoutClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyLogoutClientbound::ERR;
+    response.status = ReplyLogoutClientbound::ERR;
   }
   catch (std::exception &e)
   {
@@ -159,17 +159,17 @@ void handle_unregister_user(std::stringstream &buffer, Address &addr_from,
   catch (FileOpenException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyUnregisterClientbound::ERR;
+    response.status = ReplyUnregisterClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyUnregisterClientbound::ERR;
+    response.status = ReplyUnregisterClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyUnregisterClientbound::ERR;
+    response.status = ReplyUnregisterClientbound::ERR;
   }
   catch (std::exception &e)
   {
@@ -213,17 +213,17 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
   catch (FileOpenException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyListMyAuctionsClientbound::ERR;
+    response.status = ReplyListMyAuctionsClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyListMyAuctionsClientbound::ERR;
+    response.status = ReplyListMyAuctionsClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyListMyAuctionsClientbound::ERR;
+    response.status = ReplyListMyAuctionsClientbound::ERR;
   }
   catch (std::exception &e)
   {
@@ -267,17 +267,17 @@ void handle_list_mybids(std::stringstream &buffer, Address &addr_from,
   catch (FileOpenException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyMyBidsClientbound::ERR;
+    response.status = ReplyMyBidsClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyMyBidsClientbound::ERR;
+    response.status = ReplyMyBidsClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyMyBidsClientbound::ERR;
+    response.status = ReplyMyBidsClientbound::ERR;
   }
   catch (std::exception &e)
   {
@@ -315,17 +315,17 @@ void handle_list_auctions(std::stringstream &buffer, Address &addr_from,
   catch (FileOpenException &e)
   {
     state.cdebug << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyListAuctionsClientbound::ERR;
+    response.status = ReplyListAuctionsClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyListAuctionsClientbound::ERR;
+    response.status = ReplyListAuctionsClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyListAuctionsClientbound::ERR;
+    response.status = ReplyListAuctionsClientbound::ERR;
   }
   catch (std::exception &e)
   {
@@ -520,7 +520,7 @@ void handle_close_auction(int connection_fd, AuctionServerState &state)
   catch (UserNotRegisteredException &e)
   {
     state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
-    //TODO response.status = ReplyCloseAuctionClientbound::ERR; (Maybe NLG?)
+    //response.status = ReplyCloseAuctionClientbound::ERR; (Maybe NLG?)
   }
   catch (AuctionDoesNotExistException &e)
   {
@@ -540,17 +540,17 @@ void handle_close_auction(int connection_fd, AuctionServerState &state)
   catch (FileOpenException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyCloseAuctionClientbound::ERR;
+    response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyCloseAuctionClientbound::ERR;
+    response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyCloseAuctionClientbound::ERR;
+    response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (std::exception &e)
   {
