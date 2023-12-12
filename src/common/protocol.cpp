@@ -121,7 +121,7 @@ uint32_t UdpPacket::readInt(std::stringstream &buffer) {
 };
 
 uint32_t UdpPacket::readUserId(std::stringstream &buffer) {
-  std::string id_str = readString(buffer, USER_ID_MAX_LEN);
+  std::string id_str = readString(buffer, USER_ID_STR_LEN);
   return parse_packet_user_id(id_str);
 };
 
@@ -146,7 +146,7 @@ void LoginServerbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   user_id = readUserId(buffer);
   readSpace(buffer);
-  password = readString(buffer, PASSWORD_MAX_LEN);
+  password = readString(buffer, PASSWORD_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -206,7 +206,7 @@ void LogoutServerbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   user_id = readUserId(buffer);
   readSpace(buffer);
-  password = readString(buffer, PASSWORD_MAX_LEN);
+  password = readString(buffer, PASSWORD_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -261,7 +261,7 @@ void UnregisterServerbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   user_id = readUserId(buffer);
   readSpace(buffer);
-  password = readString(buffer, PASSWORD_MAX_LEN);
+  password = readString(buffer, PASSWORD_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -1157,12 +1157,12 @@ void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
 }
 
 void write_user_id(std::stringstream &buffer, const uint32_t user_id) {
-  buffer << std::setfill('0') << std::setw(USER_ID_MAX_LEN) << user_id;
+  buffer << std::setfill('0') << std::setw(USER_ID_STR_LEN) << user_id;
   buffer.copyfmt(std::ios(NULL));  // reset formatting
 }
 
 uint32_t parse_packet_user_id(std::string &id_str) {
-  if (id_str.length() != USER_ID_MAX_LEN) {
+  if (id_str.length() != USER_ID_STR_LEN) {
     throw InvalidPacketException();
   }
   for (char c : id_str) {

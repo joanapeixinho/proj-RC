@@ -45,7 +45,7 @@ uint32_t AuctionData::getId() const {
 
 std::string AuctionData::getUidString() const {
     std::ostringstream oss;
-    oss << std::setw(USER_ID_MAX_LEN) << std::setfill('0') << uid;
+    oss << std::setw(USER_ID_STR_LEN) << std::setfill('0') << uid;
     return oss.str();
 }
 

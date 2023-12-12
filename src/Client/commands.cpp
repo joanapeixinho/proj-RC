@@ -93,13 +93,13 @@ void LoginCommand::handle(std::string args, UserState& state) {
   try {
     user_id = parse_user_id(user_id_str);
   } catch (...) {
-    std::cout << "Invalid user ID. It must be a positive number up to "
-              << USER_ID_MAX_LEN << " digits" << std::endl;
+    std::cout << "Invalid user ID. It must be "<< USER_ID_STR_LEN 
+              << " digits" << std::endl;
     return;
   }
   // Check if Password is too long
-  if (password.length() == 0 || password.length() > PASSWORD_MAX_LEN || password.length() < 1) {
-    std::cout << "Invalid password. It must be between 1 and " << PASSWORD_MAX_LEN 
+  if (password.length() != PASSWORD_LEN) {
+    std::cout << "Invalid password. It must be " << PASSWORD_LEN 
               << " characters long" << std::endl;
     return;
   }
@@ -241,6 +241,7 @@ void UnregisterCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyUnregisterClientbound::status::ERR:
+    default:
       std::cout
           << "Failed to un-register: an unknown error occurred on the server "
           << "side. Please try again." << std::endl;
@@ -786,7 +787,7 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
           << "Failed to show record: the auction [" 
           << auction_id << "] does not exist." << std::endl;
       break;
-      
+
     case ReplyShowRecordClientbound::status::ERR:
     default:
       std::cout

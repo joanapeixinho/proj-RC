@@ -34,7 +34,7 @@ uint32_t UserData::getId() const
 std::string UserData::getIdString() const
 {
     std::ostringstream oss;
-    oss << std::setw(USER_ID_MAX_LEN) << std::setfill('0') << id;
+    oss << std::setw(USER_ID_STR_LEN) << std::setfill('0') << id;
     return oss.str();
 }
 

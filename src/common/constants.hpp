@@ -15,9 +15,9 @@
 #define SOCKET_BUFFER_LEN (256)
 #define PACKET_ID_LEN (3)
 
-#define USER_ID_MAX_LEN (6)
-#define USER_ID_MAX ((uint32_t)pow(10, USER_ID_MAX_LEN) - 1)
-#define PASSWORD_MAX_LEN (8)
+#define USER_ID_STR_LEN (6)
+#define USER_ID_MAX ((uint32_t)pow(10, USER_ID_STR_LEN) - 1)
+#define PASSWORD_LEN (8)
 
 #define AUCTION_NAME_MAX_LENGTH (10)
 #define BID_MAX_VALUE (999999)
