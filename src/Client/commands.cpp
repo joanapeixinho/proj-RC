@@ -133,10 +133,16 @@ void LoginCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyLoginClientbound::status::REG:
-    default:
       // Registered user is still logged in
       state.login(user_id, password);
       std::cout << "New user registered successfully!" << std::endl;
+      break;
+
+
+    default:
+      std::cout 
+          << "Something went wrong. Please try again."" 
+          << std::endl;
       break;
   }
 }

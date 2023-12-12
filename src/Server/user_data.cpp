@@ -72,6 +72,10 @@ void UserData::login()
             {
                 fileManager.loginUser(std::to_string(this->id));
             }
+            else {
+                throw WrongPasswordException(this->password);
+            
+            }
         }
     }
     else

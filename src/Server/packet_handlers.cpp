@@ -15,7 +15,7 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
+    state.cdebug << userTag(packet.user_id) << "Asked to login"
                  << std::endl;
 
     UserData user(packet.user_id, packet.password, state.file_manager);
@@ -38,27 +38,27 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
   catch (UserIdException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Invalid user id" << std::endl;
-    response.status = ReplyLoginClientbound::NOK;
+    response.status = ReplyLoginClientbound::ERR;
   }
   catch (UserPasswordException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Invalid user password" << std::endl;
-    response.status = ReplyLoginClientbound::NOK;
+    response.status = ReplyLoginClientbound::ERR;
   }
   catch (FileOpenException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyLoginClientbound::ERR;
+    response.status = ReplyLoginClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyLoginClientbound::ERR;
+    response.status = ReplyLoginClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyLoginClientbound::ERR;
+    response.status = ReplyLoginClientbound::ERR;
   }
   catch (std::exception &e)
   {
@@ -81,7 +81,7 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
+    state.cdebug << userTag(packet.user_id) << "Asked to loggout user"
                  << std::endl;
 
     UserData user(packet.user_id, packet.password, state.file_manager);
@@ -137,7 +137,7 @@ void handle_unregister_user(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to start Auction"
+    state.cdebug << userTag(packet.user_id) << "Asked to unregister user"
                  << std::endl;
 
     UserData user(packet.user_id, packet.password, state.file_manager);
@@ -192,7 +192,7 @@ void handle_list_myauctions(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to list auctions"
+    state.cdebug << userTag(packet.user_id) << "Asked to list user auctions"
                  << std::endl;
 
     UserData user(packet.user_id, state.file_manager);
@@ -246,7 +246,7 @@ void handle_list_mybids(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to list bids"
+    state.cdebug << userTag(packet.user_id) << "Asked to list user bids"
                  << std::endl;
 
     UserData user(packet.user_id, state.file_manager);
@@ -363,17 +363,17 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
   catch (FileOpenException &e)
   {
     state.cdebug << auctionTag(packet.auction_id) << "Failed to open file" << std::endl;
-    //TODO response.status = ReplyShowRecordClientbound::ERR;
+    response.status = ReplyShowRecordClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
     state.cdebug << auctionTag(packet.auction_id) << "Failed to write to file" << std::endl;
-    //TODO response.status = ReplyShowRecordClientbound::ERR;
+    response.status = ReplyShowRecordClientbound::ERR;
   }
   catch (FileReadException &e)
   {
     state.cdebug << auctionTag(packet.auction_id) << "Failed to read from file" << std::endl;
-    //TODO response.status = ReplyShowRecordClientbound::ERR;
+    response.status = ReplyShowRecordClientbound::ERR;
   }
   catch (std::exception &e)
   {
@@ -582,7 +582,7 @@ void handle_show_asset(int connection_fd, AuctionServerState &state)
 
     response.file_path = asset_path;
 
-    state.cdebug << auctionTag(packet.auction_id) << "Asset shown" << std::endl;
+    state.cdebug << auctionTag(packet.auction_id) << "Asked to show asset" << std::endl;
   }
   catch (AuctionDoesNotExistException &e)
   {

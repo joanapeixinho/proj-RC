@@ -126,7 +126,7 @@ class LoginServerbound : public UdpPacket {
 // Reply to Start Auction Packet (RLI)
 class ReplyLoginClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, REG };
+  enum status { OK, NOK, REG, ERR};
   static constexpr const char *ID = "RLI";
   status status;
   std::stringstream serialize();
@@ -147,7 +147,7 @@ class LogoutServerbound : public UdpPacket {
 // Reply to Logout Packet (RLO)
 class ReplyLogoutClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, UNR };
+  enum status { OK, NOK, UNR, ERR};
   static constexpr const char *ID = "RLO";
   status status;
   std::stringstream serialize();
@@ -168,7 +168,7 @@ class UnregisterServerbound : public UdpPacket {
 // Reply to Unregister Packet (RUN)
 class ReplyUnregisterClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, UNR };
+  enum status { OK, NOK, UNR, ERR};
   static constexpr const char *ID = "RUN";
   status status;
   std::stringstream serialize();
@@ -190,7 +190,7 @@ class ListMyAuctionsServerbound : public UdpPacket {
 
 class ReplyListMyAuctionsClientbound : public UdpPacket {
  public:
-  enum status { OK, NLG, NOK};
+  enum status { OK, NLG, NOK, ERR};
   static constexpr const char *ID = "RLM";
   std::vector<std::pair<uint32_t, bool>> auctions;
 
@@ -214,7 +214,7 @@ class MyBidsServerbound : public UdpPacket {
 
 class ReplyMyBidsClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, NLG };
+  enum status { OK, NOK, NLG, ERR };
   static constexpr const char *ID = "RMB";
   status status;
   std::vector<std::pair<uint32_t, bool>> auctions;
@@ -238,7 +238,7 @@ class ListAuctionsServerbound : public UdpPacket {
 
 class ReplyListAuctionsClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK };
+  enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RLS";
   status status;
   std::vector<std::pair<uint32_t, bool>> auctions;
@@ -259,7 +259,7 @@ class ErrorUdpPacket : public UdpPacket {
 
 class ReplyShowRecordClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK };
+  enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RRC";
   status status;
 
@@ -328,7 +328,7 @@ class OpenAuctionServerbound : public TcpPacket {
 
 class ReplyOpenAuctionClientbound : public TcpPacket {
  public:
-  enum status { OK, NOK, NLG };
+  enum status { OK, NOK, NLG, ERR };
   static constexpr const char *ID = "ROA";
   status status;
   uint32_t auction_id; 
@@ -351,7 +351,7 @@ class CloseAuctionServerbound : public TcpPacket {
 
 class ReplyCloseAuctionClientbound : public TcpPacket {
  public:
-  enum status { OK, EAU, EOW, END, NLG };
+  enum status { OK, EAU, EOW, END, NLG, ERR};
   static constexpr const char *ID = "RCL";
   status status;
 
@@ -371,7 +371,7 @@ class ShowAssetServerbound : public TcpPacket {
 
 class ReplyShowAssetClientbound : public TcpPacket {
  public:
-  enum status { OK, NOK };
+  enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RSA";
   status status;
   std::string file_name;
@@ -396,7 +396,7 @@ class BidServerbound : public TcpPacket {
 
 class ReplyBidClientbound : public TcpPacket {
  public:
-  enum status { ACC, NOK, NLG, ILG, REF };
+  enum status { ACC, NOK, NLG, ILG, REF, ERR };
   static constexpr const char *ID = "RBD";
   status status;
 
