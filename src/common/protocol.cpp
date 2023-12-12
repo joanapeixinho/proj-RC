@@ -121,7 +121,7 @@ uint32_t UdpPacket::readInt(std::stringstream &buffer) {
 };
 
 uint32_t UdpPacket::readUserId(std::stringstream &buffer) {
-  std::string id_str = readString(buffer, USER_ID_MAX_LEN);
+  std::string id_str = readString(buffer, USER_ID_STR_LEN);
   return parse_packet_user_id(id_str);
 };
 
@@ -146,7 +146,7 @@ void LoginServerbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   user_id = readUserId(buffer);
   readSpace(buffer);
-  password = readString(buffer, PASSWORD_MAX_LEN);
+  password = readString(buffer, PASSWORD_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -161,6 +161,8 @@ std::stringstream ReplyLoginClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyLoginClientbound::status::REG) {
     buffer << "REG";
+  } else if (status == ReplyLoginClientbound::status::ERR) {
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -180,6 +182,8 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "REG") {
     status = REG;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -202,7 +206,7 @@ void LogoutServerbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   user_id = readUserId(buffer);
   readSpace(buffer);
-  password = readString(buffer, PASSWORD_MAX_LEN);
+  password = readString(buffer, PASSWORD_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -215,6 +219,8 @@ std::stringstream ReplyLogoutClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyLogoutClientbound::status::UNR) {
     buffer << "UNR";
+  } else if (status == ReplyLogoutClientbound::status::ERR){
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -233,6 +239,8 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "UNR") {
     status = UNR;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -253,7 +261,7 @@ void UnregisterServerbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   user_id = readUserId(buffer);
   readSpace(buffer);
-  password = readString(buffer, PASSWORD_MAX_LEN);
+  password = readString(buffer, PASSWORD_LEN);
   readPacketDelimiter(buffer);
 };
 
@@ -266,6 +274,8 @@ std::stringstream ReplyUnregisterClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyUnregisterClientbound::status::UNR) {
     buffer << "UNR";
+  } else if (status == ReplyUnregisterClientbound::status::ERR) {
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -284,6 +294,8 @@ void ReplyUnregisterClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "UNR") {
     status = UNR;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -315,6 +327,8 @@ std::stringstream ReplyListMyAuctionsClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyListMyAuctionsClientbound::status::NLG) {
     buffer << "NLG";
+  } else if (status == ReplyListMyAuctionsClientbound::status::ERR) {
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -333,6 +347,8 @@ void ReplyListMyAuctionsClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "NLG") {
     status = NLG;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -364,6 +380,8 @@ std::stringstream ReplyMyBidsClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyMyBidsClientbound::status::NLG) {
     buffer << "NLG";
+  } else if (status == ReplyMyBidsClientbound::status::ERR) {
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -384,6 +402,8 @@ void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
     status = NOK;
   } else if (status_str == "NLG") {
     status = NLG;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -409,6 +429,8 @@ std::stringstream ReplyListAuctionsClientbound::serialize() {
     buffer << "OK " << formatAuctions(auctions);
   } else if (status == ReplyListAuctionsClientbound::status::NOK) {
     buffer << "NOK";
+  } else if (status == ReplyListAuctionsClientbound::status::ERR) {
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -427,6 +449,8 @@ void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
     auctions = parseAuctions(buffer.str());
   } else if (status_str == "NOK") {
     status = NOK;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -485,6 +509,8 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     }
   } else if (status == ReplyShowRecordClientbound::status::NOK) {
     buffer << "NOK";
+  } else if (status == ReplyShowRecordClientbound::status::ERR) {
+    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -537,6 +563,8 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     }
   } else if (status_str == "NOK") {
     status = NOK;
+  } else if (status_str == "ERR") {
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -833,6 +861,8 @@ void ReplyOpenAuctionClientbound::send(int fd) {
     stream << "NOK";
   } else if (status == NLG) {
     stream << "NLG";
+  } else if (status == ERR) {
+    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -852,6 +882,8 @@ void ReplyOpenAuctionClientbound::receive(int fd) {
     this->status = NOK;
   } else if (status_str == "NLG") {
     this->status = NLG;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -892,6 +924,8 @@ void ReplyCloseAuctionClientbound::send(int fd) {
     stream << "END";
   } else if (status == NLG) {
     stream << "NLG";
+  } else if (status == ERR) {
+    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -913,6 +947,8 @@ void ReplyCloseAuctionClientbound::receive(int fd) {
     this->status = END;
   } else if (status_str == "NLG") {
     this->status = NLG;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -945,6 +981,8 @@ void ReplyShowAssetClientbound::send(int fd) {
     return;
   } else if (status == NOK) {
     stream << "NOK";
+  } else if (status == ERR) {
+    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -966,6 +1004,8 @@ void ReplyShowAssetClientbound::receive(int fd) {
     readAndSaveToFile(fd, file_name, file_size, false);
   } else if (status_str == "NOK") {
     this->status = NOK;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -1008,6 +1048,8 @@ void ReplyBidClientbound::send(int fd) {
     stream << "ILG";
   } else if (status == REF){
     stream << "REF";
+  } else if (status == ERR){
+    stream << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -1029,6 +1071,8 @@ void ReplyBidClientbound::receive(int fd) {
     this->status = ILG;
   } else if (status_str == "REF") {
     this->status = REF;
+  } else if (status_str == "ERR") {
+    this->status = ERR;
   } else {
     throw InvalidPacketException();
   }
@@ -1113,12 +1157,12 @@ void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
 }
 
 void write_user_id(std::stringstream &buffer, const uint32_t user_id) {
-  buffer << std::setfill('0') << std::setw(USER_ID_MAX_LEN) << user_id;
+  buffer << std::setfill('0') << std::setw(USER_ID_STR_LEN) << user_id;
   buffer.copyfmt(std::ios(NULL));  // reset formatting
 }
 
 uint32_t parse_packet_user_id(std::string &id_str) {
-  if (id_str.length() != USER_ID_MAX_LEN) {
+  if (id_str.length() != USER_ID_STR_LEN) {
     throw InvalidPacketException();
   }
   for (char c : id_str) {

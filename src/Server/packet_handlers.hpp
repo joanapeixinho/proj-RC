@@ -11,7 +11,7 @@ class userTag {  // IOManip helper
  public:
   explicit userTag(uint32_t __user_id) : user_id{__user_id} {}
   friend std::ostream &operator<<(std::ostream &os, const userTag &obj) {
-    os << "[user " << std::setfill('0') << std::setw(USER_ID_MAX_LEN)
+    os << "[user " << std::setfill('0') << std::setw(USER_ID_STR_LEN)
        << obj.user_id << "] ";
     return os;
   }
