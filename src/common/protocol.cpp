@@ -173,7 +173,7 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   readPacketId(buffer, ReplyLoginClientbound::ID);
   readSpace(buffer);
-  auto status_str = readString(buffer, 3);
+  auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
   } else if (status_str == "NOK") {
@@ -226,7 +226,7 @@ void ReplyLogoutClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   readPacketId(buffer, ReplyLogoutClientbound::ID);
   readSpace(buffer);
-  auto status_str = readString(buffer, 3);
+  auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
   } else if (status_str == "NOK") {
@@ -277,7 +277,7 @@ void ReplyUnregisterClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   readPacketId(buffer, ReplyUnregisterClientbound::ID);
   readSpace(buffer);
-  auto status_str = readString(buffer, 3);
+  auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
   } else if (status_str == "NOK") {
@@ -326,7 +326,7 @@ void ReplyListMyAuctionsClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   readPacketId(buffer, ReplyListMyAuctionsClientbound::ID);
   readSpace(buffer);
-  auto status_str = readString(buffer, 3);
+  auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
   } else if (status_str == "NOK") {
@@ -375,7 +375,7 @@ void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   readPacketId(buffer, ReplyMyBidsClientbound::ID);
   readSpace(buffer);
-  auto status_str = readString(buffer, 3);
+  auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
@@ -420,7 +420,7 @@ void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   readPacketId(buffer, ReplyListAuctionsClientbound::ID);
   readSpace(buffer);
-  auto status_str = readString(buffer, 3);
+  auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
@@ -496,7 +496,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
   readPacketId(buffer, ReplyShowRecordClientbound::ID);
   readSpace(buffer);
-  auto status_str = readString(buffer, 3);
+  auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);

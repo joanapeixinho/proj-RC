@@ -123,7 +123,7 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
               << e.what() << std::endl;
     return;
   }
-
+  printf("Sending packet response to LOGOUT\n");
   send_packet(response, addr_from.socket, (struct sockaddr *)&addr_from.addr, addr_from.size);
 }
 
@@ -407,7 +407,7 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
 
     time_t now = time(0);
 
-    AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, 0, 0, now, std::vector<Bid>());
+    AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, now, 0, 0, std::vector<Bid>());
 
     if (packet.file_size > ASSET_MAX_BYTES)
     {
