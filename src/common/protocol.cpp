@@ -16,10 +16,28 @@ extern bool is_shutting_down;
 
 void UdpPacket::readPacketId(std::stringstream &buffer, const char *packet_id) {
   char current_char;
+  const char *errorID = ErrorUdpPacket::ID;
+  int errorID_counter = 0;
   while (*packet_id != '\0') {
     buffer >> current_char;
     if (!buffer.good() || current_char != *packet_id) {
-      throw UnexpectedPacketException();
+      // Check if the unexpected packet is an error packet
+      if (current_char != errorID[errorID_counter]) {
+        
+        // If it is not an error packet, throw an exception
+        throw UnexpectedPacketException();
+      } else {
+        
+        // While the packet seems to be an error packet, keep reading
+        errorID_counter++;
+      }
+      
+      // If it's confirmed that the packet is an error packet, throw an exception
+      if (errorID_counter == 3) {
+        // Without the packet delimiter, the error packet would invalid
+        readPacketDelimiter(buffer); 
+        throw ErrorUdpPacketException();
+      }
     }
     ++packet_id;
   }
@@ -143,8 +161,6 @@ std::stringstream ReplyLoginClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyLoginClientbound::status::REG) {
     buffer << "REG";
-  } else if (status == ReplyLoginClientbound::status::ERR) {
-    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -201,8 +217,6 @@ std::stringstream ReplyLogoutClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyLogoutClientbound::status::UNR) {
     buffer << "UNR";
-  } else if (status == ReplyLogoutClientbound::status::ERR) {
-    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -256,8 +270,6 @@ std::stringstream ReplyUnregisterClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyUnregisterClientbound::status::UNR) {
     buffer << "UNR";
-  } else if (status == ReplyUnregisterClientbound::status::ERR) {
-    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -309,8 +321,6 @@ std::stringstream ReplyListMyAuctionsClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyListMyAuctionsClientbound::status::NLG) {
     buffer << "NLG";
-  } else if (status == ReplyListMyAuctionsClientbound::status::ERR) {
-    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -362,8 +372,6 @@ std::stringstream ReplyMyBidsClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyMyBidsClientbound::status::NLG) {
     buffer << "NLG";
-  } else if (status == ReplyMyBidsClientbound::status::ERR) {
-    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -411,8 +419,6 @@ std::stringstream ReplyListAuctionsClientbound::serialize() {
     buffer << "OK " << formatAuctions(auctions);
   } else if (status == ReplyListAuctionsClientbound::status::NOK) {
     buffer << "NOK";
-  } else if (status == ReplyListAuctionsClientbound::status::ERR) {
-    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }
@@ -491,8 +497,6 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     }
   } else if (status == ReplyShowRecordClientbound::status::NOK) {
     buffer << "NOK";
-  } else if (status == ReplyShowRecordClientbound::status::ERR) {
-    buffer << "ERR";
   } else {
     throw PacketSerializationException();
   }

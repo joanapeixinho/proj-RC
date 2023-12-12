@@ -33,6 +33,15 @@ class InvalidPacketException : public std::runtime_error {
             "server.") {}
 };
 
+class ErrorUdpPacketException : public std::runtime_error {
+ public:
+  ErrorUdpPacketException()
+      : std::runtime_error(
+            "The server detected an error in the command sent by this user, so "
+            "the operation was aborted. Please try again or connect to a "
+            "different Auction server.") {}
+};
+
 // Thrown when serialization error occurs
 class PacketSerializationException : public std::runtime_error {
  public:
@@ -127,7 +136,7 @@ class LogoutServerbound : public UdpPacket {
 // Reply to Logout Packet (RLO)
 class ReplyLogoutClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, UNR, ERR };
+  enum status { OK, NOK, UNR };
   static constexpr const char *ID = "RLO";
   status status;
   std::stringstream serialize();
@@ -148,7 +157,7 @@ class UnregisterServerbound : public UdpPacket {
 // Reply to Unregister Packet (RUN)
 class ReplyUnregisterClientbound : public UdpPacket {
  public:
-  enum status { OK, NOK, UNR, ERR };
+  enum status { OK, NOK, UNR };
   static constexpr const char *ID = "RUN";
   status status;
   std::stringstream serialize();
@@ -170,7 +179,7 @@ class ListMyAuctionsServerbound : public UdpPacket {
 
 class ReplyListMyAuctionsClientbound : public UdpPacket {
  public:
-  enum status { OK, NLG, NOK, ERR };
+  enum status { OK, NLG, NOK};
   static constexpr const char *ID = "RLM";
   std::vector<std::pair<uint32_t, bool>> auctions;
 
