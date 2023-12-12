@@ -45,7 +45,7 @@ class LoginCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  LoginCommand() : CommandHandler("login", std::nullopt, "UID", "Login User") {}
+  LoginCommand() : CommandHandler("login", std::nullopt, "<UID> <password>", "Login User") {}
 };
 
 class LogoutCommand : public CommandHandler {
@@ -67,7 +67,7 @@ class ListCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ListCommand() : CommandHandler("list", "l", std::nullopt, "List Users") {}
+  ListCommand() : CommandHandler("list", "l", std::nullopt, "List active Auctions") {}
 };
 
 
@@ -75,7 +75,7 @@ class BidCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  BidCommand() : CommandHandler("bid", "b", "AID", "Bid on Auction") {}
+  BidCommand() : CommandHandler("bid", "b", "<AID>", "Bid on Auction") {}
 };
 
 
@@ -94,7 +94,7 @@ class ShowAssetCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ShowAssetCommand() : CommandHandler("show_asset", "sa", "AID", "Show Asset") {}
+  ShowAssetCommand() : CommandHandler("show_asset", "sa", "<AID>", "Show Asset") {}
 };
 
 class ListMyAuctionsCommand : public CommandHandler {
@@ -115,14 +115,14 @@ class OpenAuctionCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  OpenAuctionCommand() : CommandHandler("open", std::nullopt, "AuctionName", "Open Auction") {}
+  OpenAuctionCommand() : CommandHandler("open", std::nullopt, "<name> <asset_fname> <start_value> <timeactive> ", "Open Auction") {}
 };
 
 class CloseAuctionCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  CloseAuctionCommand() : CommandHandler("close", std::nullopt, "AID", "Close Auction") {}
+  CloseAuctionCommand() : CommandHandler("close", std::nullopt, "<AID>", "Close Auction") {}
 };
 
 class ExitCommand : public CommandHandler {
@@ -136,7 +136,7 @@ class ShowRecordCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ShowRecordCommand() : CommandHandler("show_record", "sr", "AID", "Show Record") {}
+  ShowRecordCommand() : CommandHandler("show_record", "sr", "<AID>", "Show Auction Record") {}
 };
 
 
