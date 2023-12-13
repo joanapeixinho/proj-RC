@@ -94,7 +94,7 @@ class ShowAssetCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ShowAssetCommand() : CommandHandler("show_asset", "sa", "<AID>", "Show Asset") {}
+  ShowAssetCommand() : CommandHandler("show_asset", "sa", "<AID> <bid_value>", "Show Asset") {}
 };
 
 class ListMyAuctionsCommand : public CommandHandler {
@@ -139,7 +139,7 @@ class ShowRecordCommand : public CommandHandler {
   ShowRecordCommand() : CommandHandler("show_record", "sr", "<AID>", "Show Auction Record") {}
 };
 
-
+std::string auctionID_ToString(uint32_t auction_id);
 
 bool is_numeric(std::string& str);
 

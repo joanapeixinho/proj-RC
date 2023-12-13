@@ -329,7 +329,8 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   packet_out.start_value = start_value;
   packet_out.time_active = timeactive;
   packet_out.file_name = asset_file_name;
-  // We assume the file is in the ASSETS directory
+
+  // TODO: Remove this constant and leave the asset_file_name as the path
   packet_out.file_path = std::filesystem::path(ASSETS_RELATIVE_DIRERCTORY) / asset_file_name;
 
 
@@ -339,8 +340,9 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   switch (roa.status) {
     case ReplyOpenAuctionClientbound::status::OK:
       // Output open auction info
-      std::cout << "Auction opened successfully with ID ["<< roa.auction_id
-                << "]!" << std::endl;
+      std::cout 
+          << "Auction opened successfully with ID ["
+          << auctionID_ToString(roa.auction_id) << "]!" << std::endl;
       break;
 
     case ReplyOpenAuctionClientbound::status::NOK:
@@ -828,10 +830,16 @@ void printBidsInfo(const std::vector<Bid> bids) {
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     for (const auto& auction : auctions) {
         std::cout 
-            << "Auction ID: " << auction.first
+            << "Auction ID: " << auctionID_ToString(auction.first)
             << " - Status: " << (auction.second ? "Active" : "Inactive") 
             << std::endl;
     }
+}
+
+std::string auctionID_ToString(uint32_t auction_id) {
+  std::ostringstream oss;
+  oss << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN) << auction_id;
+  return oss.str();
 }
 
 bool is_alphanumeric(std::string& str) {
