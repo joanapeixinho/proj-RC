@@ -10,6 +10,7 @@
 UserState::UserState(std::string &hostname, std::string &port) {
   this->setupSockets();
   this->resolveServerAddress(hostname, port);
+  this->password = "";
 }
 
 UserState::~UserState() {
@@ -41,7 +42,7 @@ std::string UserState::getPassword() {
 }
 
 bool UserState::isLoggedIn() {
-  return this->user_id != 0;
+  return this->password != "";
 }
 
 void UserState::logout() {
