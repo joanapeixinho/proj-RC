@@ -329,7 +329,7 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   packet_out.start_value = start_value;
   packet_out.time_active = timeactive;
   packet_out.file_name = asset_file_name;
-  // We assume the file is in the ASSETS directory
+  // TODO: Remove this constant and leave the asset_file_name as the path
   packet_out.file_path = std::filesystem::path(ASSETS_RELATIVE_DIRERCTORY) / asset_file_name;
 
 
