@@ -83,6 +83,14 @@ void CommandManager::waitForCommand(UserState& state) {
 
 /* Command handlers */
 void LoginCommand::handle(std::string args, UserState& state) {
+  // Check if user is already logged in
+  if (state.isLoggedIn()) {
+    std::cout 
+        << "Failed to login: the user [" << state.getUserId()
+        << "] is already logged in."  << std::endl;
+    return;
+  }
+  
   uint32_t user_id;
   auto splitIndex = args.find(' ');
   std::string user_id_str = args.substr(0, splitIndex);
@@ -152,7 +160,6 @@ void LoginCommand::handle(std::string args, UserState& state) {
 }
 
 void LogoutCommand::handle(std::string args, UserState& state) {
-
   //avoid unused parameter warning
   (void) args;
   // Check if user is logged in
