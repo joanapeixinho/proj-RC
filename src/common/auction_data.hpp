@@ -27,6 +27,7 @@ public:
                          std::time_t inputEndTime, uint32_t inputEndTimeSec,
                          const std::vector<Bid>& inputBids);    
     std::string getIdString() const;
+    static std::string idToString(uint32_t id);
     uint32_t getId() const;
     std::string getUidString() const;
     std::string toString() const; 

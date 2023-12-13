@@ -179,7 +179,7 @@ void FileManager::createAuctionEndFile(const std::string &auctionId, const std::
     std::stringstream ss;
     ss << std::put_time(std::localtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
     ss << activeSeconds;
-    if (!writeToFile("END (" + auctionId + ").txt", ss.str(), std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId))
+    if (!writeToFile("END (" + auctionId + ").txt", ss.str(), AUCTION_DIR + std::string("/") + auctionId))
     {
         throw FileWriteException("END (" + auctionId + ").txt");
     }
@@ -302,15 +302,18 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions()
     return auctionList;
 }
 
-AuctionData FileManager::getAuction(const std::string &auctionId)
+AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
 {
     AuctionData data;
+
+    std::string auctionId = AuctionData::idToString(auctionIdInt);
 
     safeLockAuction(auctionId, [&]()
                     {
         //check if start file exists
         if (!std::filesystem::exists(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/START (" + auctionId + ").txt")) {
             throw AuctionDoesNotExistException(auctionId);
+           // return data;
         }
 
         //update Auction
@@ -323,7 +326,6 @@ AuctionData FileManager::getAuction(const std::string &auctionId)
         std::getline(ss, name, ' ');
         std::getline(ss, assetFname, ' ');
         std::getline(ss, startValue, ' ');
-        std::cout << "startValue: " << startValue << std::endl;
         std::getline(ss, timeActive, ' ');
         std::getline(ss, startDatetime, ' ');
         uint32_t initialBid = static_cast<uint32_t>(std::stoul(startValue));

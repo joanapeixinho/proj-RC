@@ -40,6 +40,12 @@ std::string AuctionData::getIdString() const {
     return oss.str();
 }
 
+std::string AuctionData::idToString(uint32_t id) {
+    std::ostringstream oss;
+    oss << std::setw(AUCTION_ID_MAX_LEN) << std::setfill('0') << id;
+    return oss.str();
+}
+
 uint32_t AuctionData::getId() const {
     return id;
 }
@@ -113,7 +119,6 @@ void AuctionData::setInactive() {
 uint32_t AuctionData::getHighestBidValue() const {
     if (bids.empty()) {
         //print initalBid
-        std :: cout << "initialBid" << initialBid << std :: endl;
         return initialBid;
     } else {
         //print bids.back().bid_value
