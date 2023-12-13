@@ -26,18 +26,6 @@ AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string&
         throw InvalidAuctionInitialBidException(std::to_string(initialBid));
     }
 
-    std::cout << "initialBid" << initialBid << std::endl;
-
-    std::cout << "durationSeconds" << durationSeconds << std::endl;
-
-    std::cout << "assetFname" << assetFname << std::endl;
-
-    std::cout << "startTime" << startTime << std::endl;
-
-    std::cout << "endTime" << endTime << std::endl;
-
-    std::cout << "endTimeSec" << endTimeSec << std::endl;
-
     if (durationSeconds > AUCTION_DURATION_MAX_VALUE) {
         throw InvalidAuctionDurationException(std::to_string(durationSeconds));
     }

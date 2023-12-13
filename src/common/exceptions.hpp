@@ -161,6 +161,11 @@ public:
         : std::runtime_error("Cannot bid on own auction: " + userId) {}
 };
 
+class InvalidDateTimeException : public std::runtime_error {
+public:
+    InvalidDateTimeException(const std::string& dateTime)
+        : std::runtime_error("Invalid date time: " + dateTime) {}
+};
 
 
 #endif

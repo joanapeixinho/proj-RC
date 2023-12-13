@@ -330,13 +330,25 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
         std::getline(ss, timeActive, ' ');
         std::getline(ss, startDatetime, ' ');
         std::getline(ss, startFulltime, ' ');
-        // Use std::stoul instead of std::stoi to convert strings to uint32_t
+
         uint32_t initialBid = static_cast<uint32_t>(std::stoul(startValue));
         uint32_t durationSeconds = static_cast<uint32_t>(std::stoul(timeActive));
         uint32_t uidInt = static_cast<uint32_t>(std::stoul(uid));
 
-        // Use std::stol to convert strings to std::time_t
-        std::time_t startTime = static_cast<std::time_t>(std::stol(startFulltime));
+        std::tm tm = {};
+        std::istringstream timeStream(startDatetime + " " + startFulltime);
+        
+        timeStream >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+        if (timeStream.fail()) {
+    
+            throw InvalidDateTimeException(startDatetime + " " + startFulltime);
+        }
+
+        std::time_t startTime = std::mktime(&tm);
+
+        std::cout << "startTime: " << startTime << std::endl;
+
 
         if (!auctionIsActive(auctionId)) {
             std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
@@ -357,7 +369,7 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
             data = AuctionData(auctionIdInt,uidInt, name, initialBid,
                              durationSeconds, assetFname, startTime, 0, 0, bids);
         } });
-
+        
     return data;
 }
 
@@ -429,10 +441,28 @@ void FileManager::UpdateAuction(const std::string &auctionId)
         std::getline(ss, timeActive, ' ');
         std::getline(ss, startDatetime, ' ');
         std::getline(ss, startFulltime, ' ');
-        std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
+
+
         uint32_t durationSeconds = static_cast<uint32_t>(std::stoul(timeActive));
+
+        std::tm tm = {};
+        std::istringstream timeStream(startDatetime + " " + startFulltime);
+        
+        timeStream >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+        if (timeStream.fail()) {
+    
+            throw InvalidDateTimeException(startDatetime + " " + startFulltime);
+        }
+
+        std::time_t startTime = std::mktime(&tm);
+
+        std::cout << "startTime: " << startTime << std::endl;
+
+
         std::time_t endTime = startTime + durationSeconds;
         std::time_t now = std::time(nullptr);
+
         if (now > endTime)
         {
             std::cout << "Auction " << auctionId << " has ended." << std::endl;
