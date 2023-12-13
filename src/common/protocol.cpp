@@ -304,7 +304,7 @@ void ReplyUnregisterClientbound::deserialize(std::stringstream &buffer) {
 
 std::stringstream ListMyAuctionsServerbound::serialize() {
   std::stringstream buffer;
-  buffer << LogoutServerbound::ID << " ";
+  buffer << ListMyAuctionsServerbound::ID << " ";
   write_user_id(buffer, user_id);
   buffer << std::endl;
   return buffer;
