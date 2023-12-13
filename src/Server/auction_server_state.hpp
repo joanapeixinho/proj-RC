@@ -88,7 +88,6 @@ class AuctionServerState {
   DebugStream cdebug;
   u_int32_t auctionsCount = 0;
   FileManager& file_manager;
-  uint32_t user_id = NO_USER_ID;
 
 
   AuctionServerState ( std::string& port, bool __verbose, FileManager& __file_manager );

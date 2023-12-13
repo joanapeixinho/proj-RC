@@ -35,7 +35,7 @@ bool FileManager::writeToFile(const std::string &filename, const std::string &da
 
 std::string FileManager::readFromFile(const std::string &filename, const std::string &directory)
 {
-    std::ifstream file(std::string(BASE_DIR) + directory + std::string("/") + filename);
+    std::ifstream file(std::string(BASE_DIR) + std::string("/") + directory + std::string("/") + filename);
     std::string data;
 
     if (!file.is_open())
@@ -200,7 +200,7 @@ std::string FileManager::getUserPassword(const std::string &userId)
 {
     if (UserRegistered(userId))
     {
-        return readFromFile(userId + "_pass.txt", std::string(BASE_DIR) + "/" + USER_DIR + "/" + std::string(userId));
+        return readFromFile(userId + "_pass.txt", USER_DIR + std::string("/") + std::string(userId) );
     }
     throw UserNotRegisteredException(userId);
     return "";
@@ -316,7 +316,7 @@ AuctionData FileManager::getAuction(const std::string &auctionId)
         //update Auction
         UpdateAuction(auctionId);
 
-        std::string startFile = readFromFile("START (" + auctionId + ").txt", std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId);
+        std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
         std::stringstream ss(startFile);
         std::string uid, name, assetFname, startValue, timeActive, startDatetime, startFulltime;
         std::getline(ss, uid, ' ');
@@ -330,7 +330,7 @@ AuctionData FileManager::getAuction(const std::string &auctionId)
         std::time_t startTime = static_cast<uint32_t>(std::stoi(startFulltime));
 
         if (!auctionIsActive(auctionId)) {
-            std::string endFile = readFromFile("END (" + auctionId + ").txt", std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId);
+            std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
             std::stringstream ssEnd(endFile);
             std::string endDatetime, endSecTime;
             std::getline(ssEnd, endDatetime, ' ');
@@ -359,7 +359,7 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
         safeLockAuction(auctionId, [&]()
                         {
         std::string bidValue = entry.path().filename().string();
-        std::string bidFile = readFromFile(bidValue, std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
+        std::string bidFile = readFromFile(bidValue, AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
         std::stringstream ss(bidFile);
         std::string bidder_user_id, bid_value, date_time, sec_time;
         std::getline(ss, bidder_user_id, ' ');
@@ -408,7 +408,7 @@ void FileManager::UpdateAuction(const std::string &auctionId)
 
     if (auctionIsActive(auctionId))
     {
-        std::string startFile = readFromFile("START (" + auctionId + ").txt", std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId);
+        std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
         std::stringstream ss(startFile);
         std::string uid, name, assetFname, startValue, timeActive, startDatetime, startFulltime;
         std::getline(ss, uid, ' ');
