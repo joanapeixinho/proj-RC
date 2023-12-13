@@ -419,19 +419,19 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
     case ReplyCloseAuctionClientbound::status::EAU:
       std::cout
           << "Failed to close auction: the auction with ID [" 
-          << auction_id << "] does not exist." << std::endl;
+          << auctionID_ToString(auction_id) << "] does not exist." << std::endl;
       break;
     
     case ReplyCloseAuctionClientbound::status::EOW:
       std::cout
           << "Failed to close auction: the auction with ID [" 
-          << auction_id << "] is not owned by this user." << std::endl;
+          << auctionID_ToString(auction_id) << "] is not owned by this user." << std::endl;
       break;
     
     case ReplyCloseAuctionClientbound::status::END:
       std::cout
           << "Failed to close auction: the auction with ID [" 
-          << auction_id << "] has already ended." << std::endl;
+          << auctionID_ToString(auction_id) << "] has already ended." << std::endl;
       break;
 
     case ReplyCloseAuctionClientbound::status::NLG:
@@ -626,7 +626,7 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
     case ReplyShowAssetClientbound::status::NOK:
       std::cout
           << "Failed to show asset: the auction with ID [" 
-          << auction_id << "] does not exist." << std::endl;
+          << auctionID_ToString(auction_id) << "] does not exist." << std::endl;
       break;
 
     case ReplyShowAssetClientbound::status::ERR:
@@ -704,7 +704,7 @@ void BidCommand::handle(std::string args, UserState& state) {
     case ReplyBidClientbound::status::NOK:
       std::cout
           << "Failed to bid: the auction with ID [" 
-          << auction_id << "] has already ended." << std::endl;
+          << auctionID_ToString(auction_id) << "] has already ended." << std::endl;
       break;
 
     case ReplyBidClientbound::status::NLG:
@@ -721,8 +721,8 @@ void BidCommand::handle(std::string args, UserState& state) {
     case ReplyBidClientbound::status::REF:
       std::cout 
           << "Failed to bid: the bid of " << bid_value << " was lower than"
-          << " the current bid of the auction [" << auction_id << "]."
-          << std::endl;
+          << " the current bid of the auction [" 
+          << auctionID_ToString(auction_id) << "]." << std::endl;
       break;
 
     case ReplyBidClientbound::status::ERR:
@@ -768,8 +768,8 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
     case ReplyShowRecordClientbound::status::OK:
       // Output Auction & Bids info
       std::cout 
-          << "Displaying the record of the auction with ID [" << auction_id << "]:" 
-          << std::endl;
+          << "Displaying the record of the auction with ID [" 
+          << auctionID_ToString(auction_id) << "]:" << std::endl;
       std::cout << "Auction host: " << rrc.auction.getUidString() << std::endl;
       std::cout << "Auction name: " << rrc.auction.getName() << std::endl;
       std::cout << "Auction asset: " << rrc.auction.getAssetFname() << std::endl;
@@ -799,7 +799,7 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
     case ReplyShowRecordClientbound::status::NOK:
       std::cout 
           << "Failed to show record: the auction [" 
-          << auction_id << "] does not exist." << std::endl;
+          << auctionID_ToString(auction_id) << "] does not exist." << std::endl;
       break;
 
     case ReplyShowRecordClientbound::status::ERR:
