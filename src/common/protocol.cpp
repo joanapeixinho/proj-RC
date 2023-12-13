@@ -512,7 +512,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
   } else if (status == ReplyShowRecordClientbound::status::ERR) {
     buffer << "ERR";
   } else {
-    throw PacketSerializationException();
+    throw InvalidPacketException();
   }
   buffer << std::endl;
   return buffer;
