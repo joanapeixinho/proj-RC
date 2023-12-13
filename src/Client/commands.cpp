@@ -312,10 +312,18 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
               << " characters long" << std::endl;
     return;
   }
+  if (!is_numeric(start_value_str)) {
+    std::cout << "Invalid start value. It must be a number" << std::endl;
+    return;
+  }
   // Check if timeactive_str is too long
-  if (timeactive_str.length() > AUCTION_DURATION_MAX_VALUE) {
+  if (timeactive_str.length() > AUCTION_DURATION_MAX_LEN) {
     std::cout << "Invalid auction duration. It must be at most " << AUCTION_DURATION_MAX_VALUE 
               << " characters long" << std::endl;
+    return;
+  }
+  if (!is_numeric(timeactive_str)) {
+    std::cout << "Invalid auction duration. It must be a number" << std::endl;
     return;
   }
 
