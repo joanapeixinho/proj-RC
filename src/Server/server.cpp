@@ -25,8 +25,10 @@ int main(int argc, char *argv[]) {
 
     Server config(argc, argv);
 
+    uint32_t auctionsCount = fileManager.getAuctionsCount();
+
     
-    AuctionServerState state(config.port, config.verbose, fileManager);
+    AuctionServerState state(config.port, config.verbose, fileManager, auctionsCount);
 
     state.registerPacketHandlers();
 

@@ -86,11 +86,11 @@ class AuctionServerState {
   struct addrinfo* server_udp_addr = NULL;
   struct addrinfo* server_tcp_addr = NULL;
   DebugStream cdebug;
-  u_int32_t auctionsCount = 0;
+  u_int32_t auctionsCount;
   FileManager& file_manager;
 
 
-  AuctionServerState ( std::string& port, bool __verbose, FileManager& __file_manager );
+  AuctionServerState ( std::string& port, bool __verbose, FileManager& __file_manager, uint32_t __auctionsCount);
   ~AuctionServerState();
   void resolveServerAddress(std::string& port);
   void registerPacketHandlers();

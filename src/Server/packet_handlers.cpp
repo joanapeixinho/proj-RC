@@ -654,12 +654,12 @@ void handle_bid(int connection_fd, AuctionServerState &state)
 
     AuctionData auction = state.file_manager.getAuction(packet.auction_id);
 
+    std::cout << "Auction " << auction.toString() << std::endl;
 
     user.bid(auction, packet.bid_value, packet.password);
 
     response.status = ReplyBidClientbound::ACC;
 
-    state.cdebug << auctionTag(packet.auction_id) << "Bid made" << std::endl;
   }
   catch (WrongPasswordException &e)
   {
