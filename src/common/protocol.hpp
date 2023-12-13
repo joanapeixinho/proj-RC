@@ -441,4 +441,6 @@ std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctions
 
 void readBid(std::stringstream &buffer, AuctionData& auction);
 
+std::string auctionID_ToString(uint32_t auction_id);
+
 #endif

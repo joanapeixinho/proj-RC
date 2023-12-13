@@ -139,7 +139,6 @@ class ShowRecordCommand : public CommandHandler {
   ShowRecordCommand() : CommandHandler("show_record", "sr", "<AID>", "Show Auction Record") {}
 };
 
-std::string auctionID_ToString(uint32_t auction_id);
 
 bool is_numeric(std::string& str);
 

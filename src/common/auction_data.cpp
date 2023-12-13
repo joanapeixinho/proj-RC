@@ -68,7 +68,7 @@ uint32_t AuctionData::getDurationSeconds() const {
 
 std::string AuctionData::toString() const {
     std::stringstream ss;
-    ss << std::setw(6) << std::setfill('0') << id << " "; // UID
+    ss << std::setw(6) << std::setfill('0') << uid << " "; // UID
     ss << name << " "; // name
     ss << assetFname << " "; // asset fname
     ss << initialBid << " "; // start value

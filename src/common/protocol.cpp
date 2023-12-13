@@ -723,7 +723,7 @@ std::string TcpPacket::readFileName(const int fd) {
   }
   for (uint32_t i = 0; i < str.length(); ++i) {
     char c = str[i];
-    if (!isalpha((unsigned char)c) && c != '-' && c != '_' && c != '.') {
+    if (!isalpha((unsigned char)c) && !isdigit(c) && c != '-' && c != '_' && c != '.') {
       throw InvalidPacketException();
     }
 
@@ -736,7 +736,6 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
                                   const size_t file_size,
                                   const bool cancellable) {
   std::ofstream file(file_name);
-
   if (!file.good()) {
     throw IOException();
   }
@@ -835,18 +834,25 @@ void OpenAuctionServerbound::receive(int fd) {
   // Serverbound packets don't read their ID
   readSpace(fd);
   user_id = readUserId(fd);
+  std::cout << "Read user_id: " << user_id << std::endl;
   readSpace(fd);
   password = readString(fd);
+  std::cout << "Read password: " << password << std::endl;
   readSpace(fd);
   auction_name = readString(fd);
+  std::cout << "Read Acution Name:" << auction_name << std::endl;
   readSpace(fd);
   start_value = readInt(fd);
+  std::cout << "Read start_value: " << start_value << std::endl;
   readSpace(fd);
   time_active = readInt(fd);
+  std::cout << "Read time_active: " << time_active << std::endl;
   readSpace(fd);
   file_name = readFileName(fd);
+  std::cout << "Read file_name: " << file_name << std::endl;
   readSpace(fd);
   file_size = readFileSize(fd);
+  std::cout << "Read file_size: " << file_size << std::endl;
   readSpace(fd);
   readAndSaveToFile(fd, file_name, file_size, false);
   readPacketDelimiter(fd);
@@ -1272,4 +1278,10 @@ Bid UdpPacket::readBid(std::stringstream &buffer) {
   readSpace(buffer);
   bid.sec_time = readInt(buffer);
   return bid;
+}
+
+std::string auctionID_ToString(uint32_t auction_id) {
+  std::ostringstream oss;
+  oss << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN) << auction_id;
+  return oss.str();
 }

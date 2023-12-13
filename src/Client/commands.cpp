@@ -841,11 +841,7 @@ void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     }
 }
 
-std::string auctionID_ToString(uint32_t auction_id) {
-  std::ostringstream oss;
-  oss << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN) << auction_id;
-  return oss.str();
-}
+
 
 bool is_alphanumeric(std::string& str) {
   for (char c : str) {
