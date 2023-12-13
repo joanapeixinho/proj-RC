@@ -55,7 +55,7 @@ public:
     void unregisterUser(const std::string& userId);
     std::vector<std::pair<uint32_t, bool>> getUserAuctions(const std::string& userId, const std::string& directory); 
     std::vector<std::pair<uint32_t, bool>> getAllAuctions();   
-    AuctionData getAuction(const std::string& auctionId);
+    AuctionData getAuction(const uint32_t auctionIdInt);
     std::vector<Bid> getAuctionBids(const std::string& auctionId);
     void openAuction(const std::string& userId, const AuctionData& data);
     void closeAuction(AuctionData& auction);

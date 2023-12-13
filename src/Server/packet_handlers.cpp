@@ -361,7 +361,7 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
     state.cdebug << auctionTag(packet.auction_id) << "Asked to show record"
                  << std::endl;
 
-    AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
+    AuctionData auction = state.file_manager.getAuction(packet.auction_id);
 
     response.status = ReplyShowRecordClientbound::OK;
     response.auction = auction;
@@ -418,12 +418,15 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
 
     AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, now, 0, 0, std::vector<Bid>());
 
+    std::cout << "start value in packet:" << packet.start_value << std::endl;
+   
     if (packet.file_size > ASSET_MAX_BYTES)
     {
       throw InvalidAuctionAssetException(packet.file_name);
     }
 
     user.openAuction(auction, packet.password);
+
 
     response.auction_id = auction.getId();
 
@@ -514,7 +517,7 @@ void handle_close_auction(int connection_fd, AuctionServerState &state)
 
     UserData user(packet.user_id, state.file_manager);
 
-    AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
+    AuctionData auction = state.file_manager.getAuction(packet.auction_id);
 
     user.closeAuction(auction);
 
@@ -584,7 +587,7 @@ void handle_show_asset(int connection_fd, AuctionServerState &state)
   {
     packet.receive(connection_fd);
 
-    AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
+    AuctionData auction = state.file_manager.getAuction(packet.auction_id);
 
     std::filesystem::path asset_path = state.file_manager.showAsset(auction);
 
@@ -649,7 +652,8 @@ void handle_bid(int connection_fd, AuctionServerState &state)
 
     UserData user(packet.user_id, packet.password, state.file_manager);
 
-    AuctionData auction = state.file_manager.getAuction(std::to_string(packet.auction_id));
+    AuctionData auction = state.file_manager.getAuction(packet.auction_id);
+
 
     user.bid(auction, packet.bid_value, packet.password);
 
@@ -698,7 +702,7 @@ void handle_bid(int connection_fd, AuctionServerState &state)
     state.cdebug << auctionTag(packet.auction_id) << "Cannot bid on own auction" << std::endl;
     response.status = ReplyBidClientbound::ILG;
   }
-  catch ( LargerBidAlreadyExistsException &e) {
+  catch (LargerBidAlreadyExistsException &e) {
     state.cdebug << auctionTag(packet.auction_id) << "Larger bid already exists" << std::endl;
     response.status = ReplyBidClientbound::REF;
   }
