@@ -16,6 +16,8 @@ AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string&
         throw InvalidAuctionIdException(std::to_string(id));
     }
 
+    std::cout << "name" << name << std::endl;
+
     if (name.length() > AUCTION_NAME_MAX_LENGTH) {
         throw InvalidAuctionNameException(name);
     }
@@ -23,6 +25,18 @@ AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string&
     if (initialBid > BID_MAX_VALUE) {
         throw InvalidAuctionInitialBidException(std::to_string(initialBid));
     }
+
+    std::cout << "initialBid" << initialBid << std::endl;
+
+    std::cout << "durationSeconds" << durationSeconds << std::endl;
+
+    std::cout << "assetFname" << assetFname << std::endl;
+
+    std::cout << "startTime" << startTime << std::endl;
+
+    std::cout << "endTime" << endTime << std::endl;
+
+    std::cout << "endTimeSec" << endTimeSec << std::endl;
 
     if (durationSeconds > AUCTION_DURATION_MAX_VALUE) {
         throw InvalidAuctionDurationException(std::to_string(durationSeconds));
@@ -74,7 +88,7 @@ uint32_t AuctionData::getDurationSeconds() const {
 
 std::string AuctionData::toString() const {
     std::stringstream ss;
-    ss << std::setw(6) << std::setfill('0') << uid << " "; // UID
+    ss << std::setw(USER_ID_STR_LEN) << std::setfill('0') << uid << " "; // UID
     ss << name << " "; // name
     ss << assetFname << " "; // asset fname
     ss << initialBid << " "; // start value

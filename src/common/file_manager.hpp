@@ -12,10 +12,12 @@
 #include <mutex>
 #include <functional>
 #include <ctime>
+#include <chrono>
 
 #include "exceptions.hpp"
 #include "constants.hpp"
 #include "auction_data.hpp"
+
 
 
 
@@ -61,6 +63,7 @@ public:
     void closeAuction(AuctionData& auction);
     std::filesystem::path showAsset(AuctionData& auction);
     void bid(AuctionData& auction, uint32_t bidValue);
+    uint32_t getAuctionsCount();
 
 private:
     std::map<std::string, std::mutex> userMutexes;

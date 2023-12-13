@@ -11,11 +11,12 @@
 #include "../common/protocol.hpp"
 #include "packet_handlers.hpp"
 
-AuctionServerState::AuctionServerState(std::string &port, bool __verbose, FileManager& fileManager)
+AuctionServerState::AuctionServerState(std::string &port, bool __verbose, FileManager& fileManager, uint32_t __auctionsCount)
     : cdebug{DebugStream(__verbose)} , file_manager{fileManager} { 
   this->setup_sockets();
   this->resolveServerAddress(port);
   this->registerPacketHandlers();
+  this->auctionsCount = __auctionsCount;
   
 }
 
