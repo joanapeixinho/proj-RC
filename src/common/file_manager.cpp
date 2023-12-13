@@ -311,7 +311,7 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
     safeLockAuction(auctionId, [&]()
                     {
         //check if start file exists
-        if (!std::filesystem::exists(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/START (" + auctionId + ").txt")) {
+        if (!std::filesystem::exists(std::string(BASE_DIR) + std::string(AUCTION_DIR) + auctionId + "/START (" + auctionId + ").txt")) {
             throw AuctionDoesNotExistException(auctionId);
            // return data;
         }

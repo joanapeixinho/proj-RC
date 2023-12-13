@@ -834,25 +834,18 @@ void OpenAuctionServerbound::receive(int fd) {
   // Serverbound packets don't read their ID
   readSpace(fd);
   user_id = readUserId(fd);
-  std::cout << "Read user_id: " << user_id << std::endl;
   readSpace(fd);
   password = readString(fd);
-  std::cout << "Read password: " << password << std::endl;
   readSpace(fd);
   auction_name = readString(fd);
-  std::cout << "Read Acution Name:" << auction_name << std::endl;
   readSpace(fd);
   start_value = readInt(fd);
-  std::cout << "Read start_value: " << start_value << std::endl;
   readSpace(fd);
   time_active = readInt(fd);
-  std::cout << "Read time_active: " << time_active << std::endl;
   readSpace(fd);
   file_name = readFileName(fd);
-  std::cout << "Read file_name: " << file_name << std::endl;
   readSpace(fd);
   file_size = readFileSize(fd);
-  std::cout << "Read file_size: " << file_size << std::endl;
   readSpace(fd);
   readAndSaveToFile(fd, file_name, file_size, false);
   readPacketDelimiter(fd);
