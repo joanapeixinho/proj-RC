@@ -90,14 +90,18 @@ void LoginCommand::handle(std::string args, UserState& state) {
         << "] is already logged in."  << std::endl;
     return;
   }
-  
-  uint32_t user_id;
-  auto splitIndex = args.find(' ');
-  std::string user_id_str = args.substr(0, splitIndex);
-  args.erase(0, splitIndex + 1);
-  std::string password = args;
+  // Argument parsing
+  std::istringstream iss(args);
+  std::string user_id_str;
+  std::string password;
+
+  if( !(iss >> user_id_str) || !(iss >> password) ) {
+    std::cout << "Invalid arguments. Usage: login <UID> <password>" << std::endl;
+    return;
+  }
   
   // Argument parsing
+  uint32_t user_id;
   try {
     user_id = parse_user_id(user_id_str);
   } catch (...) {
@@ -502,6 +506,7 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
         << std::endl;
     return;
   }
+  
 
   // Populate and send packet
   MyBidsServerbound packet_out;
