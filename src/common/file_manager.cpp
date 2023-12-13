@@ -386,6 +386,7 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
 void FileManager::openAuction(const std::string &userId, const AuctionData &data)
 {
 
+    //print 
     std::string auctionId = data.getIdString();
 
     safeLockUser(userId, [&]()

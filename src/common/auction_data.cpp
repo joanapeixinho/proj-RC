@@ -1,4 +1,5 @@
 #include "auction_data.hpp"
+#include <iostream>
 
 
 AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
@@ -112,10 +113,14 @@ void AuctionData::setInactive() {
 uint32_t AuctionData::getHighestBidValue() const {
     if (bids.empty()) {
         return initialBid;
+        //print initalBid
+        std :: cout << "initialBid" << initialBid << std :: endl;
     } else {
         return bids.back().bid_value;
+        //print bids.back().bid_value
+        std :: cout << "bids.back().bid_value" << bids.back().bid_value << std :: endl;
     }
-
+    
 }
 
 void AuctionData::setOwnerId(uint32_t inputUid) {

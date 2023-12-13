@@ -814,6 +814,8 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
 
 void OpenAuctionServerbound::send(int fd) {
   std::stringstream stream;
+  file_size = getFileSize(file_path);
+
   stream << OpenAuctionServerbound::ID << " " ;
   write_user_id(stream, user_id);
   stream << " " << password << " " << auction_name << " ";
