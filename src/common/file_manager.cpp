@@ -12,7 +12,7 @@ FileManager::FileManager()
 bool FileManager::writeToFile(const std::string &filename, const std::string &data, const std::string &directory)
 {
 
-    std::ofstream file(std::string(BASE_DIR) + directory + std::string("/") + filename);
+    std::ofstream file(std::string(BASE_DIR) + std::string("/") + directory + std::string("/") + filename);
 
     if (!file.is_open())
     {
@@ -144,7 +144,7 @@ void FileManager::removeUserAuctionFile(const std::string &userId, const std::st
 
 void FileManager::createAuctionStartFile(const std::string &auctionId, const AuctionData &data)
 {
-    if (!writeToFile("START (" + auctionId + ").txt", data.toString(), std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId))
+    if (!writeToFile("START (" + auctionId + ").txt", data.toString(), AUCTION_DIR + std::string("/") + auctionId))
     {
         std::cerr << "Unable to create START file for auction: " << auctionId << std::endl;
     }
@@ -323,6 +323,7 @@ AuctionData FileManager::getAuction(const std::string &auctionId)
         std::getline(ss, name, ' ');
         std::getline(ss, assetFname, ' ');
         std::getline(ss, startValue, ' ');
+        std::cout << "startValue: " << startValue << std::endl;
         std::getline(ss, timeActive, ' ');
         std::getline(ss, startDatetime, ' ');
         uint32_t initialBid = static_cast<uint32_t>(std::stoul(startValue));

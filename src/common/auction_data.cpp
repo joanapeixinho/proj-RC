@@ -112,13 +112,13 @@ void AuctionData::setInactive() {
 
 uint32_t AuctionData::getHighestBidValue() const {
     if (bids.empty()) {
-        return initialBid;
         //print initalBid
         std :: cout << "initialBid" << initialBid << std :: endl;
+        return initialBid;
     } else {
-        return bids.back().bid_value;
         //print bids.back().bid_value
         std :: cout << "bids.back().bid_value" << bids.back().bid_value << std :: endl;
+        return bids.back().bid_value;
     }
     
 }
