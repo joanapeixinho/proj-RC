@@ -161,5 +161,7 @@ public:
         : std::runtime_error("Cannot bid on own auction: " + userId) {}
 };
 
+
+
 #endif
 

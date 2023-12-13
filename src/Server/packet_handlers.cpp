@@ -20,7 +20,12 @@ void handle_login_user(std::stringstream &buffer, Address &addr_from,
 
     UserData user(packet.user_id, packet.password, state.file_manager);
 
+    if (state.user_id != NO_USER_ID ) {
+      throw UserAlreadyLoggedInException(user.getIdString());
+    }
+
     user.login();
+    state.user_id = packet.user_id;
     response.status = ReplyLoginClientbound::OK;
 
     state.cdebug << userTag(packet.user_id) << "User logged in" << std::endl;
@@ -89,11 +94,20 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
                  << std::endl;
 
     UserData user(packet.user_id, packet.password, state.file_manager);
+
+    if (state.user_id != packet.user_id) {
+      throw UserNotLoggedInException(user.getIdString());
+    }
+
     user.logout();
+    
+    state.user_id = NO_USER_ID;
+
     response.status = ReplyLogoutClientbound::OK;
     state.cdebug << userTag(packet.user_id) << "User logged out" << std::endl;
 
-    // duvida -> aqui é suposto verificar a password????
+
+
   }
   catch (UserNotRegisteredException &e)
   {
@@ -104,6 +118,10 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
   {
     response.status = ReplyLogoutClientbound::NOK;
     state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+  }
+  catch (WrongPasswordException &e) {
+    state.cdebug << userTag(packet.user_id) << "Wrong password" << std::endl;
+    response.status = ReplyLogoutClientbound::ERR;
   }
   catch (FileOpenException &e)
   {

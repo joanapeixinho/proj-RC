@@ -100,7 +100,7 @@ void FileManager::createUserDirectory(const std::string &userId)
 
 void FileManager::createUserPassFile(const std::string &userId, const std::string &password)
 {
-    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "_pass.txt");
+    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_pass.txt");
     file << password;
     if (!file.good())
     {
@@ -111,19 +111,19 @@ void FileManager::createUserPassFile(const std::string &userId, const std::strin
 
 void FileManager::createUserLoginFile(const std::string &userId)
 {
-    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "_login.txt");
+    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
     file.close();
 }
 
 void FileManager::removeUserLoginFile(const std::string &userId)
 {
-    std::filesystem::remove(std::string(BASE_DIR) + "/" + std::string(USER_DIR) + userId + "_login.txt");
+    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
 }
 
 void FileManager::removeUserFiles(const std::string &userId)
 {
-    std::filesystem::remove(std::string(BASE_DIR) + "/" + std::string(USER_DIR) + userId + "_pass.txt");
-    std::filesystem::remove(std::string(BASE_DIR) + "/" + std::string(USER_DIR) + userId + "_login.txt");
+    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
+    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_pass.txt");
 }
 
 void FileManager::createAuctionDirectory(const std::string &auctionId)
@@ -208,12 +208,12 @@ std::string FileManager::getUserPassword(const std::string &userId)
 
 bool FileManager::UserLoggedIn(const std::string &userId)
 {
-    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + "_login.txt");
+    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
 }
 
 bool FileManager::UserRegistered(const std::string &userId)
 {
-    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + "_pass.txt");
+    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_pass.txt");
 }
 
 /*Returns True if END file exists and therefore auction is active*/

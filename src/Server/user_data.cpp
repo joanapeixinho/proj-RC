@@ -1,5 +1,6 @@
 #include "user_data.hpp"
 
+
 UserData::UserData(uint32_t __id, const std::string &__password, FileManager &__fileManager)
     : id(__id), password(__password), fileManager(__fileManager)
 {

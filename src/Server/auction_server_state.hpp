@@ -79,6 +79,7 @@ class AuctionServerState {
   
   void setup_sockets();
 
+
  public:
   int udp_socket_fd = -1;
   int tcp_socket_fd = -1;
@@ -87,6 +88,7 @@ class AuctionServerState {
   DebugStream cdebug;
   u_int32_t auctionsCount = 0;
   FileManager& file_manager;
+  uint32_t user_id = NO_USER_ID;
 
 
   AuctionServerState ( std::string& port, bool __verbose, FileManager& __file_manager );

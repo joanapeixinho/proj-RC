@@ -18,6 +18,7 @@
 #define USER_ID_STR_LEN (6)
 #define USER_ID_MAX ((uint32_t)pow(10, USER_ID_STR_LEN) - 1)
 #define PASSWORD_LEN (8)
+#define NO_USER_ID 1000000
 
 #define AUCTION_NAME_MAX_LENGTH (10)
 #define BID_MAX_VALUE (999999)
