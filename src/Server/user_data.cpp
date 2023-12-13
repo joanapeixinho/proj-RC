@@ -135,7 +135,7 @@ void UserData::openAuction(const AuctionData &data, const std::string &_password
     }
     else
     {
-        std::string idString = std::to_string(id);
+        std::string idString = std::to_string(this->id);
         fileManager.openAuction(idString, data);
     }
 }

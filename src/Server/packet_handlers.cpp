@@ -414,8 +414,6 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
 
     UserData user(packet.user_id, state.file_manager);
 
-    // start auction with time now in format YYYY-MM-DD HH:MM:SS
-
     time_t now = time(0);
 
     AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, now, 0, 0, std::vector<Bid>());
@@ -491,6 +489,7 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
   catch (std::exception &e)
   {
 
+    response.status = ReplyOpenAuctionClientbound::NOK;
     std::cerr << "[OpenAuction] There was an unhandled exception that prevented "
                  "the server from opening the auction:"
               << e.what() << std::endl;
