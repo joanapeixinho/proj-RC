@@ -354,19 +354,17 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
         
             std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
             std::stringstream ssEnd(endFile);
-            std::string endDatetime, endSecTime;
-            std::getline(ssEnd, endDatetime, ' ');
+            std::string endDate, endHour, endSecTime;
+            std::getline(ssEnd, endDate, ' ');
+            std::getline(ssEnd, endHour, ' ');
             std::getline(ssEnd, endSecTime, ' ');
-
-            std::cout << endSecTime << std::endl;
            
             uint32_t endTimeSec = static_cast<uint32_t>(std::stoul(endSecTime));
 
-            std::string endDatetimeSec = std::to_string(endTimeSec);
           
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(auctionIdInt, uidInt, name, initialBid,
-                   durationSeconds, assetFname, startTime,endDatetime, endTimeSec, bids);
+                   durationSeconds, assetFname, startTime,endDate + ' ' + endHour, endTimeSec, bids);
 
             data.setInactive();
         } else {
@@ -444,7 +442,6 @@ void FileManager::UpdateAuction(const std::string &auctionId)
 
         uint32_t durationSeconds = static_cast<uint32_t>(std::stoul(timeActive));
 
-        std::cout << "durationSeconds in update auction " << durationSeconds << std::endl;
 
         std::time_t startTime = static_cast<std::time_t>(std::stoll(startFulltime));
 
@@ -464,11 +461,22 @@ void FileManager::UpdateAuction(const std::string &auctionId)
 
 void FileManager::closeAuction(AuctionData &auction)
 {
+    
+    std::time_t now = std::time(nullptr);
+
+    //get string in format YYYY-MM-DD HH:MM:SS for now
+    std::ostringstream oss;
+    oss << std::put_time(std::gmtime(&now), "%Y-%m-%d %H:%M:%S");
+    std::string endTimeDate = oss.str(); 
+
+    //calculate duration of auction in seconds in uint32_t
+
+    uint32_t durationSeconds = static_cast<uint32_t>(now - auction.getStartTime());
 
     safeLockAuction(auction.getIdString(), [&]()
                     {
         if (auctionIsActive(auction.getIdString())) {
-            createAuctionEndFile(auction.getIdString(), auction.getEndTimeString(), auction.getDurationSeconds());
+            createAuctionEndFile(auction.getIdString(), endTimeDate, durationSeconds);
             auction.setInactive();
         }
         else {

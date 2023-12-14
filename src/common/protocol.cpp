@@ -521,8 +521,8 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
   readPacketId(buffer, ReplyShowRecordClientbound::ID);
   readSpace(buffer);
   auto status_str = readString(buffer, PACKET_ID_LEN);
-  std ::cout << "status_str: " << status_str << std :: endl;
-  std::cout << "buffer" << buffer.str() << std :: endl;
+
+ 
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
@@ -535,9 +535,12 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     readSpace(buffer);
     auction.setInitialBid(readInt(buffer));
     readSpace(buffer);
+
+    //read date time reads space
     startTime = read_date_time(buffer);
-    readSpace(buffer);
+ 
     auction.setDurationSeconds(readInt(buffer));
+  
     int bidCounter = 0;
     // Read bids and end time
    if ( buffer.peek() != '\n'){ // Check if there are bids or end time
@@ -553,7 +556,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
           readChar(buffer);
           readSpace(buffer);
           endTime = read_date_time(buffer);
-          readSpace(buffer);
+        
           auction.setEndTimeSec(readInt(buffer));
           break;
         } 
