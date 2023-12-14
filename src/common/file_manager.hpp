@@ -41,7 +41,7 @@ public:
     void createAuctionAssetFile(const std::string& auctionId, const std::string& assetFname);
     void createAuctionEndFile(const std::string& auctionId, const std::time_t& endTime, const uint32_t& activeSeconds);
     void createBidsDirectory(const std::string& auctionId);
-    void createBidFile(const std::string& auctionId, const std::string& bidValue);
+    void createBidFile(const std::string& auctionId, const std::string& bidValue, const std::string& userId, const std::string& bidDatetime, const std::string& bidSecTime);
     bool writeToFile(const std::string& fileName, const std::string& data, const std::string& directory);
     std::string readFromFile(const std::string& fileName, const std::string& directory);
     void safeLockUser(const std::string& userId, std::function<void()> func);

@@ -119,7 +119,6 @@ void AuctionData::setInactive() {
 
 uint32_t AuctionData::getHighestBidValue() const {
     if (bids.empty()) {
-        //print initalBid
         return initialBid;
     } else {
         //print bids.back().bid_value
