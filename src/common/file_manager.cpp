@@ -302,7 +302,7 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions()
                             {
                         
                     UpdateAuction(auctionId);
-                    bool isActive = auctionIsActive(auctionId);
+                    bool isActive = auctionIsActive(auctionId); 
                     uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
 
                 auctionList.push_back(std::make_pair(intAuctionId, isActive)); });
@@ -320,6 +320,7 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions()
 AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
 {
     AuctionData data;
+
 
     std::string auctionId = AuctionData::idToString(auctionIdInt);
 
