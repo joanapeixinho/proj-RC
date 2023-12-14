@@ -619,7 +619,7 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
       // Output asset info
       std::cout 
           << "Received the asset '"<< rsa.file_name 
-          <<"' of the auction with ID [" << auction_id << "]:" 
+          <<"' of the auction with ID [" << auctionID_ToString(auction_id) << "]:" 
           << std::endl;
       std::cout << "In the current directory" << std::endl;
       break;

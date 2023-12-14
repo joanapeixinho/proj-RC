@@ -793,7 +793,7 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
       if (((downloaded_size - (size_t)n) * 100 / file_size) %
               PROGRESS_BAR_STEP_SIZE >
           (downloaded_size * 100 / file_size) % PROGRESS_BAR_STEP_SIZE) {
-        std::cout << "Progress: " << downloaded_size * 100 / file_size << "%"
+        std::cout << "Downloading Asset: " << downloaded_size * 100 / file_size << "%"
                   << std::endl;
       }
     } else if (FD_ISSET(fileno(stdin), &file_descriptors)) {
