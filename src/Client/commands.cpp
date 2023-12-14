@@ -584,14 +584,7 @@ void ListCommand::handle(std::string args, UserState& state) {
 }
 
 void ShowAssetCommand::handle(std::string args, UserState& state) {
-  // Check if user is logged in
-  if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to show asset: you need to be logged in to show an asset." 
-        << std::endl;
-    return;
-  }
-
+ 
   // Argument parsing
   std::istringstream iss(args);
   std::string auction_id_str;
