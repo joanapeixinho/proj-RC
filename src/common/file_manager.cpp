@@ -385,15 +385,16 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
         std::string bidValue = entry.path().filename().string();
         std::string bidFile = readFromFile(bidValue, AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
         std::stringstream ss(bidFile);
-        std::string bidder_user_id, bid_value, date_time, sec_time;
+        std::string bidder_user_id, bid_value, date, hours, sec_time;
         std::getline(ss, bidder_user_id, ' ');
         std::getline(ss, bid_value, ' ');
-        std::getline(ss, date_time, ' ');
+        std::getline(ss, date, ' ');
+        std::getline(ss, hours, ' ');
         std::getline(ss, sec_time, ' ');
         Bid bid;
         bid.bidder_user_id = static_cast<uint32_t>(std::stoi(bidder_user_id));
         bid.bid_value = static_cast<uint32_t>(std::stoi(bid_value));        
-        bid.date_time = date_time;
+        bid.date_time = date + ' ' + hours;
         bid.sec_time = static_cast<uint32_t>(std::stoi(sec_time));
         bids.push_back(bid); 
     }
