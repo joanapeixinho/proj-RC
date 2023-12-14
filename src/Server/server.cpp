@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    fileManager.shutdown();
+
     std::cout << "Shutting down UDP server..." << std::endl;
 
     tcp_thread.join();

@@ -550,3 +550,15 @@ uint32_t FileManager::getAuctionsCount()
     }
     return count;
 }
+
+void FileManager::shutdown() {
+    // logout all users
+    for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + USER_DIR))
+    {
+        if (std::filesystem::is_directory(entry.status()))
+        {
+            std::string userId = entry.path().filename().string();
+            logoutUser(userId);
+        }
+    }
+}
