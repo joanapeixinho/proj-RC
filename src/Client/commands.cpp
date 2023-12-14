@@ -775,10 +775,9 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
       std::cout << "Auction name: " << rrc.auction.getName() << std::endl;
       std::cout << "Auction asset: " << rrc.auction.getAssetFname() << std::endl;
       std::cout << "Auction start value: " << rrc.auction.getInitialBid() << std::endl;
-      
       std::cout 
           << "Auction start date: " 
-        	<< formatTime(rrc.auction.getStartTime(), "%Y-%m-%d %H:%M:%S") 
+        	<< rrc.startTime
           << std::endl;
       std::cout 
           << "Auction time active: " << rrc.auction.getDurationSeconds()
@@ -789,7 +788,7 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
         std::cout << "Auction status: Closed" << std::endl;
         std::cout 
             <<  "Auction end date: " 
-            << formatTime(rrc.auction.getEndTime(), "%Y-%m-%d %H:%M:%S")
+            << rrc.endTime
             << std::endl;
         std::cout <<  "Auction end seconds: " << rrc.auction.getEndTimeSec() << std::endl;
       }

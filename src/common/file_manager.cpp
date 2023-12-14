@@ -436,7 +436,6 @@ void FileManager::UpdateAuction(const std::string &auctionId)
         std::getline(ss, startDate, ' ');
         std::getline(ss, startHour, ' ');
         std::getline(ss, startFulltime, ' ');
-        std::cout << "startFulltime: " << startFulltime << std::endl;
 
 
         uint32_t durationSeconds = static_cast<uint32_t>(std::stoul(timeActive));
@@ -523,7 +522,7 @@ void FileManager::bid(AuctionData &auction, uint32_t bidValue, const std::string
 
 uint32_t FileManager::getAuctionsCount()
 {
-    uint32_t count = 0;
+    uint32_t count = 1;
     for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + AUCTION_DIR))
     {
         if (std::filesystem::is_directory(entry.status()))

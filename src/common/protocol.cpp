@@ -480,8 +480,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     write_user_id(buffer, auction.getOwnerId());
     buffer << " " << auction.getName() << " " << auction.getAssetFname();
     buffer << " " << auction.getInitialBid() << " ";
-    write_date_time(buffer, auction.getStartTime());
-    buffer << auction.getDurationSeconds();
+    buffer << auction.getStartTimeString() << " " << auction.getDurationSeconds();
     if (auction.hasBids()) {
       const std::vector<Bid>& bids = auction.getBids();
       std::vector<Bid>::size_type numBidsToRetrieve = 50;
@@ -503,7 +502,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     }
     if (!auction.isActive()) {
       buffer << " E ";
-      write_date_time(buffer, auction.getEndTime());
+      buffer << auction.getEndTimeString();
       buffer << " " << auction.getEndTimeSec();
     }
   } else if (status == ReplyShowRecordClientbound::status::NOK) {
