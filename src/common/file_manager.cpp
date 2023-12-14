@@ -322,13 +322,13 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
 
 
     std::string auctionId = AuctionData::idToString(auctionIdInt);
+    //check if start file exists
+    if (!std::filesystem::exists(std::string(BASE_DIR) + std::string(AUCTION_DIR) + auctionId + "/START (" + auctionId + ").txt")) {
+        throw AuctionDoesNotExistException(auctionId);
+    }
 
     safeLockAuction(auctionId, [&]()
                     {
-        //check if start file exists
-        if (!std::filesystem::exists(std::string(BASE_DIR) + std::string(AUCTION_DIR) + auctionId + "/START (" + auctionId + ").txt")) {
-            throw AuctionDoesNotExistException(auctionId);
-        }
         //update Auction
         UpdateAuction(auctionId);
         std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
