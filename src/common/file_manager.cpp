@@ -330,37 +330,26 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
         if (!std::filesystem::exists(std::string(BASE_DIR) + std::string(AUCTION_DIR) + auctionId + "/START (" + auctionId + ").txt")) {
             throw AuctionDoesNotExistException(auctionId);
         }
-
         //update Auction
         UpdateAuction(auctionId);
-
-
         std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
         std::stringstream ss(startFile);
-        std::string uid, name, assetFname, startValue, timeActive, startDatetime, startFulltime;
+        std::string uid, name, assetFname, startValue, timeActive, startDate, startHour, startFulltime;
         std::getline(ss, uid, ' ');
         std::getline(ss, name, ' ');
         std::getline(ss, assetFname, ' ');
         std::getline(ss, startValue, ' ');
         std::getline(ss, timeActive, ' ');
-        std::getline(ss, startDatetime, ' ');
+        std::getline(ss, startDate, ' ');
+        std::getline(ss, startHour, ' ');
         std::getline(ss, startFulltime, ' ');
+
 
         uint32_t initialBid = static_cast<uint32_t>(std::stoul(startValue));
         uint32_t durationSeconds = static_cast<uint32_t>(std::stoul(timeActive));
         uint32_t uidInt = static_cast<uint32_t>(std::stoul(uid));
 
-        std::tm tm = {};
-        std::istringstream timeStream(startDatetime + " " + startFulltime);
-        
-        timeStream >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-
-        if (timeStream.fail()) {
-    
-            throw InvalidDateTimeException(startDatetime + " " + startFulltime);
-        }
-
-        std::time_t startTime = std::mktime(&tm);
+        std::time_t startTime = static_cast<std::time_t>(std::stoll(startFulltime));
 
         if (!auctionIsActive(auctionId)) {
         
@@ -401,15 +390,8 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
         std::getline(ss, sec_time, ' ');
         Bid bid;
         bid.bidder_user_id = static_cast<uint32_t>(std::stoi(bidder_user_id));
-        std :: cout << "bidder_user_id: " << bid.bidder_user_id << std::endl;
-        bid.bid_value = static_cast<uint32_t>(std::stoi(bid_value));
-        std :: cout << "bid_value: " << bid.bid_value << std::endl;
-
-        // Convert date_time string to time_t
-        std::tm tm = {};
-        std::stringstream ss_date_time(date_time);
-        ss_date_time >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-        bid.date_time = std::mktime(&tm);
+        bid.bid_value = static_cast<uint32_t>(std::stoi(bid_value));        
+        bid.date_time = date_time;
         bid.sec_time = static_cast<uint32_t>(std::stoi(sec_time));
         bids.push_back(bid); 
     }
@@ -445,29 +427,21 @@ void FileManager::UpdateAuction(const std::string &auctionId)
     {
         std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
         std::stringstream ss(startFile);
-        std::string uid, name, assetFname, startValue, timeActive, startDatetime, startFulltime;
+        std::string uid, name, assetFname, startValue, timeActive, startDate, startHour, startFulltime;
         std::getline(ss, uid, ' ');
         std::getline(ss, name, ' ');
         std::getline(ss, assetFname, ' ');
         std::getline(ss, startValue, ' ');
         std::getline(ss, timeActive, ' ');
-        std::getline(ss, startDatetime, ' ');
+        std::getline(ss, startDate, ' ');
+        std::getline(ss, startHour, ' ');
         std::getline(ss, startFulltime, ' ');
+        std::cout << "startFulltime: " << startFulltime << std::endl;
 
 
         uint32_t durationSeconds = static_cast<uint32_t>(std::stoul(timeActive));
 
-        std::tm tm = {};
-        std::istringstream timeStream(startDatetime + " " + startFulltime);
-        
-        timeStream >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-
-        if (timeStream.fail()) {
-    
-            throw InvalidDateTimeException(startDatetime + " " + startFulltime);
-        }
-
-        std::time_t startTime = std::mktime(&tm);
+        std::time_t startTime = static_cast<std::time_t>(std::stoll(startFulltime));
 
 
         std::time_t endTime = startTime + durationSeconds;
@@ -530,6 +504,7 @@ void FileManager::bid(AuctionData &auction, uint32_t bidValue, const std::string
 
                 safeLockAuction(auction.getIdString(), [&]()
                                 {
+                
                 createBidFile(auction.getIdString(), userId, bidValueString, auction.getStartTime()); 
                     });
 
