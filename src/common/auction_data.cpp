@@ -80,8 +80,20 @@ std::string AuctionData::toString() const {
     ss << assetFname << " "; // asset fname
     ss << initialBid << " "; // start value
     ss << durationSeconds << " "; // timeactive
-    ss << std::put_time(std::localtime(&startTime), "%Y-%m-%d %H:%M:%S") << " "; // start datetime
+    ss << std::put_time(std::gmtime(&startTime), "%Y-%m-%d %H:%M:%S") << " "; // start datetime
     ss << startTime; // start fulltime
+    return ss.str();
+}
+
+std::string AuctionData::getStartTimeString() const {
+    std::stringstream ss;
+    ss << std::put_time(std::gmtime(&startTime), "%Y-%m-%d %H:%M:%S");
+    return ss.str();
+}
+
+std :: string AuctionData::getEndTimeString() const {
+    std::stringstream ss;
+    ss << std::put_time(std::gmtime(&endTime), "%Y-%m-%d %H:%M:%S");
     return ss.str();
 }
 

@@ -265,6 +265,8 @@ class ReplyShowRecordClientbound : public UdpPacket {
   status status;
 
   AuctionData auction;
+  std::string startTime;
+  std::string endTime;
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
