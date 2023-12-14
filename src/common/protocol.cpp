@@ -1144,7 +1144,9 @@ void write_date_time(std::stringstream &buffer, const std::time_t &time) {
 }
 std::time_t read_date_time(std::stringstream &buffer) {
   std::tm tm_time;
-  buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+  //buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+  std::cout << buffer.str() << std::endl;
+
   if (buffer.fail()) {
     throw InvalidPacketException();
   }
