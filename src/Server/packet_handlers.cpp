@@ -590,6 +590,8 @@ void handle_show_asset(int connection_fd, AuctionServerState &state)
 
     response.status = ReplyShowAssetClientbound::OK;
 
+    response.file_name = asset_path.filename().string();
+
     response.file_path = asset_path;
 
     state.cdebug << auctionTag(packet.auction_id) << "Asked to show asset" << std::endl;
