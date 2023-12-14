@@ -444,7 +444,6 @@ void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
   auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
-    std::cout << "List going great, before reading auctions" << std::endl;
     auctions = readAuctions(buffer);
   } else if (status_str == "NOK") {
     status = NOK;
@@ -1244,18 +1243,12 @@ std::vector<std::pair<uint32_t, bool>> UdpPacket::readAuctions(std::stringstream
     uint32_t auctionId;
     bool auctionStatus;
     while (buffer.peek() != '\n') {
-        std::cout << "buffer.peek()"<< buffer.peek() << std::endl;
         readSpace(buffer);
-        std::cout << "Read Space" << std::endl;
         auctionId = readAuctionId(buffer);
-        std::cout << "Read Auction ID" << std::endl;
         readSpace(buffer);
-        std::cout << "Read Space" << std::endl;
         auctionStatus = readInt(buffer);
-        std::cout << "Read Auction Status" << std::endl;
         // emplace_back adds element to the end of the vector
         auctions.emplace_back(auctionId, auctionStatus);
-        std::cout << "Emplaced Auction" << std::endl;
     }
 
     return auctions;
