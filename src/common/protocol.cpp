@@ -495,8 +495,8 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
           // Perform operations with currentBid
           buffer << " B ";
           write_user_id(buffer, currentBid.bidder_user_id);
-          buffer << " " << currentBid.bid_value << " ";
-          write_date_time(buffer, currentBid.date_time);
+          buffer << " " << currentBid.bid_value;
+          buffer << " " << currentBid.date_time;
           buffer << " " << currentBid.sec_time;
       }
       
@@ -1144,9 +1144,10 @@ void write_date_time(std::stringstream &buffer, const std::time_t &time) {
 }
 
 std::string read_date_time(std::stringstream &buffer) {
-    std::string date_time_str;
-    buffer >> date_time_str;
-    return date_time_str;
+    std::string date, time;
+    std::getline(buffer, date, ' ');
+    std::getline(buffer, time, ' ');
+    return date + " " + time;
 }
 
 void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
@@ -1170,7 +1171,7 @@ uint32_t parse_packet_user_id(std::string &id_str) {
   }
   try {
     int i = std::stoi(id_str);
-    if (i < 0 || i > (int)USER_ID_MAX) {
+    if (i < 0 || i > (int) USER_ID_MAX) {
       throw InvalidPacketException();
     }
     return (uint32_t)i;
@@ -1259,7 +1260,7 @@ Bid UdpPacket::readBid(std::stringstream &buffer) {
   readSpace(buffer);
   bid.bid_value = readInt(buffer);
   readSpace(buffer);
-  //bid.date_time = read_date_time(buffer);
+  bid.date_time = read_date_time(buffer);
   readSpace(buffer);
   bid.sec_time = readInt(buffer);
   return bid;

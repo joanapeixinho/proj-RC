@@ -14,8 +14,7 @@
 struct Bid {
   uint32_t bidder_user_id;
   uint32_t bid_value;
-  std::time_t date_time;
-  std::string date_time_string;
+  std::string date_time;
   uint32_t sec_time;
 };
 
