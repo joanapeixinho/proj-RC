@@ -976,9 +976,9 @@ void ReplyShowAssetClientbound::send(int fd) {
   if (status == OK) {
     stream << "OK " << file_name << " " << file_size << " ";
     writeString(fd, stream.str());
+    stream.str(std::string());
+    stream.clear();
     sendFile(fd, file_path);
-    writeString(fd, "\n");
-    return;
   } else if (status == NOK) {
     stream << "NOK";
   } else if (status == ERR) {

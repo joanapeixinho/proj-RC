@@ -628,7 +628,7 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
           << "Displaying the asset '"<< rsa.file_name 
           <<"' of the auction with ID [" << auction_id << "]:" 
           << std::endl;
-      display_file(rsa.file_path);
+      display_file(rsa.file_name);
       break;
 
     case ReplyShowAssetClientbound::status::NOK:
