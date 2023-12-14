@@ -86,6 +86,7 @@ std::string UdpPacket::readString(std::stringstream &buffer, uint32_t max_len) {
   while (i < max_len) {
     char c = (char)buffer.get();
     if (!buffer.good()) {
+      std::cout << "Buffer is not good UWU" << std::endl;
       throw InvalidPacketException();
     }
     if (c == ' ' || c == '\n') {
