@@ -534,7 +534,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     readSpace(buffer);
     auction.setInitialBid(readInt(buffer));
     readSpace(buffer);
-    auction.setStartTime(read_date_time(buffer));
+    startTime = read_date_time(buffer);
     readSpace(buffer);
     auction.setDurationSeconds(readInt(buffer));
     int bidCounter = 0;
@@ -551,7 +551,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
         } else if (buffer.peek() == 'E'){ // Read end time
           readChar(buffer);
           readSpace(buffer);
-          auction.setEndTime(read_date_time(buffer));
+          endTime = read_date_time(buffer);
           readSpace(buffer);
           auction.setEndTimeSec(readInt(buffer));
           break;
@@ -1142,14 +1142,11 @@ void write_date_time(std::stringstream &buffer, const std::time_t &time) {
   // Format the time as YYYY-MM-DD HH:MM:SS
   buffer << std::put_time(&tm_time, "%Y-%m-%d %H:%M:%S");
 }
-std::time_t read_date_time(std::stringstream &buffer) {
-  std::tm tm_time;
-  //buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
 
-  if (buffer.fail()) {
-    throw InvalidPacketException();
-  }
-  return std::mktime(&tm_time);
+std::string read_date_time(std::stringstream &buffer) {
+    std::string date_time_str;
+    buffer >> date_time_str;
+    return date_time_str;
 }
 
 void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
@@ -1262,7 +1259,7 @@ Bid UdpPacket::readBid(std::stringstream &buffer) {
   readSpace(buffer);
   bid.bid_value = readInt(buffer);
   readSpace(buffer);
-  bid.date_time = read_date_time(buffer);
+  //bid.date_time = read_date_time(buffer);
   readSpace(buffer);
   bid.sec_time = readInt(buffer);
   return bid;

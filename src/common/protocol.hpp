@@ -424,7 +424,7 @@ void wait_for_packet(UdpPacket &packet, int socket);
 
 void write_date_time(std::stringstream &buffer, const time_t &time);
 
-std::time_t read_date_time(std::stringstream &buffer);
+std::string read_date_time(std::stringstream &buffer);
 
 void write_auction_id(std::stringstream &buffer, const uint32_t auction_id);
 
