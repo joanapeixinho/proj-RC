@@ -399,6 +399,13 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
 
 // TCP
 
+/**
+ * Handles the request to open an auction.
+ * 
+ * @param connection_fd The file descriptor of the connection.
+ * @param state The current state of the auction server.
+ */
+
 void handle_open_auction(int connection_fd, AuctionServerState &state)
 {
 
@@ -416,7 +423,7 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
 
     time_t now = time(0);
 
-    //mqke endTime and empty const& string
+    //make endTime and empty const& string
 
     std::string endTime = " ";
 
