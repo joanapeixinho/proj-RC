@@ -416,7 +416,11 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
 
     time_t now = time(0);
 
-    AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, now, 0, 0, std::vector<Bid>());
+    //mqke endTime and empty const& string
+
+    std::string endTime = " ";
+
+    AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, now, endTime, 0, std::vector<Bid>());
 
    
     if (packet.file_size > ASSET_MAX_BYTES)

@@ -5,7 +5,7 @@
 AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string& inputName,
                          uint32_t inputInitialBid, uint32_t inputDurationSeconds,
                          const std::string& inputAssetFname, std::time_t inputStartTime,
-                         std::time_t inputEndTime, uint32_t inputEndTimeSec,
+                         std::string inputEndTime, uint32_t inputEndTimeSec,
                          const std::vector<Bid> &inputBids) :  id(inputId), uid(inputUid), name(inputName), initialBid(inputInitialBid),
       durationSeconds(inputDurationSeconds), startTime(inputStartTime), assetFname(inputAssetFname),
       endTime(inputEndTime), endTimeSec(inputEndTimeSec),
@@ -92,9 +92,7 @@ std::string AuctionData::getStartTimeString() const {
 }
 
 std :: string AuctionData::getEndTimeString() const {
-    std::stringstream ss;
-    ss << std::put_time(std::gmtime(&endTime), "%Y-%m-%d %H:%M:%S");
-    return ss.str();
+    return endTime;  
 }
 
 std::string AuctionData::getAssetFname() const {
@@ -105,9 +103,6 @@ std::time_t AuctionData::getStartTime() const {
     return startTime;
 }
 
-std::time_t AuctionData::getEndTime() const {
-    return endTime;
-}
 
 uint32_t AuctionData::getEndTimeSec() const {
     return endTimeSec;
@@ -164,7 +159,7 @@ void AuctionData::setAssetFname(const std::string& inputAssetFname) {
     assetFname = inputAssetFname;
 }
 
-void AuctionData::setEndTime(std::time_t inputEndTime) {
+void AuctionData::setEndTime(std::string inputEndTime) {
     endTime = inputEndTime;
 }
 

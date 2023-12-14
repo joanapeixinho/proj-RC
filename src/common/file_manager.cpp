@@ -173,11 +173,10 @@ void FileManager::createAuctionAssetFile(const std::string &auctionId, const std
     }
 }
 
-void FileManager::createAuctionEndFile(const std::string &auctionId, const std::time_t &endTime, const uint32_t &activeSeconds)
+void FileManager::createAuctionEndFile(const std::string &auctionId, const std::string &endTime, const uint32_t &activeSeconds)
 {
     std::stringstream ss;
-    ss << std::put_time(std::gmtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
-    ss << activeSeconds;
+    ss << endTime << " " << activeSeconds;
     if (!writeToFile("END (" + auctionId + ").txt", ss.str(), AUCTION_DIR + std::string("/") + auctionId))
     {
         throw FileWriteException("END (" + auctionId + ").txt");
@@ -355,21 +354,24 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
         
             std::string endFile = readFromFile("END (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
             std::stringstream ssEnd(endFile);
-            std::string endDatetime, endSecTime;
-            std::getline(ssEnd, endDatetime, ' ');
+            std::string endDate, endHour, endSecTime;
+            std::getline(ssEnd, endDate, ' ');
+            std::getline(ssEnd, endHour, ' ');
             std::getline(ssEnd, endSecTime, ' ');
            
             uint32_t endTimeSec = static_cast<uint32_t>(std::stoul(endSecTime));
-            std::time_t endTime = static_cast<std::time_t>(std::stol(endDatetime));
+
+          
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(auctionIdInt, uidInt, name, initialBid,
-                   durationSeconds, assetFname, startTime, endTime, endTimeSec, bids);
+                   durationSeconds, assetFname, startTime,endDate + ' ' + endHour, endTimeSec, bids);
 
             data.setInactive();
         } else {
+            std::string endDatetime = "";
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(auctionIdInt,uidInt, name, initialBid,
-                             durationSeconds, assetFname, startTime, 0, 0, bids);
+                             durationSeconds, assetFname, startTime, endDatetime,0, bids);
         } });
         
     return data;
@@ -440,6 +442,7 @@ void FileManager::UpdateAuction(const std::string &auctionId)
 
         uint32_t durationSeconds = static_cast<uint32_t>(std::stoul(timeActive));
 
+
         std::time_t startTime = static_cast<std::time_t>(std::stoll(startFulltime));
 
 
@@ -448,18 +451,32 @@ void FileManager::UpdateAuction(const std::string &auctionId)
 
         if (now > endTime)
         {
-            createAuctionEndFile(auctionId, endTime, durationSeconds);
+            std::ostringstream oss;
+            oss << std::put_time(std::gmtime(&endTime), "%Y-%m-%d %H:%M:%S");
+            std::string endTimeDate = oss.str();
+            createAuctionEndFile(auctionId, endTimeDate, durationSeconds);
         }
     }
 }
 
 void FileManager::closeAuction(AuctionData &auction)
 {
+    
+    std::time_t now = std::time(nullptr);
+
+    //get string in format YYYY-MM-DD HH:MM:SS for now
+    std::ostringstream oss;
+    oss << std::put_time(std::gmtime(&now), "%Y-%m-%d %H:%M:%S");
+    std::string endTimeDate = oss.str(); 
+
+    //calculate duration of auction in seconds in uint32_t
+
+    uint32_t durationSeconds = static_cast<uint32_t>(now - auction.getStartTime());
 
     safeLockAuction(auction.getIdString(), [&]()
                     {
         if (auctionIsActive(auction.getIdString())) {
-            createAuctionEndFile(auction.getIdString(), auction.getEndTime(), auction.getDurationSeconds());
+            createAuctionEndFile(auction.getIdString(), endTimeDate, durationSeconds);
             auction.setInactive();
         }
         else {
