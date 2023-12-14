@@ -176,7 +176,7 @@ void FileManager::createAuctionAssetFile(const std::string &auctionId, const std
 void FileManager::createAuctionEndFile(const std::string &auctionId, const std::time_t &endTime, const uint32_t &activeSeconds)
 {
     std::stringstream ss;
-    ss << std::put_time(std::localtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
+    ss << std::put_time(std::gmtime(&endTime), "%Y-%m-%d %H:%M:%S") << " ";
     ss << activeSeconds;
     if (!writeToFile("END (" + auctionId + ").txt", ss.str(), AUCTION_DIR + std::string("/") + auctionId))
     {
@@ -202,7 +202,7 @@ void FileManager::createBidFile(const std::string &auctionId, const std::string 
 
     if (file.is_open())
     {
-        file << userId << " " << bidValue << " " << std::put_time(std::localtime(&bidDateTime), "%Y-%m-%d %H:%M:%S") << " " << bidSecTime;
+        file << userId << " " << bidValue << " " << std::put_time(std::gmtime(&bidDateTime), "%Y-%m-%d %H:%M:%S") << " " << bidSecTime;
         file.close();
     }
     else

@@ -1138,14 +1138,13 @@ void wait_for_packet(UdpPacket &packet, int socket) {
 
 void write_date_time(std::stringstream &buffer, const std::time_t &time) {
   // Convert std::time_t to std::tm
-  std::tm tm_time = *std::localtime(&time);
+  std::tm tm_time = *std::gmtime(&time);
   // Format the time as YYYY-MM-DD HH:MM:SS
   buffer << std::put_time(&tm_time, "%Y-%m-%d %H:%M:%S");
 }
 std::time_t read_date_time(std::stringstream &buffer) {
   std::tm tm_time;
   //buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
-  std::cout << buffer.str() << std::endl;
 
   if (buffer.fail()) {
     throw InvalidPacketException();
