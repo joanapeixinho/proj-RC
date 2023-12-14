@@ -103,6 +103,7 @@ class UdpPacket {
   uint32_t readUserId(std::stringstream &buffer);
   uint32_t readAuctionId(std::stringstream &buffer);
   Bid readBid(std::stringstream &buffer);
+  std::vector<std::pair<uint32_t, bool>> readAuctions(std::stringstream& buffer);
 
  public:
   virtual std::stringstream serialize() = 0;
@@ -435,9 +436,8 @@ void sendFile(int connection_fd, std::filesystem::path image_path);
 
 uint32_t getFileSize(std::filesystem::path file_path);
 
-std::string formatAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions);
+std::string auctionsToString(const std::vector<std::pair<uint32_t, bool>>& auctions);
 
-std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctionsString);
 
 void readBid(std::stringstream &buffer, AuctionData& auction);
 
