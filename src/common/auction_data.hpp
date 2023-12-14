@@ -36,6 +36,7 @@ public:
     uint32_t getInitialBid() const;
     uint32_t getDurationSeconds() const;
     std::time_t getStartTime() const;
+  
     std::time_t getEndTime() const;
     uint32_t getEndTimeSec() const;
     std::vector<Bid> getBids() const;

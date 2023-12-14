@@ -189,14 +189,20 @@ void FileManager::createBidsDirectory(const std::string &auctionId)
     std::filesystem::create_directory(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
 }
 
-void FileManager::createBidFile(const std::string &auctionId, const std::string &userId, const std::string &bidValue, const std::string &bidDatetime, const std::string &bidSecTime)
+void FileManager::createBidFile(const std::string &auctionId, const std::string &userId, const std::string &bidValue, std::time_t startTime)
 {
     std::string bidFileName = std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS/" +  bidValue + ".txt";
     std::ofstream file(bidFileName);
 
+    //get date of now in format YYYY-MM-DD HH:MM:SS
+    std::time_t bidDateTime = time(0);
+
+    //calculate the number of seconds elapsed since the start of the auction
+    std::time_t bidSecTime = bidDateTime - startTime;
+
     if (file.is_open())
     {
-        file << userId << " " << bidValue << " " << bidDatetime << " " << bidSecTime;
+        file << userId << " " << bidValue << " " << std::put_time(std::localtime(&bidDateTime), "%Y-%m-%d %H:%M:%S") << " " << bidSecTime;
         file.close();
     }
     else
@@ -384,9 +390,8 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
     std::vector<Bid> bids;
     for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS"))
     {
-        
         std::string bidValue = entry.path().filename().string();
-        std::string bidFile = readFromFile(bidValue + ".txt", AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
+        std::string bidFile = readFromFile(bidValue, AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
         std::stringstream ss(bidFile);
         std::string bidder_user_id, bid_value, date_time, sec_time;
         std::getline(ss, bidder_user_id, ' ');
@@ -395,15 +400,19 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
         std::getline(ss, sec_time, ' ');
         Bid bid;
         bid.bidder_user_id = static_cast<uint32_t>(std::stoi(bidder_user_id));
+        std :: cout << "bidder_user_id: " << bid.bidder_user_id << std::endl;
         bid.bid_value = static_cast<uint32_t>(std::stoi(bid_value));
+        std :: cout << "bid_value: " << bid.bid_value << std::endl;
 
         // Convert date_time string to time_t
         std::tm tm = {};
         std::stringstream ss_date_time(date_time);
         ss_date_time >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
         bid.date_time = std::mktime(&tm);
+        std :: cout << "date_time: " << bid.date_time << std::endl;
 
         bid.sec_time = static_cast<uint32_t>(std::stoi(sec_time));
+        std :: cout << "sec_time: " << bid.sec_time << std::endl;
         bids.push_back(bid); 
     }
 
@@ -519,20 +528,16 @@ void FileManager::bid(AuctionData &auction, uint32_t bidValue, const std::string
             if (auctionIsActive(auction.getIdString()))
             {
                 // ADD TO AUCTION BIDS
-                std::string bidValueString = std::to_string(bidValue);
+                std::string bidValueString = std::to_string(bidValue);  
 
                 safeLockAuction(auction.getIdString(), [&]()
                                 {
-                std::cout << "entering createBidFile"  << std::endl;
-                createBidFile(auction.getIdString(), bidValueString); 
-                std::cout << "exiting createBidFile"  << std::endl;
+                createBidFile(auction.getIdString(), userId, bidValueString, auction.getStartTime()); 
                     });
 
                 safeLockUser(userId, [&]()
                              {
-                    std::cout << "entering createUserAuctionFile"  << std::endl;
                     createUserAuctionFile(userId, auction.getIdString(), "BIDDED");
-                    std::cout << "exiting createUserAuctionFile"  << std::endl;
                 });
     
             }
