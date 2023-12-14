@@ -444,7 +444,6 @@ void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
   auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
-    readSpace(buffer);
     auctions = readAuctions(buffer);
   } else if (status_str == "NOK") {
     status = NOK;
