@@ -585,7 +585,7 @@ void handle_show_asset(int connection_fd, AuctionServerState &state)
     packet.receive(connection_fd);
 
     AuctionData auction = state.file_manager.getAuction(packet.auction_id);
-
+    
     std::filesystem::path asset_path = state.file_manager.showAsset(auction);
 
     response.status = ReplyShowAssetClientbound::OK;
