@@ -199,7 +199,7 @@ void UserData::bid(AuctionData &auction, uint32_t bidValue, const std::string &_
     }
     else
     {
-        fileManager.bid(auction, bidValue);
+        fileManager.bid(auction, bidValue, this->getIdString());
     }
 }
 
