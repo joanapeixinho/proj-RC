@@ -410,10 +410,7 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
         std::stringstream ss_date_time(date_time);
         ss_date_time >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
         bid.date_time = std::mktime(&tm);
-        std :: cout << "date_time: " << bid.date_time << std::endl;
-
         bid.sec_time = static_cast<uint32_t>(std::stoi(sec_time));
-        std :: cout << "sec_time: " << bid.sec_time << std::endl;
         bids.push_back(bid); 
     }
 
