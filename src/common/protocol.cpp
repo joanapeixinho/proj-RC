@@ -391,19 +391,12 @@ std::stringstream ReplyMyBidsClientbound::serialize() {
 
 void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
-  std::cout << "ReplyMyBidsClientbound::deserialize" << std::endl;
   readPacketId(buffer, ReplyMyBidsClientbound::ID);
-  std::cout << "ReplyMyBidsClientbound: read RMB" << std::endl;
   readSpace(buffer);
-  std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
   auto status_str = readString(buffer, PACKET_ID_LEN);
-  std::cout << "ReplyMyBidsClientbound: read status" << std::endl;
   if (status_str == "OK") {
     status = OK;
-    readSpace(buffer);
-    std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
     auctions = readAuctions(buffer);
-    std::cout << "ReplyMyBidsClientbound: read auctions" << std::endl;
   } else if (status_str == "NOK") {
     status = NOK;
   } else if (status_str == "NLG") {
@@ -1151,7 +1144,9 @@ void write_date_time(std::stringstream &buffer, const std::time_t &time) {
 }
 std::time_t read_date_time(std::stringstream &buffer) {
   std::tm tm_time;
-  buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+  //buffer >> std::get_time(&tm_time, "%Y-%m-%d %H:%M:%S");
+  std::cout << buffer.str() << std::endl;
+
   if (buffer.fail()) {
     throw InvalidPacketException();
   }
@@ -1249,7 +1244,6 @@ std::vector<std::pair<uint32_t, bool>> UdpPacket::readAuctions(std::stringstream
 
     uint32_t auctionId;
     bool auctionStatus;
-
     while (buffer.peek() != '\n') {
         readSpace(buffer);
         auctionId = readAuctionId(buffer);
