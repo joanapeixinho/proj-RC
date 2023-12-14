@@ -75,7 +75,7 @@ class BidCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  BidCommand() : CommandHandler("bid", "b", "<AID>", "Bid on Auction") {}
+  BidCommand() : CommandHandler("bid", "b", "<AID> <bid_value>", "Bid on Auction") {}
 };
 
 
@@ -94,7 +94,7 @@ class ShowAssetCommand : public CommandHandler {
   void handle(std::string args, UserState& state);
 
  public:
-  ShowAssetCommand() : CommandHandler("show_asset", "sa", "<AID> <bid_value>", "Show Asset") {}
+  ShowAssetCommand() : CommandHandler("show_asset", "sa", "<AID>", "Show Asset") {}
 };
 
 class ListMyAuctionsCommand : public CommandHandler {
