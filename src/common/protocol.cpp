@@ -322,7 +322,7 @@ std::stringstream ReplyListMyAuctionsClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyListMyAuctionsClientbound::ID << " ";
   if (status == ReplyListMyAuctionsClientbound::status::OK) {
-    buffer << "OK";
+    buffer << "OK " << auctionsToString(auctions);
   } else if (status == ReplyListMyAuctionsClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyListMyAuctionsClientbound::status::NLG) {
@@ -343,6 +343,7 @@ void ReplyListMyAuctionsClientbound::deserialize(std::stringstream &buffer) {
   auto status_str = readString(buffer, PACKET_ID_LEN);
   if (status_str == "OK") {
     status = OK;
+    auctions = readAuctions(buffer);
   } else if (status_str == "NOK") {
     status = NOK;
   } else if (status_str == "NLG") {
