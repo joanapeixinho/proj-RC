@@ -375,7 +375,7 @@ std::stringstream ReplyMyBidsClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyMyBidsClientbound::ID << " ";
   if (status == ReplyMyBidsClientbound::status::OK) {
-    buffer << "OK " << formatAuctions(auctions);
+    buffer << "OK " << auctionsToString(auctions);
   } else if (status == ReplyMyBidsClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyMyBidsClientbound::status::NLG) {
@@ -391,13 +391,19 @@ std::stringstream ReplyMyBidsClientbound::serialize() {
 
 void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
+  std::cout << "ReplyMyBidsClientbound::deserialize" << std::endl;
   readPacketId(buffer, ReplyMyBidsClientbound::ID);
+  std::cout << "ReplyMyBidsClientbound: read RMB" << std::endl;
   readSpace(buffer);
+  std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
   auto status_str = readString(buffer, PACKET_ID_LEN);
+  std::cout << "ReplyMyBidsClientbound: read status" << std::endl;
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
-    auctions = parseAuctions(buffer.str());
+    std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
+    auctions = readAuctions(buffer);
+    std::cout << "ReplyMyBidsClientbound: read auctions" << std::endl;
   } else if (status_str == "NOK") {
     status = NOK;
   } else if (status_str == "NLG") {
@@ -426,7 +432,7 @@ std::stringstream ReplyListAuctionsClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyListAuctionsClientbound::ID << " ";
   if (status == ReplyListAuctionsClientbound::status::OK) {
-    buffer << "OK " << formatAuctions(auctions);
+    buffer << "OK " << auctionsToString(auctions);
   } else if (status == ReplyListAuctionsClientbound::status::NOK) {
     buffer << "NOK";
   } else if (status == ReplyListAuctionsClientbound::status::ERR) {
@@ -446,7 +452,7 @@ void ReplyListAuctionsClientbound::deserialize(std::stringstream &buffer) {
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
-    auctions = parseAuctions(buffer.str());
+    auctions = readAuctions(buffer);
   } else if (status_str == "NOK") {
     status = NOK;
   } else if (status_str == "ERR") {
@@ -1225,15 +1231,8 @@ void sendFile(int connection_fd, std::filesystem::path file_path) {
   }
 }
 
-uint32_t getFileSize(std::filesystem::path file_path) {
-  try {
-    return (uint32_t)std::filesystem::file_size(file_path);
-  } catch (...) {
-    throw PacketSerializationException();
-  }
-}
 
-std::string formatAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
+std::string auctionsToString(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     std::ostringstream formattedString;
     for (size_t i = 0; i < auctions.size(); ++i) {
         formattedString << std::setfill('0') << std::setw(3) << auctions[i].first << " ";
@@ -1245,14 +1244,17 @@ std::string formatAuctions(const std::vector<std::pair<uint32_t, bool>>& auction
     return formattedString.str();
 }
 
-std::vector<std::pair<uint32_t, bool>> parseAuctions(const std::string& auctionsString) {
-    std::istringstream iss(auctionsString);
+std::vector<std::pair<uint32_t, bool>> UdpPacket::readAuctions(std::stringstream& buffer) {
     std::vector<std::pair<uint32_t, bool>> auctions;
 
     uint32_t auctionId;
     bool auctionStatus;
 
-    while (iss >> auctionId >> std::boolalpha >> auctionStatus) {
+    while (buffer.peek() != '\n') {
+        readSpace(buffer);
+        auctionId = readAuctionId(buffer);
+        readSpace(buffer);
+        auctionStatus = readInt(buffer);
         // emplace_back adds element to the end of the vector
         auctions.emplace_back(auctionId, auctionStatus);
     }
@@ -1277,4 +1279,12 @@ std::string auctionID_ToString(uint32_t auction_id) {
   std::ostringstream oss;
   oss << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN) << auction_id;
   return oss.str();
+}
+
+uint32_t getFileSize(std::filesystem::path file_path) {
+  try {
+    return (uint32_t)std::filesystem::file_size(file_path);
+  } catch (...) {
+    throw PacketSerializationException();
+  }
 }
