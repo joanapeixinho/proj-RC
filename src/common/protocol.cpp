@@ -86,7 +86,6 @@ std::string UdpPacket::readString(std::stringstream &buffer, uint32_t max_len) {
   while (i < max_len) {
     char c = (char)buffer.get();
     if (!buffer.good()) {
-      std::cout << "Buffer is not good UWU" << std::endl;
       throw InvalidPacketException();
     }
     if (c == ' ' || c == '\n') {
@@ -392,13 +391,19 @@ std::stringstream ReplyMyBidsClientbound::serialize() {
 
 void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
+  std::cout << "ReplyMyBidsClientbound::deserialize" << std::endl;
   readPacketId(buffer, ReplyMyBidsClientbound::ID);
+  std::cout << "ReplyMyBidsClientbound: read RMB" << std::endl;
   readSpace(buffer);
+  std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
   auto status_str = readString(buffer, PACKET_ID_LEN);
+  std::cout << "ReplyMyBidsClientbound: read status" << std::endl;
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
+    std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
     auctions = readAuctions(buffer);
+    std::cout << "ReplyMyBidsClientbound: read auctions" << std::endl;
   } else if (status_str == "NOK") {
     status = NOK;
   } else if (status_str == "NLG") {
