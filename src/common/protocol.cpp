@@ -400,8 +400,6 @@ void ReplyMyBidsClientbound::deserialize(std::stringstream &buffer) {
   std::cout << "ReplyMyBidsClientbound: read status" << std::endl;
   if (status_str == "OK") {
     status = OK;
-    readSpace(buffer);
-    std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
     auctions = readAuctions(buffer);
     std::cout << "ReplyMyBidsClientbound: read auctions" << std::endl;
   } else if (status_str == "NOK") {
