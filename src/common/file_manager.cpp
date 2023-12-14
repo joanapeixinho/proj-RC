@@ -508,19 +508,16 @@ void FileManager::bid(AuctionData &auction, uint32_t bidValue)
     // update auction
         safeLockAuction(
             auction.getIdString(), [&]() {
-        UpdateAuction(auction.getIdString());
+            UpdateAuction(auction.getIdString());
         
             if (auctionIsActive(auction.getIdString()))
             {
                 // ADD TO AUCTION BIDS
                 std::string bidValueString = std::to_string(bidValue);
-                safeLockAuction(auction.getIdString(), [&]()
-                        { createBidFile(auction.getIdString(), bidValueString); });
-
-                // ADD TO USER BIDDED
                 std::string userId = std::to_string(bidValue);
-                safeLockUser(userId, [&]()
-                     {createUserAuctionFile(userId, auction.getIdString(), "BIDDED"); });
+                createBidFile(auction.getIdString(), bidValueString); 
+                createUserAuctionFile(userId, auction.getIdString(), "BIDDED");
+    
             }
             else
             {
