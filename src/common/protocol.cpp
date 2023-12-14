@@ -1249,14 +1249,19 @@ std::vector<std::pair<uint32_t, bool>> UdpPacket::readAuctions(std::stringstream
 
     uint32_t auctionId;
     bool auctionStatus;
-
     while (buffer.peek() != '\n') {
+        std::cout << "buffer.peek() = " << buffer.peek() << std::endl;
         readSpace(buffer);
+        std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
         auctionId = readAuctionId(buffer);
+        std::cout << "ReplyMyBidsClientbound: read auctionId" << std::endl;
         readSpace(buffer);
+        std::cout << "ReplyMyBidsClientbound: read space" << std::endl;
         auctionStatus = readInt(buffer);
+        std::cout << "ReplyMyBidsClientbound: read auctionStatus" << std::endl;
         // emplace_back adds element to the end of the vector
         auctions.emplace_back(auctionId, auctionStatus);
+        std::cout << "ReplyMyBidsClientbound: emplace_back" << std::endl;
     }
 
     return auctions;
