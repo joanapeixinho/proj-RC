@@ -418,7 +418,6 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
 
     AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, now, 0, 0, std::vector<Bid>());
 
-    std::cout << "start value in packet:" << packet.start_value << std::endl;
    
     if (packet.file_size > ASSET_MAX_BYTES)
     {
@@ -426,8 +425,6 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
     }
 
     user.openAuction(auction, packet.password);
-
-
     response.auction_id = auction.getId();
 
     response.status = ReplyOpenAuctionClientbound::OK;
@@ -654,7 +651,6 @@ void handle_bid(int connection_fd, AuctionServerState &state)
 
     AuctionData auction = state.file_manager.getAuction(packet.auction_id);
 
-    std::cout << "Auction " << auction.toString() << std::endl;
 
     user.bid(auction, packet.bid_value, packet.password);
 

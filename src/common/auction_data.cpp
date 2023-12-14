@@ -16,7 +16,6 @@ AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string&
         throw InvalidAuctionIdException(std::to_string(id));
     }
 
-    std::cout << "name" << name << std::endl;
 
     if (name.length() > AUCTION_NAME_MAX_LENGTH) {
         throw InvalidAuctionNameException(name);
