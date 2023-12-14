@@ -215,7 +215,7 @@ bool FileManager::UserRegistered(const std::string &userId)
     return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_pass.txt");
 }
 
-/*Returns True if END file exists and therefore auction is active*/
+/*Returns True if END file does not exist and therefore auction is active*/
 bool FileManager::auctionIsActive(const std::string &auctionId)
 {
 
@@ -503,20 +503,34 @@ std::filesystem::path FileManager::showAsset(AuctionData &auction)
     return assetPath;
 }
 
-void FileManager::bid(AuctionData &auction, uint32_t bidValue)
+void FileManager::bid(AuctionData &auction, uint32_t bidValue, const std::string &userId)
 {
     // update auction
         safeLockAuction(
             auction.getIdString(), [&]() {
+            std::cout << "entering updateAuction"  << std::endl;
             UpdateAuction(auction.getIdString());
+            std::cout << "exiting updateAuction"  << std::endl;
+        });
         
             if (auctionIsActive(auction.getIdString()))
             {
                 // ADD TO AUCTION BIDS
                 std::string bidValueString = std::to_string(bidValue);
-                std::string userId = std::to_string(bidValue);
+
+                safeLockAuction(auction.getIdString(), [&]()
+                                {
+                std::cout << "entering createBidFile"  << std::endl;
                 createBidFile(auction.getIdString(), bidValueString); 
-                createUserAuctionFile(userId, auction.getIdString(), "BIDDED");
+                std::cout << "exiting createBidFile"  << std::endl;
+                    });
+
+                safeLockUser(userId, [&]()
+                             {
+                    std::cout << "entering createUserAuctionFile"  << std::endl;
+                    createUserAuctionFile(userId, auction.getIdString(), "BIDDED");
+                    std::cout << "exiting createUserAuctionFile"  << std::endl;
+                });
     
             }
             else
@@ -524,7 +538,6 @@ void FileManager::bid(AuctionData &auction, uint32_t bidValue)
 
                 throw AuctionNotActiveException(auction.getIdString());
             }
-        });
 }
 
 uint32_t FileManager::getAuctionsCount()

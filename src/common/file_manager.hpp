@@ -62,7 +62,7 @@ public:
     void openAuction(const std::string& userId, const AuctionData& data);
     void closeAuction(AuctionData& auction);
     std::filesystem::path showAsset(AuctionData& auction);
-    void bid(AuctionData& auction, uint32_t bidValue);
+    void bid(AuctionData& auction, uint32_t bidValue, const std::string& userId);
     uint32_t getAuctionsCount();
 
 private:
