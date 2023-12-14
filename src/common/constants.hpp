@@ -12,7 +12,7 @@
 #define TCP_WRITE_TIMEOUT_SECONDS (20 * 60)  // 20 minutes
 #define SERVER_RECV_RESTART_TIMEOUT_SECONDS (3)
 
-#define SOCKET_BUFFER_LEN (256)
+#define SOCKET_BUFFER_LEN (8192) // 8KB to be able to read 6010 bytes
 #define PACKET_ID_LEN (3)
 
 #define USER_ID_STR_LEN (6)
