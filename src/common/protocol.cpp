@@ -973,6 +973,7 @@ void ReplyShowAssetClientbound::send(int fd) {
   std::stringstream stream;
   stream << ReplyShowAssetClientbound::ID << " ";
   if (status == OK) {
+    file_size = getFileSize(file_path);
     stream << "OK " << file_name << " " << file_size << " ";
     writeString(fd, stream.str());
     stream.str(std::string());
@@ -994,17 +995,17 @@ void ReplyShowAssetClientbound::receive(int fd) {
   readSpace(fd);
   auto status_str = readString(fd);
   if (status_str == "OK") {
-    this->status = OK;
+    status = OK;
     readSpace(fd);
-    this->file_name = readFileName(fd);
+    file_name = readFileName(fd);
     readSpace(fd);
-    this->file_size = readFileSize(fd);
+    file_size = readFileSize(fd);
     readSpace(fd);
     readAndSaveToFile(fd, file_name, file_size, false);
   } else if (status_str == "NOK") {
-    this->status = NOK;
+    status = NOK;
   } else if (status_str == "ERR") {
-    this->status = ERR;
+    status = ERR;
   } else {
     throw InvalidPacketException();
   }

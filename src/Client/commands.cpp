@@ -396,8 +396,8 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if auction_id_str is too long
-  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+  if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
               << " digits long" << std::endl;
     return;
   }
@@ -594,8 +594,8 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if auction_id_str is too long
-  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+  if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
               << " digits long" << std::endl;
     return;
   }
@@ -618,10 +618,10 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
     case ReplyShowAssetClientbound::status::OK:
       // Output asset info
       std::cout 
-          << "Displaying the asset '"<< rsa.file_name 
+          << "Received the asset '"<< rsa.file_name 
           <<"' of the auction with ID [" << auction_id << "]:" 
           << std::endl;
-      display_file(rsa.file_name);
+      std::cout << "In the current directory" << std::endl;
       break;
 
     case ReplyShowAssetClientbound::status::NOK:
@@ -658,8 +658,8 @@ void BidCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if auction_id_str is too long
-  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+  if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
               << " digits long" << std::endl;
     return;
   }
@@ -699,7 +699,7 @@ void BidCommand::handle(std::string args, UserState& state) {
       // Output bid info
       std::cout 
           << "Bid of " << bid_value << " on auction with ID [" 
-          << auction_id << "] accepted!" << std::endl;
+          << auctionID_ToString(auction_id) << "] accepted!" << std::endl;
       break;
 
     case ReplyBidClientbound::status::NOK:
@@ -745,8 +745,8 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if auction_id_str is too long
-  if (auction_id_str.length() > AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be at most " << AUCTION_ID_MAX_LEN 
+  if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
               << " digits long" << std::endl;
     return;
   }
@@ -874,15 +874,4 @@ uint32_t parse_user_id(std::string& args) {
   }
 
   return (uint32_t)user_id;
-}
-
-void display_file(std::string filename) {
-  std::ifstream f(filename);
-  if (f.is_open()) {
-    std::cout << f.rdbuf() << std::endl;
-  } else {
-    std::cout
-        << "Failed to open file to display. Please open the file manually:"
-        << filename << std::endl;
-  }
 }
