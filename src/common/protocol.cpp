@@ -476,7 +476,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyShowRecordClientbound::ID << " ";
   if (status == ReplyShowRecordClientbound::status::OK) {
-    buffer << "OK";
+    buffer << "OK ";
     write_user_id(buffer, auction.getOwnerId());
     buffer << " " << auction.getName() << " " << auction.getAssetFname();
     buffer << " " << auction.getInitialBid() << " ";
@@ -521,6 +521,8 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
   readPacketId(buffer, ReplyShowRecordClientbound::ID);
   readSpace(buffer);
   auto status_str = readString(buffer, PACKET_ID_LEN);
+  std ::cout << "status_str: " << status_str << std :: endl;
+  std::cout << "buffer" << buffer.str() << std :: endl;
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
@@ -544,7 +546,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
         if (buffer.peek() == 'B'){ // Read bid
           auction.addBid(readBid(buffer));
           bidCounter++;
-          if (bidCounter > 50){ // You cant receive more than 50 bids
+          if (bidCounter > 50) { // You cant receive more than 50 bids
             throw InvalidPacketException();
           }
         } else if (buffer.peek() == 'E'){ // Read end time
@@ -554,9 +556,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
           readSpace(buffer);
           auction.setEndTimeSec(readInt(buffer));
           break;
-        } else {
-          throw InvalidPacketException();
-        }
+        } 
       }
     }
   } else if (status_str == "NOK") {
