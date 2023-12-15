@@ -91,6 +91,7 @@ user: src/Client/User
 clean:
 	rm -f $(OBJECTS) $(TARGETS) $(TARGET_EXECS) project.zip
 
+#cleans sub directories and files created by the auction server 
 clean-asdir:
 	rm -rf $(ASDIR)/*
 
