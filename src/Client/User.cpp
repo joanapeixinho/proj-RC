@@ -28,15 +28,17 @@ int main(int argc, char *argv[]) {
             commandManager.waitForCommand(state);
         }
 
-        // Logout User before quitting
-        LogoutCommand logoutCommand;
-        try {
-          std::cout << "\nLogging out..." << std::endl;
-          logoutCommand.handle(" ", state);
-        } catch (std::exception& e) {
-          std::cout << "[ERROR] " << e.what() << std::endl;
-        } catch (...) {
-          std::cout << "[ERROR] An unknown error occurred." << std::endl;
+        if (state.isLoggedIn()){
+          // Logout User before quitting
+          LogoutCommand logoutCommand;
+          try {
+            std::cout << "\nLogging out..." << std::endl;
+            logoutCommand.handle(" ", state);
+          } catch (std::exception& e) {
+            std::cout << "[ERROR] " << e.what() << std::endl;
+          } catch (...) {
+            std::cout << "[ERROR] An unknown error occurred." << std::endl;
+          }
         }
 
         std::cout << std::endl

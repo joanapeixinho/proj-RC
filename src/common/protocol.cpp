@@ -75,7 +75,7 @@ void UdpPacket::readSpace(std::stringstream &buffer) {
 void UdpPacket::readPacketDelimiter(std::stringstream &buffer) {
   readChar(buffer, '\n');
   buffer.peek();
-  if (!buffer.eof()) {
+  if (!buffer.eof()) { // If there is more data in the buffer, the packet is invalid
     throw InvalidPacketException();
   }
 }
