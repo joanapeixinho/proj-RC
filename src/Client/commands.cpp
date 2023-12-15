@@ -703,7 +703,7 @@ void BidCommand::handle(std::string args, UserState& state) {
     case ReplyBidClientbound::status::NOK:
       std::cout
           << "Failed to bid: the auction with ID [" 
-          << auctionID_ToString(auction_id) << "] has already ended." << std::endl;
+          << auctionID_ToString(auction_id) << "] is not an active auction." << std::endl;
       break;
 
     case ReplyBidClientbound::status::NLG:
