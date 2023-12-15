@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include <unistd.h>
+
 // #include "client_Auction.hpp"
 #include "../common/protocol.hpp"
 
@@ -66,6 +68,16 @@ void CommandManager::waitForCommand(UserState& state) {
   }
 
   if (commandName.length() == 0) {
+    return;
+  }
+
+  if (commandName == "sleep"){
+    std::istringstream iss(line);
+    std::string  number_str;
+    iss >> number_str;
+    u_int32_t number = static_cast<uint32_t>(std::stoi(number_str));
+    std::cout << "Sleeping for "<< number << " seconds..." << std::endl;
+    sleep(number);
     return;
   }
 
@@ -819,7 +831,7 @@ void printBidsInfo(const std::vector<Bid> bids) {
         std::cout << "Bidder User ID: " << bid.bidder_user_id 
                   << " Value bidded: " << bid.bid_value << std::endl;
         std::cout << "Date Time: " << bid.date_time << std::endl;
-        std::cout << " Seconds since auction start: " << bid.sec_time << std::endl;
+        std::cout << "Seconds since auction start: " << bid.sec_time << std::endl;
         std::cout << "---------------------------------------" << std::endl;
     }
 }
