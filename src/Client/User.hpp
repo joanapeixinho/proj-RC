@@ -1,7 +1,6 @@
 #ifndef USER_H
 #define USER_H
 
-// #include "common/game.hpp"
 
 #include <csignal>
 

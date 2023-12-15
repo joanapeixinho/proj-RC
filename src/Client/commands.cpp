@@ -288,11 +288,11 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   // Argument parsing
   std::istringstream iss(args);
   std::string auction_name;
-  std::string asset_file_name;
+  std::string asset_file_path;
   std::string start_value_str;
   std::string timeactive_str;
   
-  if (!(iss >> auction_name) || !(iss >> asset_file_name) || 
+  if (!(iss >> auction_name) || !(iss >> asset_file_path) || 
       !(iss >> start_value_str) || !(iss >> timeactive_str)) {
     std::cout << "Invalid arguments. Usage: openauction <auction_name> "
               << "<asset_name> <start_value> <timeactive>" << std::endl;
@@ -343,7 +343,7 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   packet_out.auction_name = auction_name;
   packet_out.start_value = start_value;
   packet_out.time_active = timeactive;
-  packet_out.file_path = std::filesystem::path(asset_file_name);
+  packet_out.file_path = std::filesystem::path(asset_file_path);
   packet_out.file_name = packet_out.file_path.filename().string();
 
 
@@ -809,12 +809,18 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
   }
 }
 
+void HelpCommand::handle(std::string args, UserState& state) {
+  (void)args;   // unused - no args
+  (void)state;  // unused
+  manager.printHelp();
+}
+
 void printBidsInfo(const std::vector<Bid> bids) {
     for (const auto bid : bids) {
-        std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
-        std::cout << "Bid Value: " << bid.bid_value << std::endl;
-        std::cout << "Date Time: " << bid.date_time << std::endl;
-        std::cout << ", Seconds: " << bid.sec_time << std::endl;
+        std::cout << "Bidder User ID: " << bid.bidder_user_id 
+                  << " Value bidded: " << bid.bid_value << std::endl;
+        std::cout << "Date Time: " << bid.date_time
+                  << " Seconds since auction start: " << bid.sec_time << std::endl;
         std::cout << "---------------------------------------" << std::endl;
     }
 }
