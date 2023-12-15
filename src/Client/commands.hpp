@@ -149,10 +149,6 @@ bool is_alphanumeric(std::string& str);
 
 uint32_t parse_user_id(std::string& args);
 
-void display_file(std::string filename);
-
-std::string formatTime(std::time_t timeValue, const std::string& format);
-
 void printBidsInfo(std::vector<Bid> bids);
 
 void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions);

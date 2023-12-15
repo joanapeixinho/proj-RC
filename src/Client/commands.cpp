@@ -564,7 +564,6 @@ void ListCommand::handle(std::string args, UserState& state) {
 
   switch (rls.status) {
     case ReplyListAuctionsClientbound::status::OK:
-      // Output autions info
       std::cout << "Displaying all the auctions:" << std::endl;
       printAuctions(rls.auctions);
       break;
