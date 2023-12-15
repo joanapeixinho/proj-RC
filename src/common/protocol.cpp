@@ -480,7 +480,8 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     write_user_id(buffer, auction.getOwnerId());
     buffer << " " << auction.getName() << " " << auction.getAssetFname();
     buffer << " " << auction.getInitialBid() << " ";
-    buffer << auction.getStartTimeString() << " " << auction.getDurationSeconds();
+    buffer << auction.getStartTimeString() << " ";
+    buffer << fillZeros(auction.getDurationSeconds(), SECONDS_MAX_LEN);
     if (auction.hasBids()) {
       const std::vector<Bid>& bids = auction.getBids();
       std::vector<Bid>::size_type numBidsToRetrieve = 50;
@@ -496,7 +497,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
           write_user_id(buffer, currentBid.bidder_user_id);
           buffer << " " << currentBid.bid_value;
           buffer << " " << currentBid.date_time;
-          buffer << " " << currentBid.sec_time;
+          buffer << " " << fillZeros(currentBid.sec_time, SECONDS_MAX_LEN);
       }
       
     }
@@ -1221,7 +1222,7 @@ void sendFile(int connection_fd, std::filesystem::path file_path) {
 std::string auctionsToString(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     std::ostringstream formattedString;
     for (size_t i = 0; i < auctions.size(); ++i) {
-        formattedString << std::setfill('0') << std::setw(3) << auctions[i].first << " ";
+        formattedString << fillZeros(auctions[i].first, AUCTION_ID_MAX_LEN) << " ";
         formattedString << auctions[i].second;
         if (i != auctions.size() - 1) {
             formattedString << " ";
@@ -1261,8 +1262,12 @@ Bid UdpPacket::readBid(std::stringstream &buffer) {
 }
 
 std::string auctionID_ToString(uint32_t auction_id) {
+  return fillZeros(auction_id, AUCTION_ID_MAX_LEN);
+}
+
+std::string fillZeros(uint32_t number, uint32_t length) {
   std::ostringstream oss;
-  oss << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN) << auction_id;
+  oss << std::setfill('0') << std::setw(length) << number;
   return oss.str();
 }
 
