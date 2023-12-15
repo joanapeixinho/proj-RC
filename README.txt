@@ -6,26 +6,22 @@ O projeto pode ser compilado executando `make` neste diretório.
 Como este é um projeto em C++, pode demorar um pouco, dependendo da máquina.
 Este projeto utiliza C++17.
 
-Uma vez compilado, dois binários, `player` e `GS`, serão colocados neste diretório.
+Uma vez compilado, dois binários, `user` e `AS`, serão colocados neste diretório.
 
-Executar o jogador:
+Executar o cliente:
 
-As opções disponíveis para o executável `player` podem ser visualizadas executando:
+As opções disponíveis para o executável `user` podem ser visualizadas executando:
 
-./player -h
+./user -h
 
-Uma vez que o jogador está em execução, ele solicitará ao usuário um comando.
+Uma vez que o cliente está em execução, ele solicitará ao usuário um comando.
 A lista de comandos é mostrada na inicialização e pode ser mostrada novamente a qualquer momento digitando `help` ou `?` no prompt.
 
-Além dos comandos solicitados, implementamos o comando `kill PLID`,
-que nos permite encerrar um jogo de um jogador específico, principalmente para fins de depuração.
-Isso envia a mensagem de protocolo `QUT`.
-
-Todos os comandos funcionam conforme a especificação, com destaque para o comando `hint`,
+Todos os comandos funcionam conforme a especificação, com destaque para o comando `show_asset`,
 que permite cancelar um download em andamento.
 
 O estado não é salvo entre sessões.
-O jogador tenta sair do jogo atual antes de sair, mesmo ao receber um sinal SIGINT ou SIGTERM.
+O cliente tenta sair do dar logout antes de sair, mesmo ao receber um sinal SIGINT ou SIGTERM.
 
 Constantes disponíveis:
 
@@ -39,15 +35,15 @@ conforme solicitado pelos professores:
 
 Executar o servidor:
 
-As opções disponíveis para o executável `GS` podem ser visualizadas executando:
+As opções disponíveis para o executável `AS` podem ser visualizadas executando:
 
-./GS -h
+./AS -h
 
-Adicionamos uma opção extra, `-r`, que habilita a seleção aleatória de palavras.
-Por padrão, as palavras são selecionadas sequencialmente, conforme solicitado pelos professores.
+TODO Adicionamos uma opção extra, `-r`, que habilita a seleção aleatória de palavras.
+TODO Por padrão, as palavras são selecionadas sequencialmente, conforme solicitado pelos professores.
 
-O servidor persiste dados entre sessões na pasta `.gamedata`, então, durante os testes, pode fazer sentido excluir a pasta após cada teste.
-Os arquivos armazenados nesta pasta estão em formato binário e podem ser inspecionados com um programa como `hexdump`.
+O servidor persiste dados entre sessões na pasta `ASDIR`, então, durante os testes, pode fazer sentido excluir a pasta após cada teste.
+Os ficheiros podem ser abertos como qualquer ficheiro para analisar o estado atual do servidor.
 
 O servidor é extremamente resistente a todos os tipos de entrada incorreta e erros, tentando se recuperar deles quando possível.
 Quando isso não é possível, ele sai graciosamente.
