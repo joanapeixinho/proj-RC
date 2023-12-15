@@ -819,7 +819,7 @@ void printBidsInfo(const std::vector<Bid> bids) {
         std::cout << "Bidder User ID: " << bid.bidder_user_id 
                   << " Value bidded: " << bid.bid_value << std::endl;
         std::cout << "Date Time: " << bid.date_time << std::endl;
-        std::cout << " Seconds since auction start: " << bid.sec_time << std::endl;
+        std::cout << "Seconds since auction start: " << bid.sec_time << std::endl;
         std::cout << "---------------------------------------" << std::endl;
     }
 }
