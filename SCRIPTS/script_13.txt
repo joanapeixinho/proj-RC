@@ -1,12 +1,12 @@
 login 111111 abcdefgh
-open One A.txt 1 10
-open Two AB.txt 2 10
-open Apollo11 Apollo11_Columbia.jpg 5000 15
-open Monet Monet_01.jpg 30 15
-open Renoir Renoir_01.jpg 50 20
-open MonaLisa DaVinci_01.jpg 5 20
-open HispaSuiza Hispano-Suiza-K6.jpg 21000 25
-open Rembrandt Rembrandt_01.jpg 15 25
+open One ASSETS/A.txt 1 10
+open Two ASSETS/AB.txt 2 10
+open Apollo11 ASSETS/Apollo11_Columbia.jpg 5000 15
+open Monet ASSETS/Monet_01.jpg 30 15
+open Renoir ASSETS/Renoir_01.jpg 50 20
+open MonaLisa ASSETS/DaVinci_01.jpg 5 20
+open HispaSuiza ASSETS/Hispano-Suiza-K6.jpg 21000 25
+open Rembrandt ASSETS/Rembrandt_01.jpg 15 25
 logout
 login 222222 hgfedcba
 bid 001 2

@@ -128,8 +128,6 @@ uint32_t AuctionData::getHighestBidValue() const {
     if (bids.empty()) {
         return initialBid;
     } else {
-        //print bids.back().bid_value
-        std :: cout << "bids.back().bid_value" << bids.back().bid_value << std :: endl;
         return bids.back().bid_value;
     }
     
