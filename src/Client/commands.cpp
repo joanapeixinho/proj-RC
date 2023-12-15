@@ -344,7 +344,7 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   packet_out.start_value = start_value;
   packet_out.time_active = timeactive;
   packet_out.file_path = std::filesystem::path(asset_file_name);
-  packet_out.file_name = file_path.filename().string();
+  packet_out.file_name = packet_out.file_path.filename().string();
 
 
   ReplyOpenAuctionClientbound roa;
