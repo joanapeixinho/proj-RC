@@ -440,7 +440,7 @@ uint32_t getFileSize(std::filesystem::path file_path);
 
 std::string auctionsToString(const std::vector<std::pair<uint32_t, bool>>& auctions);
 
-std::string fillZeros(uint32_t number, uint32_t length);
+std::string fillZeros(uint32_t number, int length);
 
 void readBid(std::stringstream &buffer, AuctionData& auction);
 
