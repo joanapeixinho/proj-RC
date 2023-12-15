@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         ex_trial++;
       } catch (...) {
         std::cerr << "Encountered unrecoverable error while running the "
-                     "application. Retrying..."
+                     "application.Retrying..."
                   << std::endl;
         ex_trial++;
       }

@@ -179,10 +179,10 @@ void LogoutCommand::handle(std::string args, UserState& state) {
   packet_out.user_id = state.getUserId();
   packet_out.password = state.getPassword();
 
-  ReplyLogoutClientbound lou;
-  state.sendUdpPacketAndWaitForReply(packet_out, lou);
+  ReplyLogoutClientbound rlo;
+  state.sendUdpPacketAndWaitForReply(packet_out, rlo);
 
-  switch (lou.status) {
+  switch (rlo.status) {
     case ReplyLogoutClientbound::status::OK:
       // Logout user
       state.logout();

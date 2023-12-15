@@ -170,7 +170,7 @@ class UnregisterServerbound : public UdpPacket {
 class ReplyUnregisterClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, UNR, ERR};
-  static constexpr const char *ID = "RUN";
+  static constexpr const char *ID = "RUR";
   status status;
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -258,6 +258,17 @@ class ErrorUdpPacket : public UdpPacket {
 };
 
 
+
+class ShowRecordServerbound : public UdpPacket {
+ public:
+  static constexpr const char *ID = "SRC";
+  uint32_t auction_id;
+
+  std::stringstream serialize();
+  void deserialize(std::stringstream &buffer);
+};
+
+
 class ReplyShowRecordClientbound : public UdpPacket {
  public:
   enum status { OK, NOK, ERR };
@@ -271,17 +282,6 @@ class ReplyShowRecordClientbound : public UdpPacket {
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
-
-class ShowRecordServerbound : public UdpPacket {
- public:
-  static constexpr const char *ID = "SRC";
-  uint32_t auction_id;
-
-  std::stringstream serialize();
-  void deserialize(std::stringstream &buffer);
-};
-
-
 
 
 class TcpPacket {

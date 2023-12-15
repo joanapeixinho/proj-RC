@@ -86,7 +86,7 @@ void handle_logout_user(std::stringstream &buffer, Address &addr_from,
   try
   {
     packet.deserialize(buffer);
-    state.cdebug << userTag(packet.user_id) << "Asked to loggout user"
+    state.cdebug << userTag(packet.user_id) << "Asked to logout user"
                  << std::endl;
 
     UserData user(packet.user_id, packet.password, state.file_manager);
@@ -363,8 +363,8 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
 
     AuctionData auction = state.file_manager.getAuction(packet.auction_id);
 
-    response.status = ReplyShowRecordClientbound::OK;
     response.auction = auction;
+    response.status = ReplyShowRecordClientbound::OK;
   }
   catch (AuctionDoesNotExistException &e)
   {
@@ -440,61 +440,61 @@ void handle_open_auction(int connection_fd, AuctionServerState &state)
 
     response.status = ReplyOpenAuctionClientbound::OK;
 
-    state.cdebug << packet.auction_name << "Auction started" << std::endl;
+    state.cdebug << packet.auction_name << " Auction started" << std::endl;
   }
   catch (WrongPasswordException &e) 
   {
-    state.cdebug << userTag(packet.user_id) << "Wrong password" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Wrong password" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (UserNotLoggedInException &e)
   {
     response.status = ReplyOpenAuctionClientbound::NLG;
-    state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " User not logged in" << std::endl;
   }
   catch (UserNotRegisteredException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " User not registered" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (AuctionIdException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Invalid auction id" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Invalid auction id" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (InvalidAuctionNameException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Invalid auction item name" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Invalid auction item name" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (InvalidAuctionInitialBidException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Invalid auction initial bid" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Invalid auction initial bid" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (InvalidAuctionDurationException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Invalid auction duration" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Invalid auction duration" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (InvalidAuctionAssetException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Invalid auction asset fname or size" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Invalid auction asset fname or size" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (FileOpenException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Failed to open file" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (FileWriteException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Failed to write to file" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (FileReadException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Failed to read from file" << std::endl;
     response.status = ReplyOpenAuctionClientbound::NOK;
   }
   catch (std::exception &e)
@@ -520,7 +520,7 @@ void handle_close_auction(int connection_fd, AuctionServerState &state)
   try
   {
     packet.receive(connection_fd);
-    state.cdebug << userTag(packet.user_id) << "Asked to close Auction"
+    state.cdebug << userTag(packet.user_id) << " Asked to close Auction"
                  << std::endl;
 
     UserData user(packet.user_id, state.file_manager);
@@ -531,46 +531,46 @@ void handle_close_auction(int connection_fd, AuctionServerState &state)
 
     response.status = ReplyCloseAuctionClientbound::OK;
 
-    state.cdebug << packet.auction_id << "Auction closed" << std::endl;
+    state.cdebug << "["<< auctionTag(packet.auction_id) << "]" << " Auction closed" << std::endl;
   }
   catch (UserNotLoggedInException &e)
   {
     response.status = ReplyCloseAuctionClientbound::NLG;
-    state.cdebug << userTag(packet.user_id) << "User not logged in" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " User not logged in" << std::endl;
   }
   catch (UserNotRegisteredException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "User not registered" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " User not registered" << std::endl;
     response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (AuctionDoesNotExistException &e)
   {
-    state.cdebug << auctionTag(packet.auction_id) << "Auction does not exist" << std::endl;
+    state.cdebug << auctionTag(packet.auction_id) << " Auction does not exist" << std::endl;
     response.status = ReplyCloseAuctionClientbound::EAU;
   }
   catch (AuctionDoesNotBelongToUserException &e)
   {
-    state.cdebug << auctionTag(packet.auction_id) << "Auction not owned by user" << std::endl;
+    state.cdebug << auctionTag(packet.auction_id) << " Auction not owned by user" << std::endl;
     response.status = ReplyCloseAuctionClientbound::EOW;
   }
   catch (AuctionNotActiveException &e)
   {
-    state.cdebug << auctionTag(packet.auction_id) << "Auction already closed" << std::endl;
+    state.cdebug << auctionTag(packet.auction_id) << " Auction already closed" << std::endl;
     response.status = ReplyCloseAuctionClientbound::EOW;
   }
   catch (FileOpenException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to open file" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Failed to open file" << std::endl;
     response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (FileWriteException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to write to file" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Failed to write to file" << std::endl;
     response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (FileReadException &e)
   {
-    state.cdebug << userTag(packet.user_id) << "Failed to read from file" << std::endl;
+    state.cdebug << userTag(packet.user_id) << " Failed to read from file" << std::endl;
     response.status = ReplyCloseAuctionClientbound::ERR;
   }
   catch (std::exception &e)
