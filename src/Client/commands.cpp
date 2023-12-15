@@ -352,7 +352,6 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
 
   switch (roa.status) {
     case ReplyOpenAuctionClientbound::status::OK:
-      // Output open auction info
       std::cout 
           << "Auction opened successfully with ID ["
           << auctionID_ToString(roa.auction_id) << "]!" << std::endl;
@@ -554,7 +553,9 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
 }
 
 void ListCommand::handle(std::string args, UserState& state) {
+  //avoid unused parameter warning
   (void) args;
+
   // Populate and send packet
   ListAuctionsServerbound packet_out;
 
@@ -615,12 +616,10 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
 
   switch (rsa.status) {
     case ReplyShowAssetClientbound::status::OK:
-      // Output asset info
       std::cout 
           << "Received the asset '"<< rsa.file_name 
-          <<"' of the auction with ID [" << auctionID_ToString(auction_id) << "]:" 
-          << std::endl;
-      std::cout << "In the current directory" << std::endl;
+          <<"' of the auction with ID [" << auctionID_ToString(auction_id) 
+          << "] in the current directory." << std::endl;
       break;
 
     case ReplyShowAssetClientbound::status::NOK:
@@ -695,7 +694,7 @@ void BidCommand::handle(std::string args, UserState& state) {
 
   switch (rbd.status) {
     case ReplyBidClientbound::status::ACC:
-      // Output bid info
+      // Bid accepted
       std::cout 
           << "Bid of " << bid_value << " on auction with ID [" 
           << auctionID_ToString(auction_id) << "] accepted!" << std::endl;
@@ -810,17 +809,6 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
   }
 }
 
-std::string formatTime(std::time_t timeValue, const std::string& format) {
-    // Convert time_t to struct tm
-    std::tm* timeInfo = std::gmtime(&timeValue); // Use gmtime for UTC time
-
-    // Format the time
-    std::ostringstream formattedTime;
-    formattedTime << std::put_time(timeInfo, format.c_str());
-
-    return formattedTime.str();
-}
-
 void printBidsInfo(const std::vector<Bid> bids) {
     for (const auto bid : bids) {
         std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
@@ -846,8 +834,7 @@ bool isValidAuctionName(const std::string& str) {
     });
 }
 
-
-bool is_alphanumeric(std::string& str) {
+bool is_aphanumeric(std::string& str) {
   for (char c : str) {
     if (!isalnum(c)) {
       return false;
