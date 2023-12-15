@@ -834,7 +834,7 @@ bool isValidAuctionName(const std::string& str) {
     });
 }
 
-bool is_aphanumeric(std::string& str) {
+bool is_alphanumeric(std::string& str) {
   for (char c : str) {
     if (!isalnum(c)) {
       return false;
