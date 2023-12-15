@@ -285,6 +285,8 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
             auctionList.push_back(std::make_pair(intAuctionId, isActive)); });
     }
 
+    std::sort(auctionList.begin(), auctionList.end());
+
     return auctionList;
 }
 
@@ -312,6 +314,10 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions()
     {
         throw NoAuctionsException();
     }
+
+    //sort auctions by auctionID
+
+    std::sort(auctionList.begin(), auctionList.end());
 
     return auctionList;
 }
@@ -398,6 +404,11 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
         bid.sec_time = static_cast<uint32_t>(std::stoi(sec_time));
         bids.push_back(bid);
     }
+
+    // sort bids by bid value
+
+    std::sort(bids.begin(), bids.end(), [](const Bid &a, const Bid &b)
+              { return a.bid_value < b.bid_value; });
 
     return bids;
 }
