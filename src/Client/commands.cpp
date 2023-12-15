@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include <unistd.h>
+
 // #include "client_Auction.hpp"
 #include "../common/protocol.hpp"
 
@@ -66,6 +68,16 @@ void CommandManager::waitForCommand(UserState& state) {
   }
 
   if (commandName.length() == 0) {
+    return;
+  }
+
+  if (commandName == "sleep"){
+    std::istringstream iss(line);
+    std::string  number_str;
+    iss >> number_str;
+    int number = std::stoi(number_str);
+    std::cout << "Sleeping for "<< number << " seconds..." << std::endl;
+    sleep(number);
     return;
   }
 
