@@ -27,11 +27,23 @@ int main(int argc, char *argv[]) {
         while (!std::cin.eof() && !is_shutting_down) {
             commandManager.waitForCommand(state);
         }
-        state.logout();
+
+        // Logout User before quitting
+        LogoutCommand logoutCommand;
+        try {
+          std::cout << "\nLogging out..." << std::endl;
+          logoutCommand.handle(" ", state);
+        } catch (std::exception& e) {
+          std::cout << "[ERROR] " << e.what() << std::endl;
+        } catch (...) {
+          std::cout << "[ERROR] An unknown error occurred." << std::endl;
+        }
+
         std::cout << std::endl
                 << "Shutting down... Press CTRL + C (again) to forcefully close "
                     "the application."
                 << std::endl;
+
 
     } catch (std::exception &e) {
         std::cerr << "Encountered unrecoverable error while running the "

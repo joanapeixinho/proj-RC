@@ -49,9 +49,10 @@ class LoginCommand : public CommandHandler {
 };
 
 class LogoutCommand : public CommandHandler {
+ // handle is public to allow logout from main after CTRL+C
+ public:
   void handle(std::string args, UserState& state);
 
- public:
   LogoutCommand() : CommandHandler("logout", std::nullopt, std::nullopt, "Logout User") {}
 };
 
