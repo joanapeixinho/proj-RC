@@ -76,6 +76,7 @@ void registerCommands(CommandManager &manager) {
   manager.registerCommand(std::make_shared<ShowAssetCommand>());    // TCP
   manager.registerCommand(std::make_shared<BidCommand>());          // TCP
   manager.registerCommand(std::make_shared<ShowRecordCommand>());   // TCP
+  manager.registerCommand(std::make_shared<HelpCommand>(manager));
 }
 
 ClientConfig::ClientConfig(int argc, char *argv[]) {
@@ -101,12 +102,12 @@ ClientConfig::ClientConfig(int argc, char *argv[]) {
 }
 
 void ClientConfig::printHelp(std::ostream &stream) {
-  stream << "Usage: " << program_path << " [-n GSIP] [-p GSport] [-h]"
+  stream << "Usage: " << program_path << " [-n GSIP] [-p GSport]"
          << std::endl;
   stream << "Available options:" << std::endl;
-  stream << "-n GSIP\t\tSet hostname of Game Server. Default: "
+  stream << "-n GSIP\t\tSet hostname of Auction Server. Default: "
          << DEFAULT_HOSTNAME << std::endl;
-  stream << "-p GSport\tSet port of Game Server. Default: " << DEFAULT_PORT
+  stream << "-p GSport\tSet port of Auction Server. Default: " << DEFAULT_PORT
          << std::endl;
   stream << "-h\t\tPrint this menu." << std::endl;
 }

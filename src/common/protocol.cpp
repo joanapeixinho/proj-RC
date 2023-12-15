@@ -1083,7 +1083,6 @@ void ReplyBidClientbound::receive(int fd) {
 }
 
 
-
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
   writeString(fd, "\n");
@@ -1136,14 +1135,6 @@ void wait_for_packet(UdpPacket &packet, int socket) {
   data.write(buffer, n);
 
   packet.deserialize(data);
-
-}
-
-void write_date_time(std::stringstream &buffer, const std::time_t &time) {
-  // Convert std::time_t to std::tm
-  std::tm tm_time = *std::gmtime(&time);
-  // Format the time as YYYY-MM-DD HH:MM:SS
-  buffer << std::put_time(&tm_time, "%Y-%m-%d %H:%M:%S");
 }
 
 std::string read_date_time(std::stringstream &buffer) {
