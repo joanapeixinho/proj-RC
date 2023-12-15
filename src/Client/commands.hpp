@@ -142,6 +142,8 @@ class ShowRecordCommand : public CommandHandler {
 
 bool is_numeric(std::string& str);
 
+bool isValidAuctionName(const std::string& str);
+
 bool is_alphanumeric(std::string& str);
 
 uint32_t parse_user_id(std::string& args);

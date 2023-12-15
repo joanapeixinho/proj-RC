@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         while (!std::cin.eof() && !is_shutting_down) {
             commandManager.waitForCommand(state);
         }
-
+        state.logout();
         std::cout << std::endl
                 << "Shutting down... Press CTRL + C (again) to forcefully close "
                     "the application."

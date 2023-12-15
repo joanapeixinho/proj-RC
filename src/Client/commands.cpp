@@ -302,7 +302,7 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Check if asset_name is AlphaNumeric
-  if (!is_alphanumeric(auction_name)) {
+  if (!isValidAuctionName(auction_name)) {
     std::cout << "Invalid auction name. It must be alphanumeric" << std::endl;
     return;
   }
@@ -841,6 +841,11 @@ void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
     }
 }
 
+bool isValidAuctionName(const std::string& str) {
+    return std::all_of(str.begin(), str.end(), [](char c){
+        return std::isalnum(c) || c == '_' || c == '-';
+    });
+}
 
 
 bool is_alphanumeric(std::string& str) {
