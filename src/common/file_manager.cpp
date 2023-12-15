@@ -378,6 +378,7 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(auctionIdInt,uidInt, name, initialBid,
                              durationSeconds, assetFname, startTime, endDatetime,0, bids);
+                             
         } });
 
     return data;
@@ -465,6 +466,8 @@ void FileManager::UpdateAuction(const std::string &auctionId)
             std::string endTimeDate = oss.str();
             createAuctionEndFile(auctionId, endTimeDate, durationSeconds);
         }
+    } else {
+        return;
     }
 }
 

@@ -557,8 +557,8 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
           readChar(buffer);
 
           readSpace(buffer);
-
           endTime = read_date_time(buffer);
+          auction.setEndTime(endTime);
           auction.setEndTimeSec(readInt(buffer));
           break;
         } 

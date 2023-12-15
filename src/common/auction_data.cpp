@@ -32,6 +32,7 @@ AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string&
     if (assetFname.length() > ASSET_NAME_MAX_LENGTH) {
         throw InvalidAuctionAssetException(assetFname);
     }
+    active = true;
 }
 
 
