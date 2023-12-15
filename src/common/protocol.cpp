@@ -547,25 +547,18 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
       while (buffer.peek() == ' '){
         readSpace(buffer);
         if (buffer.peek() == 'B'){ // Read bid
-          std::cout << "Reading bid" << std::endl;
           auction.addBid(readBid(buffer));
-          std :: cout << "Bid added" << std::endl;
           bidCounter++;
           if (bidCounter > 50) { // You cant receive more than 50 bids
             throw InvalidPacketException();
           }
         } else if (buffer.peek() == 'E'){ // Read end time
-          std::cout << ("Reading E") << std::endl;
           readChar(buffer);
-          std :: cout << "Reading space" << std::endl;
+
           readSpace(buffer);
-          std :: cout << "Read space" << std::endl;
-          std :: cout << "Reading end time" << std::endl;
+
           endTime = read_date_time(buffer);
-          std :: cout << "Read end time" << std::endl;
-          std :: cout << "Reading end time sec" << std::endl;
           auction.setEndTimeSec(readInt(buffer));
-          std :: cout << "Read end time sec" << std::endl;
           break;
         } 
       }
@@ -1266,25 +1259,14 @@ std::vector<std::pair<uint32_t, bool>> UdpPacket::readAuctions(std::stringstream
 
 Bid UdpPacket::readBid(std::stringstream &buffer) {
   Bid bid = Bid();
-  std :: cout << "Reading B" << std::endl;
   readChar(buffer, 'B');
-  std :: cout << "Reading space" << std::endl;
   readSpace(buffer);
-  std :: cout << "Reading user id" << std::endl;
   bid.bidder_user_id = readUserId(buffer);
-  std :: cout << "Reading space" << std::endl;
   readSpace(buffer);
-  std :: cout << "Reading bid value" << std::endl;
   bid.bid_value = readInt(buffer);
-  std :: cout << "Reading space" << std::endl;
   readSpace(buffer);
-  std :: cout << "Reading date time" << std::endl;
   bid.date_time = read_date_time(buffer);
-  std :: cout << "Reading space" << std::endl;
-  std :: cout << "Reading sec time" << std::endl;
-  std :: cout << bid.sec_time << std::endl;
   bid.sec_time = readInt(buffer);
-  std :: cout << "Read Int" << std::endl;
   return bid;
 }
 
