@@ -729,7 +729,6 @@ std::string TcpPacket::readFileName(const int fd) {
       throw InvalidPacketException();
     }
 
-    str[i] = (char)tolower((unsigned char)str[i]);
   }
   return str;
 }
