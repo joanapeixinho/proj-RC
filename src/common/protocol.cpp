@@ -1265,7 +1265,7 @@ std::string auctionID_ToString(uint32_t auction_id) {
   return fillZeros(auction_id, AUCTION_ID_MAX_LEN);
 }
 
-std::string fillZeros(uint32_t number, uint32_t length) {
+std::string fillZeros(uint32_t number, int length) {
   std::ostringstream oss;
   oss << std::setfill('0') << std::setw(length) << number;
   return oss.str();
