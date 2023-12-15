@@ -35,7 +35,7 @@ class CommandHandler {
 
  public:
   const char* name;
-  const std::optional<const char*> alias;
+  const std::optional<const char*> alias; // Alternative name to call the command
   const std::optional<const char*> usage;
   const char* description;
   virtual void handle(std::string args, UserState& state) = 0;
@@ -49,9 +49,10 @@ class LoginCommand : public CommandHandler {
 };
 
 class LogoutCommand : public CommandHandler {
+ // handle is public to allow logout from main after CTRL+C
+ public:
   void handle(std::string args, UserState& state);
 
- public:
   LogoutCommand() : CommandHandler("logout", std::nullopt, std::nullopt, "Logout User") {}
 };
 

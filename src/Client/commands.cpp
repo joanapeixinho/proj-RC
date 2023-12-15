@@ -10,6 +10,10 @@
 
 extern bool is_shutting_down;
 
+/* ######################################################## 
+   ################### CommandManager ###################### 
+   ######################################################## */
+
 void CommandManager::printHelp() {
   std::cout << std::endl << "Available commands:" << std::endl << std::left;
 
@@ -81,7 +85,10 @@ void CommandManager::waitForCommand(UserState& state) {
   }
 }
 
-/* Command handlers */
+/* ######################################################## 
+   ################### Command handlers ################### 
+   ######################################################## */
+
 void LoginCommand::handle(std::string args, UserState& state) {
   // Check if user is already logged in
   if (state.isLoggedIn()) {
@@ -134,7 +141,6 @@ void LoginCommand::handle(std::string args, UserState& state) {
     case ReplyLoginClientbound::status::OK:
       // Login user
       state.login(user_id, password);
-      // Output Login info
       std::cout << "Logged in successfully!" << std::endl;
       break;
 
@@ -145,7 +151,7 @@ void LoginCommand::handle(std::string args, UserState& state) {
       break;
 
     case ReplyLoginClientbound::status::REG:
-      // Registered user is still logged in
+      // Registered user is still has to logged in
       state.login(user_id, password);
       std::cout << "New user registered successfully!" << std::endl;
       break;
@@ -174,7 +180,7 @@ void LogoutCommand::handle(std::string args, UserState& state) {
     return;
   }
 
-    // Populate and send packet
+  // Populate and send packet
   LogoutServerbound packet_out;
   packet_out.user_id = state.getUserId();
   packet_out.password = state.getPassword();
@@ -186,7 +192,6 @@ void LogoutCommand::handle(std::string args, UserState& state) {
     case ReplyLogoutClientbound::status::OK:
       // Logout user
       state.logout();
-      // Output Logout info
       std::cout << "Logged out successfully!" << std::endl;
       break;
 
@@ -212,7 +217,6 @@ void LogoutCommand::handle(std::string args, UserState& state) {
 }
 
 void UnregisterCommand::handle(std::string args, UserState& state) {
-
   //avoid unused parameter warning
   (void) args;
   // Check if user is logged in
@@ -235,7 +239,6 @@ void UnregisterCommand::handle(std::string args, UserState& state) {
     case ReplyUnregisterClientbound::status::OK:
       // When you unregister, you are logged out
       state.logout();
-      // Output unregister info
       std::cout << "Un-registered successfully!" << std::endl;
       break;
 
@@ -312,6 +315,7 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
               << " characters long" << std::endl;
     return;
   }
+  // Check if start_value_str is Numeric
   if (!is_numeric(start_value_str)) {
     std::cout << "Invalid start value. It must be a number" << std::endl;
     return;
@@ -322,6 +326,7 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
               << " characters long" << std::endl;
     return;
   }
+  // Check if timeactive_str is Numeric
   if (!is_numeric(timeactive_str)) {
     std::cout << "Invalid auction duration. It must be a number" << std::endl;
     return;
@@ -331,8 +336,6 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   uint32_t start_value = static_cast<uint32_t>(std::stoi(start_value_str, NULL, 10));
   uint32_t timeactive = static_cast<uint32_t>(std::stoi(timeactive_str, NULL, 10));
 
-
-
   // Populate and send packet
   OpenAuctionServerbound packet_out;
   packet_out.user_id = state.getUserId();
@@ -340,10 +343,8 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   packet_out.auction_name = auction_name;
   packet_out.start_value = start_value;
   packet_out.time_active = timeactive;
-  packet_out.file_name = asset_file_name;
-
-  // TODO: Remove this constant and leave the asset_file_name as the path
-  packet_out.file_path = std::filesystem::path(ASSETS_RELATIVE_DIRERCTORY) / asset_file_name;
+  packet_out.file_path = std::filesystem::path(asset_file_name);
+  packet_out.file_name = file_path.filename().string();
 
 
   ReplyOpenAuctionClientbound roa;
@@ -351,7 +352,6 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
 
   switch (roa.status) {
     case ReplyOpenAuctionClientbound::status::OK:
-      // Output open auction info
       std::cout 
           << "Auction opened successfully with ID ["
           << auctionID_ToString(roa.auction_id) << "]!" << std::endl;
@@ -420,7 +420,6 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
 
   switch (rcl.status) {
     case ReplyCloseAuctionClientbound::status::OK:
-      // Output close auction info
       std::cout << "Auction closed successfully!" << std::endl;
       break;
 
@@ -457,8 +456,8 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
   }
 }
 
+
 void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
-  
   //avoid unused parameter warning
   (void) args;
 
@@ -479,7 +478,6 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
 
   switch (rma.status) {
     case ReplyListMyAuctionsClientbound::status::OK:
-      // Output autions info
       std::cout << "Displaying the auctions started by you:" << std::endl;
       printAuctions(rma.auctions);
       break;
@@ -505,8 +503,11 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
   }
 }
 
+
 void MyBidsCommand::handle(std::string args, UserState& state) {
+  //avoid unused parameter warning
   (void) args;
+
   // Check if user is logged in
   if (!state.isLoggedIn()) {
     std::cout 
@@ -514,7 +515,6 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
         << std::endl;
     return;
   }
-  
 
   // Populate and send packet
   MyBidsServerbound packet_out;
@@ -525,7 +525,6 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
 
   switch (rmb.status) {
     case ReplyMyBidsClientbound::status::OK:
-      // Output bids info
       std::cout 
           << "Displaying the auctions where you made a bid:" 
           << std::endl;
@@ -554,7 +553,9 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
 }
 
 void ListCommand::handle(std::string args, UserState& state) {
+  //avoid unused parameter warning
   (void) args;
+
   // Populate and send packet
   ListAuctionsServerbound packet_out;
 
@@ -584,7 +585,6 @@ void ListCommand::handle(std::string args, UserState& state) {
 }
 
 void ShowAssetCommand::handle(std::string args, UserState& state) {
- 
   // Argument parsing
   std::istringstream iss(args);
   std::string auction_id_str;
@@ -616,12 +616,10 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
 
   switch (rsa.status) {
     case ReplyShowAssetClientbound::status::OK:
-      // Output asset info
       std::cout 
           << "Received the asset '"<< rsa.file_name 
-          <<"' of the auction with ID [" << auctionID_ToString(auction_id) << "]:" 
-          << std::endl;
-      std::cout << "In the current directory" << std::endl;
+          <<"' of the auction with ID [" << auctionID_ToString(auction_id) 
+          << "] in the current directory." << std::endl;
       break;
 
     case ReplyShowAssetClientbound::status::NOK:
@@ -696,7 +694,7 @@ void BidCommand::handle(std::string args, UserState& state) {
 
   switch (rbd.status) {
     case ReplyBidClientbound::status::ACC:
-      // Output bid info
+      // Bid accepted
       std::cout 
           << "Bid of " << bid_value << " on auction with ID [" 
           << auctionID_ToString(auction_id) << "] accepted!" << std::endl;
@@ -705,7 +703,7 @@ void BidCommand::handle(std::string args, UserState& state) {
     case ReplyBidClientbound::status::NOK:
       std::cout
           << "Failed to bid: the auction with ID [" 
-          << auctionID_ToString(auction_id) << "] has already ended." << std::endl;
+          << auctionID_ToString(auction_id) << "] is not an active auction." << std::endl;
       break;
 
     case ReplyBidClientbound::status::NLG:
@@ -811,17 +809,6 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
   }
 }
 
-std::string formatTime(std::time_t timeValue, const std::string& format) {
-    // Convert time_t to struct tm
-    std::tm* timeInfo = std::gmtime(&timeValue); // Use gmtime for UTC time
-
-    // Format the time
-    std::ostringstream formattedTime;
-    formattedTime << std::put_time(timeInfo, format.c_str());
-
-    return formattedTime.str();
-}
-
 void printBidsInfo(const std::vector<Bid> bids) {
     for (const auto bid : bids) {
         std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
@@ -847,8 +834,7 @@ bool isValidAuctionName(const std::string& str) {
     });
 }
 
-
-bool is_alphanumeric(std::string& str) {
+bool is_aphanumeric(std::string& str) {
   for (char c : str) {
     if (!isalnum(c)) {
       return false;
