@@ -44,7 +44,6 @@ public:
     bool isActive() const;
     uint32_t getOwnerId() const;
     uint32_t getHighestBidValue() const;
-    void setInactive();
     void setOwnerId(uint32_t uid);
     void setName(const std::string& name);
     void setInitialBid(uint32_t initialBid);
@@ -67,7 +66,6 @@ private:
     std::string endTime;
     uint32_t endTimeSec;
     std::vector<Bid> bids;
-    bool active;
 };
 
 
