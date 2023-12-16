@@ -378,7 +378,7 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(auctionIdInt,uidInt, name, initialBid,
                              durationSeconds, assetFname, startTime, endDatetime,0, bids);
-                             
+
         } });
 
     return data;
@@ -459,7 +459,7 @@ void FileManager::UpdateAuction(const std::string &auctionId)
         std::time_t endTime = startTime + durationSeconds;
         std::time_t now = std::time(nullptr);
 
-        if (now > endTime)
+        if (now >= endTime)
         {
             std::ostringstream oss;
             oss << std::put_time(std::gmtime(&endTime), "%Y-%m-%d %H:%M:%S");

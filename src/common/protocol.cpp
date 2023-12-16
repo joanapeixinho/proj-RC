@@ -516,7 +516,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     if (!auction.isActive()) {
       buffer << " E ";
       buffer << auction.getEndTimeString();
-      buffer << " " << fillZeros(auction.getEndTimeSec(), SECONDS_MAX_LEN);
+      buffer << " " << auction.getEndTimeSec();
     }
   } else if (status == ReplyShowRecordClientbound::status::NOK) {
     buffer << "NOK";
