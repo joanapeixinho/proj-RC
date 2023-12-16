@@ -119,7 +119,7 @@ bool AuctionData::hasBids() const {
 }
 
 bool AuctionData::isActive() const {
-    if (endTime == " ") {
+    if (endTime == " " || endTime == "") {
         return true;
     } else {
         return false;
