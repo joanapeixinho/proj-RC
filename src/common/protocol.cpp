@@ -1277,9 +1277,15 @@ std::string auctionID_ToString(uint32_t auction_id) {
 }
 
 std::string fillZeros(uint32_t number, int length) {
-  std::ostringstream oss;
-  oss << std::setfill('0') << std::setw(length) << number;
-  return oss.str();
+  //std::ostringstream oss;
+  //oss << std::setfill('0') << std::setw(length) << number;
+  std::string str = std::to_string(number);
+  uint32_t len = static_cast<uint32_t>(length);
+  while (str.length() < len) {
+      str = '0' + str;
+  }
+
+  return str;
 }
 
 uint32_t getFileSize(std::filesystem::path file_path) {
