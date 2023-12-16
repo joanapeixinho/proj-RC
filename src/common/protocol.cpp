@@ -475,6 +475,14 @@ void ShowRecordServerbound::deserialize(std::stringstream &buffer) {
 std::stringstream ReplyShowRecordClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyShowRecordClientbound::ID << " ";
+  std::cout << "Sending: [" << auction.getName() << "]" << std::endl;
+  std::cout << "Sending: [" << auction.getAssetFname() << "]" << std::endl;
+  std::cout << "Sending: [" << auction.getInitialBid() << "]" << std::endl;
+  std::cout << "Sending: [" << auction.getStartTimeString() << "]" << std::endl;
+  std::cout << "Sending: [" << auction.getDurationSeconds() << "]" << std::endl;
+  std::cout << "Sending: [" << auction.getEndTimeString() << "]" << std::endl;
+  std::cout << "Sending: [" << auction.getEndTimeSec() << "]" << std::endl;
+
   if (status == ReplyShowRecordClientbound::status::OK) {
     buffer << "OK ";
     write_user_id(buffer, auction.getOwnerId());
@@ -493,6 +501,10 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
           // Access bids by index
           const Bid& currentBid = bids[i];
           // Perform operations with currentBid
+          std::cout << "Sending bid: [" << currentBid.bidder_user_id << "]" << std::endl;
+          std::cout << "Sending bid: [" << currentBid.bid_value << "]" << std::endl;
+          std::cout << "Sending bid: [" << currentBid.date_time << "]" << std::endl;
+          std::cout << "Sending bid: [" << currentBid.sec_time << "]" << std::endl;
           buffer << " B ";
           write_user_id(buffer, currentBid.bidder_user_id);
           buffer << " " << currentBid.bid_value;
@@ -541,7 +553,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     startTime = read_date_time(buffer);
  
     auction.setDurationSeconds(readInt(buffer));
-  
+    auction.active = true;
     int bidCounter = 0;
     // Read bids and end time
    if ( buffer.peek() != '\n'){ // Check if there are bids or end time
