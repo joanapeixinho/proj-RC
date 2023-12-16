@@ -489,7 +489,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     buffer << " " << auction.getName() << " " << auction.getAssetFname();
     buffer << " " << auction.getInitialBid() << " ";
     buffer << auction.getStartTimeString() << " ";
-    buffer << fillZeros(auction.getDurationSeconds(), SECONDS_MAX_LEN);
+    buffer << auction.getDurationSeconds();
     if (auction.hasBids()) {
       const std::vector<Bid>& bids = auction.getBids();
       std::vector<Bid>::size_type numBidsToRetrieve = 50;
@@ -507,9 +507,9 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
           std::cout << "Sending bid: [" << currentBid.sec_time << "]" << std::endl;
           buffer << " B ";
           write_user_id(buffer, currentBid.bidder_user_id);
-          buffer << " " << fillZeros(currentBid.bid_value, BID_MAX_LEN);
+          buffer << " " << currentBid.bid_value;
           buffer << " " << currentBid.date_time;
-          buffer << " " << fillZeros(currentBid.sec_time, SECONDS_MAX_LEN);
+          buffer << " " << currentBid.sec_time;
       }
       
     }
