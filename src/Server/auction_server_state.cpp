@@ -45,7 +45,6 @@ void AuctionServerState::registerPacketHandlers() {
   udp_packet_handlers.insert({ListAuctionsServerbound::ID, handle_list_auctions});
   udp_packet_handlers.insert({ShowRecordServerbound::ID, handle_show_record});
 
-
   // TCP
   tcp_packet_handlers.insert({OpenAuctionServerbound::ID, handle_open_auction});
   tcp_packet_handlers.insert({CloseAuctionServerbound::ID, handle_close_auction});

@@ -28,8 +28,6 @@ class FileManager {
 public:
     FileManager();
     void createUserDirectory(const std::string& userId);
-    void addToUserDirectory(const std::string& userId, const std::string& auctionId, const std::string& directory);
-    void removeUserDirectory(const std::string& userId);
     void createUserPassFile(const std::string& userId, const std::string& password);
     void createUserLoginFile(const std::string& userId);
     void removeUserLoginFile(const std::string& userId);

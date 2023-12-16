@@ -2,6 +2,8 @@
 
 FileManager::FileManager()
 {
+   //create base directories, doesn't check if they already exist because 
+    //it's not a problem if they do exist for the create_directory function
     std::filesystem::create_directory(BASE_DIR);
     std::string UserDir = std::string(BASE_DIR) + std::string("/") + USER_DIR;
     std::filesystem::create_directory(UserDir);
@@ -274,7 +276,7 @@ std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::s
 
         safeLockAuction(auctionId, [&]()
                         {
-            // update auction
+            // update auction in case it ended
             UpdateAuction(auctionId);
 
             // check if auction is active
@@ -335,7 +337,6 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
 
     safeLockAuction(auctionId, [&]()
                     {
-        //update Auction
         UpdateAuction(auctionId);
         std::string startFile = readFromFile("START (" + auctionId + ").txt", AUCTION_DIR + std::string("/") + auctionId);
         std::stringstream ss(startFile);
@@ -399,12 +400,13 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
         Bid bid;
         bid.bidder_user_id = static_cast<uint32_t>(std::stoi(bidder_user_id));
         bid.bid_value = static_cast<uint32_t>(std::stoi(bid_value));
+        //bid.date_time is in format YYYY-MM-DD HH:MM:SS
         bid.date_time = date + ' ' + hours;
         bid.sec_time = static_cast<uint32_t>(std::stoi(sec_time));
         bids.push_back(bid);
     }
 
-    // sort bids by bid value
+    //sort bids by bid value
 
     std::sort(bids.begin(), bids.end(), [](const Bid &a, const Bid &b)
               { return a.bid_value < b.bid_value; });
@@ -415,7 +417,6 @@ std::vector<Bid> FileManager::getAuctionBids(const std::string &auctionId)
 void FileManager::openAuction(const std::string &userId, const AuctionData &data)
 {
 
-    // print
     std::string auctionId = data.getIdString();
 
     safeLockUser(userId, [&]()
@@ -430,9 +431,9 @@ void FileManager::openAuction(const std::string &userId, const AuctionData &data
                     { createAuctionAssetFile(auctionId, data.getAssetFname()); });
 }
 
+
 /* check START FILE to see if the endtime has passed */
 /* if it has, create END FILE */
-
 void FileManager::UpdateAuction(const std::string &auctionId)
 {
 
@@ -479,8 +480,6 @@ void FileManager::closeAuction(AuctionData &auction)
     oss << std::put_time(std::gmtime(&now), "%Y-%m-%d %H:%M:%S");
     std::string endTimeDate = oss.str();
 
-    // calculate duration of auction in seconds in uint32_t
-
     uint32_t durationSeconds = static_cast<uint32_t>(now - auction.getStartTime());
 
     safeLockAuction(auction.getIdString(), [&]()
@@ -499,7 +498,6 @@ std::filesystem::path FileManager::showAsset(AuctionData &auction)
 
     safeLockAuction(auction.getIdString(), [&]()
                     {
-        // update auction
         UpdateAuction(auction.getIdString());
 
         assetPath = std::filesystem::path(BASE_DIR) / AUCTION_DIR / auction.getIdString() / auction.getAssetFname();

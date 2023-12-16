@@ -24,6 +24,4 @@ void handle_packet(std::stringstream& buffer, Address& addr_from,
 
 void wait_for_tcp_packet(AuctionServerState& server_state, WorkerPool& pool);
 
-void init_server(AuctionServerState& server_state);
-
 #endif

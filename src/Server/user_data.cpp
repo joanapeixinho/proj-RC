@@ -4,12 +4,10 @@
 UserData::UserData(uint32_t __id, const std::string &__password, FileManager &__fileManager)
     : id(__id), password(__password), fileManager(__fileManager)
 {
-    // check UID IS VALID
     if (id > USER_ID_MAX)
     {
         throw UserIdException(std::to_string(id));
     }
-    // check password is valid
     if (password.length() != 8)
     {
         throw UserPasswordException(password);
