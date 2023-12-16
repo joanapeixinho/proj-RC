@@ -507,7 +507,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
           std::cout << "Sending bid: [" << currentBid.sec_time << "]" << std::endl;
           buffer << " B ";
           write_user_id(buffer, currentBid.bidder_user_id);
-          buffer << " " << currentBid.bid_value;
+          buffer << " " << fillZeros(currentBid.bid_value, BID_MAX_LEN);
           buffer << " " << currentBid.date_time;
           buffer << " " << fillZeros(currentBid.sec_time, SECONDS_MAX_LEN);
       }
@@ -1033,7 +1033,7 @@ void BidServerbound::send(int fd) {
   write_user_id(stream, user_id);
   stream << " " << password << " ";
   write_auction_id(stream, auction_id);
-  stream << " " << bid_value << std::endl;
+  stream << " " << fillZeros(bid_value, BID_MAX_LEN) << std::endl;
   writeString(fd, stream.str());
 }
 
