@@ -32,7 +32,8 @@ AuctionData::AuctionData(uint32_t inputId, uint32_t inputUid, const std::string&
     if (assetFname.length() > ASSET_NAME_MAX_LENGTH) {
         throw InvalidAuctionAssetException(assetFname);
     }
-    active = true;
+
+
 }
 
 
@@ -118,12 +119,13 @@ bool AuctionData::hasBids() const {
 }
 
 bool AuctionData::isActive() const {
-    return active;
+    if (endTime == " ") {
+        return true;
+    } else {
+        return false;
+    }
 }
 
-void AuctionData::setInactive() {
-    active = false;
-}
 
 uint32_t AuctionData::getHighestBidValue() const {
     if (bids.empty()) {

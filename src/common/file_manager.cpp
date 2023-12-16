@@ -371,8 +371,6 @@ AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
             std :: vector<Bid> bids = getAuctionBids(auctionId);
             data = AuctionData(auctionIdInt, uidInt, name, initialBid,
                    durationSeconds, assetFname, startTime,endDate + ' ' + endHour, endTimeSec, bids);
-
-            data.setInactive();
         } else {
             std::string endDatetime = " ";
             std :: vector<Bid> bids = getAuctionBids(auctionId);
@@ -489,7 +487,6 @@ void FileManager::closeAuction(AuctionData &auction)
                     {
         if (auctionIsActive(auction.getIdString())) {
             createAuctionEndFile(auction.getIdString(), endTimeDate, durationSeconds);
-            auction.setInactive();
         }
         else {
             throw AuctionNotActiveException(auction.getIdString());
@@ -534,11 +531,10 @@ void FileManager::bid(AuctionData &auction, uint32_t bidValue, const std::string
                         { createBidFile(auction.getIdString(), userId, bidValueString, auction.getStartTime()); });
 
         safeLockUser(userId, [&]()
-                     { createUserAuctionFile(userId, auction.getIdString(), "BIDDED"); });
+                     {createUserAuctionFile(userId, auction.getIdString(), "BIDDED"); });
     }
     else
     {
-
         throw AuctionNotActiveException(auction.getIdString());
     }
 }
