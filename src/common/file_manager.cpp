@@ -524,8 +524,12 @@ void FileManager::bid(AuctionData &auction, uint32_t bidValue, const std::string
 
     if (auctionIsActive(auction.getIdString()))
     {
-        // ADD TO AUCTION BIDS
+        // bid value string must be a 6 digit number so fill with 0's
         std::string bidValueString = std::to_string(bidValue);
+        while (bidValueString.length() < 6)
+        {
+            bidValueString = "0" + bidValueString;
+        }
 
         safeLockAuction(auction.getIdString(), [&]()
                         { createBidFile(auction.getIdString(), userId, bidValueString, auction.getStartTime()); });
