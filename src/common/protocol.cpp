@@ -553,7 +553,7 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     startTime = read_date_time(buffer);
  
     auction.setDurationSeconds(readInt(buffer));
-    auction.active = true;
+
     int bidCounter = 0;
     // Read bids and end time
    if ( buffer.peek() != '\n'){ // Check if there are bids or end time
