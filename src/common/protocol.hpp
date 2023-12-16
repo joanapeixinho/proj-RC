@@ -97,8 +97,6 @@ class UdpPacket {
   char readAlphabeticalChar(std::stringstream &buffer);
   void readPacketDelimiter(std::stringstream &buffer);
   std::string readString(std::stringstream &buffer, uint32_t max_len);
-  std::string readAlphabeticalString(std::stringstream &buffer,
-                                     uint32_t max_len);
   uint32_t readInt(std::stringstream &buffer);
   uint32_t readUserId(std::stringstream &buffer);
   uint32_t readAuctionId(std::stringstream &buffer);

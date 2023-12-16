@@ -34,7 +34,7 @@ void UdpPacket::readPacketId(std::stringstream &buffer, const char *packet_id) {
       
       // If it's confirmed that the packet is an error packet, throw an exception
       if (errorID_counter == 3) {
-        // Without the packet delimiter, the error packet would invalid
+        // Without the packet delimiter, the error packet would be invalid
         readPacketDelimiter(buffer); 
         throw ErrorUdpPacketException();
       }
@@ -98,18 +98,6 @@ std::string UdpPacket::readString(std::stringstream &buffer, uint32_t max_len) {
   return str;
 };
 
-std::string UdpPacket::readAlphabeticalString(std::stringstream &buffer,
-                                              uint32_t max_len) {
-  auto str = readString(buffer, max_len);
-  for (uint32_t i = 0; i < str.length(); ++i) {
-    if (!isalpha((unsigned char)str[i])) {
-      throw InvalidPacketException();
-    }
-
-    str[i] = (char)tolower((unsigned char)str[i]);
-  }
-  return str;
-};
 
 uint32_t UdpPacket::readInt(std::stringstream &buffer) {
   int64_t i;
@@ -130,7 +118,7 @@ uint32_t UdpPacket::readAuctionId(std::stringstream &buffer) {
   return parse_packet_auction_id(id_str);
 };
 
-// Packet type seriliazation and deserialization methods
+// ----- Packet type seriliazation and deserialization methods -----
 std::stringstream LoginServerbound::serialize() {
   std::stringstream buffer;
   buffer << LoginServerbound::ID << " ";
@@ -483,6 +471,7 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     buffer << " " << auction.getInitialBid() << " ";
     buffer << auction.getStartTimeString() << " ";
     buffer << auction.getDurationSeconds();
+
     if (auction.hasBids()) {
       const std::vector<Bid>& bids = auction.getBids();
       std::vector<Bid>::size_type numBidsToRetrieve = 50;
@@ -524,7 +513,6 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   auto status_str = readString(buffer, PACKET_ID_LEN);
 
- 
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
@@ -538,13 +526,14 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     auction.setInitialBid(readInt(buffer));
     readSpace(buffer);
 
-    //read date time reads space
     startTime = read_date_time(buffer);
+    // Don't need to readSpace() because read date time reads an extra space
  
     auction.setDurationSeconds(readInt(buffer));
-    int bidCounter = 0;
+    
     // Read bids and end time
-   if ( buffer.peek() != '\n'){ // Check if there are bids or end time
+    int bidCounter = 0;
+    if ( buffer.peek() != '\n'){ // Check if there are bids or end time
       while (buffer.peek() == ' '){
         readSpace(buffer);
         if (buffer.peek() == 'B'){ // Read bid
@@ -555,7 +544,6 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
           }
         } else if (buffer.peek() == 'E'){ // Read end time
           readChar(buffer);
-
           readSpace(buffer);
           endTime = read_date_time(buffer);
           auction.setEndTime(endTime);
@@ -573,7 +561,6 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
   }
   readPacketDelimiter(buffer);
 };
-
 
 
 std::stringstream ErrorUdpPacket::serialize() {
@@ -617,7 +604,7 @@ void TcpPacket::readPacketId(int fd, const char *packet_id) {
       }
       // If it's confirmed that the packet is an error packet, throw an exception
       if (errorID_counter == 3) {
-        // Without the packet delimiter, the error packet would invalid
+        // Without the packet delimiter, the error packet would be invalid
         readPacketDelimiter(fd); 
         throw ErrorTcpPacketException();
       }
@@ -980,8 +967,8 @@ void ReplyShowAssetClientbound::send(int fd) {
     file_size = getFileSize(file_path);
     stream << "OK " << file_name << " " << file_size << " ";
     writeString(fd, stream.str());
-    stream.str(std::string());
-    stream.clear();
+    stream.str(std::string()); // clears the stream
+    stream.clear(); // resets any error flags
     sendFile(fd, file_path);
   } else if (status == NOK) {
     stream << "NOK";
@@ -1266,8 +1253,6 @@ std::string auctionID_ToString(uint32_t auction_id) {
 }
 
 std::string fillZeros(uint32_t number, int length) {
-  //std::ostringstream oss;
-  //oss << std::setfill('0') << std::setw(length) << number;
   std::string str = std::to_string(number);
   uint32_t len = static_cast<uint32_t>(length);
   while (str.length() < len) {

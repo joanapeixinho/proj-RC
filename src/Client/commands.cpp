@@ -71,16 +71,6 @@ void CommandManager::waitForCommand(UserState& state) {
     return;
   }
 
-  if (commandName == "sleep"){
-    std::istringstream iss(line);
-    std::string  number_str;
-    iss >> number_str;
-    u_int32_t number = static_cast<uint32_t>(std::stoi(number_str));
-    std::cout << "Sleeping for "<< number << " seconds..." << std::endl;
-    sleep(number);
-    return;
-  }
-
   auto handler = this->handlers.find(commandName);
   if (handler == this->handlers.end()) {
     std::cout << "Unknown command" << std::endl;

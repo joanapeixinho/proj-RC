@@ -17,12 +17,17 @@ int main(int argc, char *argv[]) {
         setup_signal_handlers();
 
         ClientConfig config(argc, argv);
+        if (config.help) {
+          config.printHelp(std::cout);
+          return EXIT_SUCCESS;
+        }
         UserState state(config.host, config.port);
+        
 
         CommandManager commandManager;
         registerCommands(commandManager);
 
-        commandManager.printHelp();
+        commandManager.printHelp(); // Display commands
 
         while (!std::cin.eof() && !is_shutting_down) {
             commandManager.waitForCommand(state);
@@ -70,7 +75,7 @@ void registerCommands(CommandManager &manager) {
   manager.registerCommand(std::make_shared<ExitCommand>());
   manager.registerCommand(std::make_shared<OpenAuctionCommand>());  // TCP
   manager.registerCommand(std::make_shared<CloseAuctionCommand>()); // TCP
-  manager.registerCommand(std::make_shared<ListMyAuctionsCommand>());   // UDP
+  manager.registerCommand(std::make_shared<ListMyAuctionsCommand>());// UDP
   manager.registerCommand(std::make_shared<MyBidsCommand>());       // UDP
   manager.registerCommand(std::make_shared<ListCommand>());         // UDP
   manager.registerCommand(std::make_shared<ShowAssetCommand>());    // TCP
@@ -83,13 +88,16 @@ ClientConfig::ClientConfig(int argc, char *argv[]) {
   program_path = argv[0];
   int opt;
 
-  while ((opt = getopt(argc, argv, "n:p:")) != -1) {
+  while ((opt = getopt(argc, argv, "hn:p:")) != -1) {
     switch (opt) {
       case 'n':
         host = std::string(optarg);
         break;
       case 'p':
         port = std::string(optarg);
+        break;
+      case 'h':
+        help = true;
         break;
       default:
         std::cerr << std::endl;
