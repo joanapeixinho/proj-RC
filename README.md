@@ -1,18 +1,19 @@
-Project RC 2022/2023 - Group 37
+# Project RC 2022/2023 - Group 37
 
-Compilation:
+## Compilation
 
 The project can be compiled by executing `make` in this directory.
 This project utilizes C++17.
 
 Once compiled, two binaries, `user` and `AS`, will be placed in this directory.
 
-## Run the client:
+## Run the client
 
 The available options for the `user` executable can be viewed by executing:
 
-
+```bash
 ./user -h
+```
 
 Once the client is running, it will prompt the user for a command.
 The list of commands is shown at startup and can be displayed again at any time by typing `help` or `?` at the prompt.
@@ -21,12 +22,13 @@ All commands function according to the specification, with a highlight on the `s
 
 The user logs out every time the program terminates, even when receiving a SIGINT or SIGTERM signal.
 
-## Run the server:
+## Run the server
 
 The available options for the `AS` executable can be viewed by executing:
 
-
+```bash
 ./AS -h
+```
 
 The server persists data between sessions in the `ASDIR` folder, so during testing, it might make sense to delete the folder after each test.
 To delete all files in the ASDIR directory, simply execute "make clean-asdir" in this directory.
