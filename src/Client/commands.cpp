@@ -12,8 +12,8 @@
 
 extern bool is_shutting_down;
 
-/* ######################################################## 
-   ################### CommandManager ###################### 
+/* ########################################################
+   ################### CommandManager ######################
    ######################################################## */
 
 void CommandManager::printHelp() {
@@ -46,7 +46,7 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
   }
 }
 
-void CommandManager::waitForCommand(UserState& state) {
+void CommandManager::waitForCommand(UserState &state) {
   std::cout << "> ";
 
   std::string line;
@@ -78,25 +78,25 @@ void CommandManager::waitForCommand(UserState& state) {
   }
 
   try {
-    // "handler" is an iterator & "handler->second" is a pointer to the handler instance
+    // "handler" is an iterator & "handler->second" is a pointer to the handler
+    // instance
     handler->second->handle(line, state);
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     std::cout << "[ERROR] " << e.what() << std::endl;
   } catch (...) {
     std::cout << "[ERROR] An unknown error occurred." << std::endl;
   }
 }
 
-/* ######################################################## 
-   ################### Command handlers ################### 
+/* ########################################################
+   ################### Command handlers ###################
    ######################################################## */
 
-void LoginCommand::handle(std::string args, UserState& state) {
+void LoginCommand::handle(std::string args, UserState &state) {
   // Check if user is already logged in
   if (state.isLoggedIn()) {
-    std::cout 
-        << "Failed to login: the user [" << state.getUserId()
-        << "] is already logged in."  << std::endl;
+    std::cout << "Failed to login: the user [" << state.getUserId()
+              << "] is already logged in." << std::endl;
     return;
   }
   // Argument parsing
@@ -104,23 +104,24 @@ void LoginCommand::handle(std::string args, UserState& state) {
   std::string user_id_str;
   std::string password;
 
-  if( !(iss >> user_id_str) || !(iss >> password) ) {
-    std::cout << "Invalid arguments. Usage: login <UID> <password>" << std::endl;
+  if (!(iss >> user_id_str) || !(iss >> password)) {
+    std::cout << "Invalid arguments. Usage: login <UID> <password>"
+              << std::endl;
     return;
   }
-  
+
   // Argument parsing
   uint32_t user_id;
   try {
     user_id = parse_user_id(user_id_str);
   } catch (...) {
-    std::cout << "Invalid user ID. It must be "<< USER_ID_STR_LEN 
-              << " digits" << std::endl;
+    std::cout << "Invalid user ID. It must be " << USER_ID_STR_LEN << " digits"
+              << std::endl;
     return;
   }
   // Check if Password is too long
   if (password.length() != PASSWORD_LEN) {
-    std::cout << "Invalid password. It must be " << PASSWORD_LEN 
+    std::cout << "Invalid password. It must be " << PASSWORD_LEN
               << " characters long" << std::endl;
     return;
   }
@@ -129,7 +130,6 @@ void LoginCommand::handle(std::string args, UserState& state) {
     std::cout << "Invalid password. It must be alphanumeric" << std::endl;
     return;
   }
-
 
   // Populate and send packet
   LoginServerbound packet_out;
@@ -140,45 +140,41 @@ void LoginCommand::handle(std::string args, UserState& state) {
   state.sendUdpPacketAndWaitForReply(packet_out, rli);
 
   switch (rli.status) {
-    case ReplyLoginClientbound::status::OK:
-      // Login user
-      state.login(user_id, password);
-      std::cout << "Logged in successfully!" << std::endl;
-      break;
+  case ReplyLoginClientbound::status::OK:
+    // Login user
+    state.login(user_id, password);
+    std::cout << "Logged in successfully!" << std::endl;
+    break;
 
-    case ReplyLoginClientbound::status::NOK:
-      std::cout
-          << "Failed to login: the password does not match the UserID."
-          << std::endl;
-      break;
+  case ReplyLoginClientbound::status::NOK:
+    std::cout << "Failed to login: the password does not match the UserID."
+              << std::endl;
+    break;
 
-    case ReplyLoginClientbound::status::REG:
-      // Registered user is still has to logged in
-      state.login(user_id, password);
-      std::cout << "New user registered successfully!" << std::endl;
-      break;
+  case ReplyLoginClientbound::status::REG:
+    // Registered user is still has to logged in
+    state.login(user_id, password);
+    std::cout << "New user registered successfully!" << std::endl;
+    break;
 
-    case ReplyLoginClientbound::status::ERR:
+  case ReplyLoginClientbound::status::ERR:
 
-      std::cout
-          << "Failed to login: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
-    default:
-      std::cout 
-          << "Something went wrong. Please try again." << std::endl;
-      break;
-    }
+    std::cout << "Failed to login: an unknown error occurred on the server "
+              << "side. Please try again." << std::endl;
+    break;
+  default:
+    std::cout << "Something went wrong. Please try again." << std::endl;
+    break;
+  }
 }
 
-void LogoutCommand::handle(std::string args, UserState& state) {
-  //avoid unused parameter warning
-  (void) args;
+void LogoutCommand::handle(std::string args, UserState &state) {
+  // avoid unused parameter warning
+  (void)args;
   // Check if user is logged in
   if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to logout: you need to be logged in to logout." 
-        << std::endl;
+    std::cout << "Failed to logout: you need to be logged in to logout."
+              << std::endl;
     return;
   }
 
@@ -191,41 +187,35 @@ void LogoutCommand::handle(std::string args, UserState& state) {
   state.sendUdpPacketAndWaitForReply(packet_out, rlo);
 
   switch (rlo.status) {
-    case ReplyLogoutClientbound::status::OK:
-      // Logout user
-      state.logout();
-      std::cout << "Logged out successfully!" << std::endl;
-      break;
+  case ReplyLogoutClientbound::status::OK:
+    // Logout user
+    state.logout();
+    std::cout << "Logged out successfully!" << std::endl;
+    break;
 
-    case ReplyLogoutClientbound::status::NOK:
-      std::cout
-          << "Failed to logout: the user is not logged in."
-          << std::endl;
-      break;
+  case ReplyLogoutClientbound::status::NOK:
+    std::cout << "Failed to logout: the user is not logged in." << std::endl;
+    break;
 
-    case ReplyLogoutClientbound::status::UNR:
-      std::cout 
-          << "Failed to logout: the user is not registered." 
-          << std::endl;
-      break;
+  case ReplyLogoutClientbound::status::UNR:
+    std::cout << "Failed to logout: the user is not registered." << std::endl;
+    break;
 
-    case ReplyLogoutClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to logout: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyLogoutClientbound::status::ERR:
+  default:
+    std::cout << "Failed to logout: an unknown error occurred on the server "
+              << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void UnregisterCommand::handle(std::string args, UserState& state) {
-  //avoid unused parameter warning
-  (void) args;
+void UnregisterCommand::handle(std::string args, UserState &state) {
+  // avoid unused parameter warning
+  (void)args;
   // Check if user is logged in
   if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to unregister: you need to be logged in to unregister." 
-        << std::endl;
+    std::cout << "Failed to unregister: you need to be logged in to unregister."
+              << std::endl;
     return;
   }
 
@@ -238,52 +228,48 @@ void UnregisterCommand::handle(std::string args, UserState& state) {
   state.sendUdpPacketAndWaitForReply(packet_out, lou);
 
   switch (lou.status) {
-    case ReplyUnregisterClientbound::status::OK:
-      // When you unregister, you are logged out
-      state.logout();
-      std::cout << "Un-registered successfully!" << std::endl;
-      break;
+  case ReplyUnregisterClientbound::status::OK:
+    // When you unregister, you are logged out
+    state.logout();
+    std::cout << "Un-registered successfully!" << std::endl;
+    break;
 
-    case ReplyUnregisterClientbound::status::NOK:
-      std::cout
-          << "Failed to un-register: the user is not logged in."
-          << std::endl;
-      break;
+  case ReplyUnregisterClientbound::status::NOK:
+    std::cout << "Failed to un-register: the user is not logged in."
+              << std::endl;
+    break;
 
-    case ReplyUnregisterClientbound::status::UNR:
-      std::cout 
-          << "Failed to un-register: the user is not registered." 
-          << std::endl;
-      break;
+  case ReplyUnregisterClientbound::status::UNR:
+    std::cout << "Failed to un-register: the user is not registered."
+              << std::endl;
+    break;
 
-    case ReplyUnregisterClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to un-register: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyUnregisterClientbound::status::ERR:
+  default:
+    std::cout
+        << "Failed to un-register: an unknown error occurred on the server "
+        << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void ExitCommand::handle(std::string args, UserState& state) {
-  //avoid unused parameter warning
-  (void) args;
+void ExitCommand::handle(std::string args, UserState &state) {
+  // avoid unused parameter warning
+  (void)args;
   // Check if user is logged in
   if (state.isLoggedIn()) {
-    std::cout 
-        << "Failed to exit: please logout before exiting." 
-        << std::endl;
+    std::cout << "Failed to exit: please logout before exiting." << std::endl;
     return;
   }
   is_shutting_down = true;
 }
 
-void OpenAuctionCommand::handle(std::string args, UserState& state) {
+void OpenAuctionCommand::handle(std::string args, UserState &state) {
   // Check if user is logged in
   if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to open auction: you need to be logged in to open an auction." 
-        << std::endl;
+    std::cout << "Failed to open auction: you need to be logged in to open an "
+                 "auction."
+              << std::endl;
     return;
   }
 
@@ -293,8 +279,8 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   std::string asset_file_path;
   std::string start_value_str;
   std::string timeactive_str;
-  
-  if (!(iss >> auction_name) || !(iss >> asset_file_path) || 
+
+  if (!(iss >> auction_name) || !(iss >> asset_file_path) ||
       !(iss >> start_value_str) || !(iss >> timeactive_str)) {
     std::cout << "Invalid arguments. Usage: openauction <auction_name> "
               << "<asset_name> <start_value> <timeactive>" << std::endl;
@@ -302,8 +288,8 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   }
   // Check if asset_name is too long
   if (auction_name.length() > AUCTION_NAME_MAX_LENGTH) {
-    std::cout << "Invalid auction name. It must be at most " << AUCTION_NAME_MAX_LENGTH 
-              << " characters long" << std::endl;
+    std::cout << "Invalid auction name. It must be at most "
+              << AUCTION_NAME_MAX_LENGTH << " characters long" << std::endl;
     return;
   }
   // Check if asset_name is AlphaNumeric
@@ -313,8 +299,8 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   }
   // Check if start_value_str is too long
   if (start_value_str.length() > AUCTION_START_VALUE_MAX_LEN) {
-    std::cout << "Invalid start value. It must be at most " << AUCTION_START_VALUE_MAX_LEN 
-              << " characters long" << std::endl;
+    std::cout << "Invalid start value. It must be at most "
+              << AUCTION_START_VALUE_MAX_LEN << " characters long" << std::endl;
     return;
   }
   // Check if start_value_str is Numeric
@@ -324,8 +310,8 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   }
   // Check if timeactive_str is too long
   if (timeactive_str.length() > AUCTION_DURATION_MAX_LEN) {
-    std::cout << "Invalid auction duration. It must be at most " << AUCTION_DURATION_MAX_VALUE 
-              << " characters long" << std::endl;
+    std::cout << "Invalid auction duration. It must be at most "
+              << AUCTION_DURATION_MAX_VALUE << " characters long" << std::endl;
     return;
   }
   // Check if timeactive_str is Numeric
@@ -335,8 +321,10 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   }
 
   // Convert start_value_str to uint32_t
-  uint32_t start_value = static_cast<uint32_t>(std::stoi(start_value_str, NULL, 10));
-  uint32_t timeactive = static_cast<uint32_t>(std::stoi(timeactive_str, NULL, 10));
+  uint32_t start_value =
+      static_cast<uint32_t>(std::stoi(start_value_str, NULL, 10));
+  uint32_t timeactive =
+      static_cast<uint32_t>(std::stoi(timeactive_str, NULL, 10));
 
   // Populate and send packet
   OpenAuctionServerbound packet_out;
@@ -348,58 +336,54 @@ void OpenAuctionCommand::handle(std::string args, UserState& state) {
   packet_out.file_path = std::filesystem::path(asset_file_path);
   packet_out.file_name = packet_out.file_path.filename().string();
 
-
   ReplyOpenAuctionClientbound roa;
   state.sendTcpPacketAndWaitForReply(packet_out, roa);
 
   switch (roa.status) {
-    case ReplyOpenAuctionClientbound::status::OK:
-      std::cout 
-          << "Auction opened successfully with ID ["
-          << auctionID_ToString(roa.auction_id) << "]!" << std::endl;
-      break;
+  case ReplyOpenAuctionClientbound::status::OK:
+    std::cout << "Auction opened successfully with ID ["
+              << auctionID_ToString(roa.auction_id) << "]!" << std::endl;
+    break;
 
-    case ReplyOpenAuctionClientbound::status::NOK:
-      std::cout
-          << "Failed to open auction: it could not be started."
-          << std::endl;
-      break;
+  case ReplyOpenAuctionClientbound::status::NOK:
+    std::cout << "Failed to open auction: it could not be started."
+              << std::endl;
+    break;
 
-    case ReplyOpenAuctionClientbound::status::NLG:
-      std::cout 
-          << "Failed to open auction: the user is not logged in." 
-          << std::endl;
-      break;
+  case ReplyOpenAuctionClientbound::status::NLG:
+    std::cout << "Failed to open auction: the user is not logged in."
+              << std::endl;
+    break;
 
-    case ReplyOpenAuctionClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to open auction: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyOpenAuctionClientbound::status::ERR:
+  default:
+    std::cout
+        << "Failed to open auction: an unknown error occurred on the server "
+        << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void CloseAuctionCommand::handle(std::string args, UserState& state) {
+void CloseAuctionCommand::handle(std::string args, UserState &state) {
   // Check if user is logged in
   if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to close auction: you need to be logged in to close an auction." 
-        << std::endl;
+    std::cout << "Failed to close auction: you need to be logged in to close "
+                 "an auction."
+              << std::endl;
     return;
   }
 
   // Argument parsing
   std::istringstream iss(args);
   std::string auction_id_str;
-  
+
   if (!(iss >> auction_id_str)) {
     std::cout << "Invalid arguments. Usage: close <auction_id>" << std::endl;
     return;
   }
   // Check if auction_id_str is too long
   if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN
               << " digits long" << std::endl;
     return;
   }
@@ -409,7 +393,8 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
+  uint32_t auction_id =
+      static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
 
   // Populate and send packet
   CloseAuctionServerbound packet_out;
@@ -421,53 +406,51 @@ void CloseAuctionCommand::handle(std::string args, UserState& state) {
   state.sendTcpPacketAndWaitForReply(packet_out, rcl);
 
   switch (rcl.status) {
-    case ReplyCloseAuctionClientbound::status::OK:
-      std::cout << "Auction closed successfully!" << std::endl;
-      break;
+  case ReplyCloseAuctionClientbound::status::OK:
+    std::cout << "Auction closed successfully!" << std::endl;
+    break;
 
-    case ReplyCloseAuctionClientbound::status::EAU:
-      std::cout
-          << "Failed to close auction: the auction with ID [" 
-          << auctionID_ToString(auction_id) << "] does not exist." << std::endl;
-      break;
-    
-    case ReplyCloseAuctionClientbound::status::EOW:
-      std::cout
-          << "Failed to close auction: the auction with ID [" 
-          << auctionID_ToString(auction_id) << "] is not owned by this user." << std::endl;
-      break;
-    
-    case ReplyCloseAuctionClientbound::status::END:
-      std::cout
-          << "Failed to close auction: the auction with ID [" 
-          << auctionID_ToString(auction_id) << "] has already ended." << std::endl;
-      break;
+  case ReplyCloseAuctionClientbound::status::EAU:
+    std::cout << "Failed to close auction: the auction with ID ["
+              << auctionID_ToString(auction_id) << "] does not exist."
+              << std::endl;
+    break;
 
-    case ReplyCloseAuctionClientbound::status::NLG:
-      std::cout 
-          << "Failed to close auction: the user is not logged in." 
-          << std::endl;
-      break;
+  case ReplyCloseAuctionClientbound::status::EOW:
+    std::cout << "Failed to close auction: the auction with ID ["
+              << auctionID_ToString(auction_id)
+              << "] is not owned by this user." << std::endl;
+    break;
 
-    case ReplyCloseAuctionClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to close auction: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyCloseAuctionClientbound::status::END:
+    std::cout << "Failed to close auction: the auction with ID ["
+              << auctionID_ToString(auction_id) << "] has already ended."
+              << std::endl;
+    break;
+
+  case ReplyCloseAuctionClientbound::status::NLG:
+    std::cout << "Failed to close auction: the user is not logged in."
+              << std::endl;
+    break;
+
+  case ReplyCloseAuctionClientbound::status::ERR:
+  default:
+    std::cout
+        << "Failed to close auction: an unknown error occurred on the server "
+        << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-
-void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
-  //avoid unused parameter warning
-  (void) args;
+void ListMyAuctionsCommand::handle(std::string args, UserState &state) {
+  // avoid unused parameter warning
+  (void)args;
 
   // Check if user is logged in
   if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to list auctions: you need to be logged in to list your auctions." 
-        << std::endl;
+    std::cout << "Failed to list auctions: you need to be logged in to list "
+                 "your auctions."
+              << std::endl;
     return;
   }
 
@@ -479,41 +462,38 @@ void ListMyAuctionsCommand::handle(std::string args, UserState& state) {
   state.sendUdpPacketAndWaitForReply(packet_out, rma);
 
   switch (rma.status) {
-    case ReplyListMyAuctionsClientbound::status::OK:
-      std::cout << "Displaying the auctions started by you:" << std::endl;
-      printAuctions(rma.auctions);
-      break;
+  case ReplyListMyAuctionsClientbound::status::OK:
+    std::cout << "Displaying the auctions started by you:" << std::endl;
+    printAuctions(rma.auctions);
+    break;
 
-    case ReplyListMyAuctionsClientbound::status::NLG:
-      std::cout 
-          << "Failed to list auctions: the user has to be logged in." 
-          << std::endl;
-      break;
-    
-    case ReplyListMyAuctionsClientbound::status::NOK:
-      std::cout
-          << "Failed to list auctions: the user has 0 ongoing auctions."
-          << std::endl;
-      break;
+  case ReplyListMyAuctionsClientbound::status::NLG:
+    std::cout << "Failed to list auctions: the user has to be logged in."
+              << std::endl;
+    break;
 
-    case ReplyListMyAuctionsClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to list auctions: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyListMyAuctionsClientbound::status::NOK:
+    std::cout << "Failed to list auctions: the user has 0 ongoing auctions."
+              << std::endl;
+    break;
+
+  case ReplyListMyAuctionsClientbound::status::ERR:
+  default:
+    std::cout
+        << "Failed to list auctions: an unknown error occurred on the server "
+        << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-
-void MyBidsCommand::handle(std::string args, UserState& state) {
-  //avoid unused parameter warning
-  (void) args;
+void MyBidsCommand::handle(std::string args, UserState &state) {
+  // avoid unused parameter warning
+  (void)args;
 
   // Check if user is logged in
   if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to list bids: you need to be logged in to list your bids." 
+    std::cout
+        << "Failed to list bids: you need to be logged in to list your bids."
         << std::endl;
     return;
   }
@@ -526,37 +506,32 @@ void MyBidsCommand::handle(std::string args, UserState& state) {
   state.sendUdpPacketAndWaitForReply(packet_out, rmb);
 
   switch (rmb.status) {
-    case ReplyMyBidsClientbound::status::OK:
-      std::cout 
-          << "Displaying the auctions where you made a bid:" 
-          << std::endl;
-      printAuctions(rmb.auctions);
-      break;
+  case ReplyMyBidsClientbound::status::OK:
+    std::cout << "Displaying the auctions where you made a bid:" << std::endl;
+    printAuctions(rmb.auctions);
+    break;
 
-    case ReplyMyBidsClientbound::status::NLG:
-      std::cout 
-          << "Failed to list bids: the user has to be logged in." 
-          << std::endl;
-      break;
-    
-    case ReplyMyBidsClientbound::status::NOK:
-      std::cout
-          << "Failed to list bids: the user has 0 ongoing bids."
-          << std::endl;
-      break;
+  case ReplyMyBidsClientbound::status::NLG:
+    std::cout << "Failed to list bids: the user has to be logged in."
+              << std::endl;
+    break;
 
-    case ReplyMyBidsClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to list bids: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyMyBidsClientbound::status::NOK:
+    std::cout << "Failed to list bids: the user has 0 ongoing bids."
+              << std::endl;
+    break;
+
+  case ReplyMyBidsClientbound::status::ERR:
+  default:
+    std::cout << "Failed to list bids: an unknown error occurred on the server "
+              << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void ListCommand::handle(std::string args, UserState& state) {
-  //avoid unused parameter warning
-  (void) args;
+void ListCommand::handle(std::string args, UserState &state) {
+  // avoid unused parameter warning
+  (void)args;
 
   // Populate and send packet
   ListAuctionsServerbound packet_out;
@@ -565,38 +540,38 @@ void ListCommand::handle(std::string args, UserState& state) {
   state.sendUdpPacketAndWaitForReply(packet_out, rls);
 
   switch (rls.status) {
-    case ReplyListAuctionsClientbound::status::OK:
-      std::cout << "Displaying all the auctions:" << std::endl;
-      printAuctions(rls.auctions);
-      break;
+  case ReplyListAuctionsClientbound::status::OK:
+    std::cout << "Displaying all the auctions:" << std::endl;
+    printAuctions(rls.auctions);
+    break;
 
-    case ReplyListAuctionsClientbound::status::NOK:
-      std::cout
-          << "Failed to list auctions: there are no ongoing auctions."
-          << std::endl;
-      break;
+  case ReplyListAuctionsClientbound::status::NOK:
+    std::cout << "Failed to list auctions: there are no ongoing auctions."
+              << std::endl;
+    break;
 
-    case ReplyListAuctionsClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to list auctions: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyListAuctionsClientbound::status::ERR:
+  default:
+    std::cout
+        << "Failed to list auctions: an unknown error occurred on the server "
+        << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void ShowAssetCommand::handle(std::string args, UserState& state) {
+void ShowAssetCommand::handle(std::string args, UserState &state) {
   // Argument parsing
   std::istringstream iss(args);
   std::string auction_id_str;
-  
+
   if (!(iss >> auction_id_str)) {
-    std::cout << "Invalid arguments. Usage: show_asset <auction_id>" << std::endl;
+    std::cout << "Invalid arguments. Usage: show_asset <auction_id>"
+              << std::endl;
     return;
   }
   // Check if auction_id_str is too long
   if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN
               << " digits long" << std::endl;
     return;
   }
@@ -606,7 +581,8 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
+  uint32_t auction_id =
+      static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
 
   // Populate and send packet
   ShowAssetServerbound packet_out;
@@ -616,34 +592,31 @@ void ShowAssetCommand::handle(std::string args, UserState& state) {
   state.sendTcpPacketAndWaitForReply(packet_out, rsa);
 
   switch (rsa.status) {
-    case ReplyShowAssetClientbound::status::OK:
-      std::cout 
-          << "Received the asset '"<< rsa.file_name 
-          <<"' of the auction with ID [" << auctionID_ToString(auction_id) 
-          << "] in the current directory." << std::endl;
-      break;
+  case ReplyShowAssetClientbound::status::OK:
+    std::cout << "Received the asset '" << rsa.file_name
+              << "' of the auction with ID [" << auctionID_ToString(auction_id)
+              << "] in the current directory." << std::endl;
+    break;
 
-    case ReplyShowAssetClientbound::status::NOK:
-      std::cout
-          << "Failed to show asset: the auction with ID [" 
-          << auctionID_ToString(auction_id) << "] does not exist." << std::endl;
-      break;
+  case ReplyShowAssetClientbound::status::NOK:
+    std::cout << "Failed to show asset: the auction with ID ["
+              << auctionID_ToString(auction_id) << "] does not exist."
+              << std::endl;
+    break;
 
-    case ReplyShowAssetClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to show asset: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyShowAssetClientbound::status::ERR:
+  default:
+    std::cout
+        << "Failed to show asset: an unknown error occurred on the server "
+        << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void BidCommand::handle(std::string args, UserState& state) {
+void BidCommand::handle(std::string args, UserState &state) {
   // Check if user is logged in
   if (!state.isLoggedIn()) {
-    std::cout 
-        << "Failed to bid: you need to be logged in to bid." 
-        << std::endl;
+    std::cout << "Failed to bid: you need to be logged in to bid." << std::endl;
     return;
   }
 
@@ -651,14 +624,15 @@ void BidCommand::handle(std::string args, UserState& state) {
   std::istringstream iss(args);
   std::string auction_id_str;
   std::string bid_value_str;
-  
+
   if (!(iss >> auction_id_str) || !(iss >> bid_value_str)) {
-    std::cout << "Invalid arguments. Usage: bid <auction_id> <bid_value>" << std::endl;
+    std::cout << "Invalid arguments. Usage: bid <auction_id> <bid_value>"
+              << std::endl;
     return;
   }
   // Check if auction_id_str is too long
   if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN
               << " digits long" << std::endl;
     return;
   }
@@ -669,7 +643,7 @@ void BidCommand::handle(std::string args, UserState& state) {
   }
   // Check if bid_value_str is too long
   if (bid_value_str.length() > BID_MAX_LEN) {
-    std::cout << "Invalid bid value. It must be at most " << BID_MAX_LEN 
+    std::cout << "Invalid bid value. It must be at most " << BID_MAX_LEN
               << " digits long" << std::endl;
     return;
   }
@@ -679,9 +653,11 @@ void BidCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
+  uint32_t auction_id =
+      static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
   // Convert bid_value_str to uint32_t
-  uint32_t bid_value = static_cast<uint32_t>(std::stoi(bid_value_str, NULL, 10));
+  uint32_t bid_value =
+      static_cast<uint32_t>(std::stoi(bid_value_str, NULL, 10));
 
   // Populate and send packet
   BidServerbound packet_out;
@@ -694,58 +670,54 @@ void BidCommand::handle(std::string args, UserState& state) {
   state.sendTcpPacketAndWaitForReply(packet_out, rbd);
 
   switch (rbd.status) {
-    case ReplyBidClientbound::status::ACC:
-      // Bid accepted
-      std::cout 
-          << "Bid of " << bid_value << " on auction with ID [" 
-          << auctionID_ToString(auction_id) << "] accepted!" << std::endl;
-      break;
+  case ReplyBidClientbound::status::ACC:
+    // Bid accepted
+    std::cout << "Bid of " << bid_value << " on auction with ID ["
+              << auctionID_ToString(auction_id) << "] accepted!" << std::endl;
+    break;
 
-    case ReplyBidClientbound::status::NOK:
-      std::cout
-          << "Failed to bid: the auction with ID [" 
-          << auctionID_ToString(auction_id) << "] is not an active auction." << std::endl;
-      break;
+  case ReplyBidClientbound::status::NOK:
+    std::cout << "Failed to bid: the auction with ID ["
+              << auctionID_ToString(auction_id) << "] is not an active auction."
+              << std::endl;
+    break;
 
-    case ReplyBidClientbound::status::NLG:
-      std::cout 
-          << "Failed to bid: the user is not logged in." 
-          << std::endl;
-      break;
-    case ReplyBidClientbound::status::ILG:
-      std::cout 
-          << "Failed to bid: the user cannot bid on one of his own auctions." 
-          << std::endl;
-      break;
+  case ReplyBidClientbound::status::NLG:
+    std::cout << "Failed to bid: the user is not logged in." << std::endl;
+    break;
+  case ReplyBidClientbound::status::ILG:
+    std::cout
+        << "Failed to bid: the user cannot bid on one of his own auctions."
+        << std::endl;
+    break;
 
-    case ReplyBidClientbound::status::REF:
-      std::cout 
-          << "Failed to bid: the bid of " << bid_value << " was lower than"
-          << " the current bid of the auction [" 
-          << auctionID_ToString(auction_id) << "]." << std::endl;
-      break;
+  case ReplyBidClientbound::status::REF:
+    std::cout << "Failed to bid: the bid of " << bid_value << " was lower than"
+              << " the current bid of the auction ["
+              << auctionID_ToString(auction_id) << "]." << std::endl;
+    break;
 
-    case ReplyBidClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to bid: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyBidClientbound::status::ERR:
+  default:
+    std::cout << "Failed to bid: an unknown error occurred on the server "
+              << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void ShowRecordCommand::handle(std::string args, UserState& state) {
+void ShowRecordCommand::handle(std::string args, UserState &state) {
   // Argument parsing
   std::istringstream iss(args);
   std::string auction_id_str;
-  
+
   if (!(iss >> auction_id_str)) {
-    std::cout << "Invalid arguments. Usage: show_record <auction_id>" << std::endl;
+    std::cout << "Invalid arguments. Usage: show_record <auction_id>"
+              << std::endl;
     return;
   }
   // Check if auction_id_str is too long
   if (auction_id_str.length() != AUCTION_ID_MAX_LEN) {
-    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN 
+    std::cout << "Invalid auction ID. It must be " << AUCTION_ID_MAX_LEN
               << " digits long" << std::endl;
     return;
   }
@@ -755,7 +727,8 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
     return;
   }
   // Convert auction_id_str to uint32_t
-  uint32_t auction_id = static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
+  uint32_t auction_id =
+      static_cast<uint32_t>(std::stoi(auction_id_str, NULL, 10));
 
   // Populate and send packet
   ShowRecordServerbound packet_out;
@@ -765,83 +738,76 @@ void ShowRecordCommand::handle(std::string args, UserState& state) {
   state.sendUdpPacketAndWaitForReply(packet_out, rrc);
 
   switch (rrc.status) {
-    case ReplyShowRecordClientbound::status::OK:
-      // Output Auction & Bids info
-      std::cout 
-          << "Displaying the record of the auction with ID [" 
-          << auctionID_ToString(auction_id) << "]:" << std::endl;
-      std::cout << "Auction host: " << rrc.auction.getUidString() << std::endl;
-      std::cout << "Auction name: " << rrc.auction.getName() << std::endl;
-      std::cout << "Auction asset: " << rrc.auction.getAssetFname() << std::endl;
-      std::cout << "Auction start value: " << rrc.auction.getInitialBid() << std::endl;
-      std::cout 
-          << "Auction start date: " 
-        	<< rrc.startTime
-          << std::endl;
-      std::cout 
-          << "Auction time active: " << rrc.auction.getDurationSeconds()
-          << std::endl;
-      if (rrc.auction.isActive()) {
-        std::cout << "Auction status: Ongoing" << std::endl;
-      } else {
-        std::cout << "Auction status: Closed" << std::endl;
-        std::cout 
-            <<  "Auction end date: " 
-            << rrc.endTime
-            << std::endl;
-        std::cout <<  "Auction end seconds: " << rrc.auction.getEndTimeSec() << std::endl;
-      }
-      std::cout <<  "----------- Last 50 bids: -----------" << std::endl;
-      printBidsInfo(rrc.auction.getBids());
-      break;
+  case ReplyShowRecordClientbound::status::OK:
+    // Output Auction & Bids info
+    std::cout << "Displaying the record of the auction with ID ["
+              << auctionID_ToString(auction_id) << "]:" << std::endl;
+    std::cout << "Auction host: " << rrc.auction.getUidString() << std::endl;
+    std::cout << "Auction name: " << rrc.auction.getName() << std::endl;
+    std::cout << "Auction asset: " << rrc.auction.getAssetFname() << std::endl;
+    std::cout << "Auction start value: " << rrc.auction.getInitialBid()
+              << std::endl;
+    std::cout << "Auction start date: " << rrc.startTime << std::endl;
+    std::cout << "Auction time active: " << rrc.auction.getDurationSeconds()
+              << std::endl;
+    if (rrc.auction.isActive()) {
+      std::cout << "Auction status: Ongoing" << std::endl;
+    } else {
+      std::cout << "Auction status: Closed" << std::endl;
+      std::cout << "Auction end date: " << rrc.endTime << std::endl;
+      std::cout << "Auction end seconds: " << rrc.auction.getEndTimeSec()
+                << std::endl;
+    }
+    std::cout << "----------- Last 50 bids: -----------" << std::endl;
+    printBidsInfo(rrc.auction.getBids());
+    break;
 
-    case ReplyShowRecordClientbound::status::NOK:
-      std::cout 
-          << "Failed to show record: the auction [" 
-          << auctionID_ToString(auction_id) << "] does not exist." << std::endl;
-      break;
+  case ReplyShowRecordClientbound::status::NOK:
+    std::cout << "Failed to show record: the auction ["
+              << auctionID_ToString(auction_id) << "] does not exist."
+              << std::endl;
+    break;
 
-    case ReplyShowRecordClientbound::status::ERR:
-    default:
-      std::cout
-          << "Failed to show record: an unknown error occurred on the server "
-          << "side. Please try again." << std::endl;
-      break;
+  case ReplyShowRecordClientbound::status::ERR:
+  default:
+    std::cout
+        << "Failed to show record: an unknown error occurred on the server "
+        << "side. Please try again." << std::endl;
+    break;
   }
 }
 
-void HelpCommand::handle(std::string args, UserState& state) {
-  (void)args;   // unused - no args
-  (void)state;  // unused
+void HelpCommand::handle(std::string args, UserState &state) {
+  (void)args;  // unused - no args
+  (void)state; // unused
   manager.printHelp();
 }
 
 void printBidsInfo(const std::vector<Bid> bids) {
-    for (const auto bid : bids) {
-        std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
-        std::cout << " Value bidded: " << bid.bid_value << std::endl;
-        std::cout << "Date Time: " << bid.date_time << std::endl;
-        std::cout << "Seconds since auction start: " << bid.sec_time << std::endl;
-        std::cout << "---------------------------------------" << std::endl;
-    }
+  for (const auto bid : bids) {
+    std::cout << "Bidder User ID: " << bid.bidder_user_id << std::endl;
+    std::cout << " Value bidded: " << bid.bid_value << std::endl;
+    std::cout << "Date Time: " << bid.date_time << std::endl;
+    std::cout << "Seconds since auction start: " << bid.sec_time << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
+  }
 }
 
-void printAuctions(const std::vector<std::pair<uint32_t, bool>>& auctions) {
-    for (const auto& auction : auctions) {
-        std::cout 
-            << "Auction ID: " << auctionID_ToString(auction.first)
-            << " - Status: " << (auction.second ? "Active" : "Inactive") 
-            << std::endl;
-    }
+void printAuctions(const std::vector<std::pair<uint32_t, bool>> &auctions) {
+  for (const auto &auction : auctions) {
+    std::cout << "Auction ID: " << auctionID_ToString(auction.first)
+              << " - Status: " << (auction.second ? "Active" : "Inactive")
+              << std::endl;
+  }
 }
 
-bool isValidAuctionName(const std::string& str) {
-    return std::all_of(str.begin(), str.end(), [](char c){
-        return std::isalnum(c) || c == '_' || c == '-';
-    });
+bool isValidAuctionName(const std::string &str) {
+  return std::all_of(str.begin(), str.end(), [](char c) {
+    return std::isalnum(c) || c == '_' || c == '-';
+  });
 }
 
-bool is_alphanumeric(std::string& str) {
+bool is_alphanumeric(std::string &str) {
   for (char c : str) {
     if (!isalnum(c)) {
       return false;
@@ -850,7 +816,7 @@ bool is_alphanumeric(std::string& str) {
   return true;
 }
 
-bool is_numeric(std::string& str) {
+bool is_numeric(std::string &str) {
   for (char c : str) {
     if (!isdigit(c)) {
       return false;
@@ -859,10 +825,9 @@ bool is_numeric(std::string& str) {
   return true;
 }
 
-
-uint32_t parse_user_id(std::string& args) {
+uint32_t parse_user_id(std::string &args) {
   size_t converted = 0;
-  if(args.length() != USER_ID_STR_LEN){
+  if (args.length() != USER_ID_STR_LEN) {
     throw std::runtime_error("invalid user id");
   }
 

@@ -5,10 +5,10 @@
 
 #include "auction_server_state.hpp"
 
-class userTag {  // IOManip helper
+class userTag { // IOManip helper
   uint32_t user_id;
 
- public:
+public:
   explicit userTag(uint32_t __user_id) : user_id{__user_id} {}
   friend std::ostream &operator<<(std::ostream &os, const userTag &obj) {
     os << "[user " << std::setfill('0') << std::setw(USER_ID_STR_LEN)
@@ -17,10 +17,10 @@ class userTag {  // IOManip helper
   }
 };
 
-class auctionTag {  // IOManip helper
+class auctionTag { // IOManip helper
   uint32_t auction_id;
 
- public:
+public:
   explicit auctionTag(uint32_t __auction_id) : auction_id{__auction_id} {}
   friend std::ostream &operator<<(std::ostream &os, const auctionTag &obj) {
     os << "[auction " << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN)
@@ -52,7 +52,6 @@ void handle_list_auctions(std::stringstream &buffer, Address &addr_from,
 void handle_show_record(std::stringstream &buffer, Address &addr_from,
                         AuctionServerState &state);
 
-
 // TCP
 void handle_open_auction(int connection_fd, AuctionServerState &state);
 
@@ -61,6 +60,5 @@ void handle_close_auction(int connection_fd, AuctionServerState &state);
 void handle_show_asset(int connection_fd, AuctionServerState &state);
 
 void handle_bid(int connection_fd, AuctionServerState &state);
-
 
 #endif

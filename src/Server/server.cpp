@@ -3,15 +3,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#include <filesystem>
 #include <iostream>
 #include <thread>
-#include <filesystem>
 
 #include "../common/common.hpp"
-#include "../common/protocol.hpp"
 #include "../common/exceptions.hpp"
 #include "../common/file_manager.hpp"
-
+#include "../common/protocol.hpp"
 
 extern bool is_shutting_down;
 
@@ -22,18 +21,16 @@ int main(int argc, char *argv[]) {
 
     FileManager fileManager = FileManager();
 
-
     Server config(argc, argv);
 
     uint32_t auctionsCount = fileManager.getAuctionsCount();
 
-    
-    AuctionServerState state(config.port, config.verbose, fileManager, auctionsCount);
+    AuctionServerState state(config.port, config.verbose, fileManager,
+                             auctionsCount);
 
     state.registerPacketHandlers();
 
     setup_signal_handlers();
-    
 
     state.cdebug << "Verbose mode is active" << std::endl << std::endl;
 
@@ -191,7 +188,7 @@ void wait_for_tcp_packet(AuctionServerState &server_state, WorkerPool &pool) {
     return;
   }
   if (connection_fd < 0) {
-    if (errno == EAGAIN) {  // timeout, just go around and keep listening
+    if (errno == EAGAIN) { // timeout, just go around and keep listening
       return;
     }
     throw UnrecoverableError("[ERROR] Failed to accept a connection", errno);
@@ -227,16 +224,16 @@ Server::Server(int argc, char *argv[]) {
 
   while ((opt = getopt(argc, argv, "-p:v")) != -1) {
     switch (opt) {
-      case 'p':
-        port = std::string(optarg);
-        break;
-      case 'v':
-        verbose = true;
-        break;
+    case 'p':
+      port = std::string(optarg);
+      break;
+    case 'v':
+      verbose = true;
+      break;
 
-      default:
-        std::cerr << std::endl;
-        exit(EXIT_FAILURE);
+    default:
+      std::cerr << std::endl;
+      exit(EXIT_FAILURE);
     }
   }
 
