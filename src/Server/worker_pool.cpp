@@ -6,9 +6,7 @@
 
 #include "../common/protocol.hpp"
 
-Worker::Worker() {
-  thread = std::thread(&Worker::execute, this);
-}
+Worker::Worker() { thread = std::thread(&Worker::execute, this); }
 
 Worker::~Worker() {
   lock.lock();

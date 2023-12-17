@@ -2,27 +2,21 @@
 #ifndef FILE_MANAGER_H
 #define FILE_MANAGER_H
 
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+#include <chrono>
+#include <ctime>
 #include <filesystem>
-#include <sstream>
-#include <vector>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <iostream>
 #include <map>
 #include <mutex>
-#include <functional>
-#include <ctime>
-#include <chrono>
+#include <sstream>
+#include <vector>
 
-#include "exceptions.hpp"
-#include "constants.hpp"
 #include "auction_data.hpp"
-
-
-
-
-
-
+#include "constants.hpp"
+#include "exceptions.hpp"
 
 class FileManager {
 public:
@@ -65,8 +59,8 @@ public:
     void shutdown();
 
 private:
-    std::map<std::string, std::mutex> userMutexes;
-    std::map<std::string, std::mutex> auctionMutexes;
+  std::map<std::string, std::mutex> userMutexes;
+  std::map<std::string, std::mutex> auctionMutexes;
 };
 
 #endif

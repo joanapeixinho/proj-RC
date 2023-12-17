@@ -15,7 +15,7 @@ class Worker {
 
   void execute();
 
- public:
+public:
   int tcp_socket_fd = -1;
   bool shutdown = false;
   bool to_execute = false;
@@ -33,7 +33,7 @@ class WorkerPool {
   bool busy_threads[TCP_WORKER_POOL_SIZE];
   std::mutex busy_threads_lock;
 
- public:
+public:
   AuctionServerState &server_state;
 
   WorkerPool(AuctionServerState &__server_state);
@@ -44,7 +44,7 @@ class WorkerPool {
 std::string read_packet_id(int fd);
 
 class NoWorkersAvailableException : public std::runtime_error {
- public:
+public:
   NoWorkersAvailableException()
       : std::runtime_error(
             "All TCP workers are busy, cannot handle the incoming "

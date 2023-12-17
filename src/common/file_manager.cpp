@@ -3,7 +3,7 @@
 FileManager::FileManager()
 {
    //create base directories, doesn't check if they already exist because 
-    //it's not a problem if they do exist for the create_directory function
+  //it's not a problem if they do exist for the create_directory function
     std::filesystem::create_directory(BASE_DIR);
     std::string UserDir = std::string(BASE_DIR) + std::string("/") + USER_DIR;
     std::filesystem::create_directory(UserDir);
@@ -11,328 +11,294 @@ FileManager::FileManager()
     std::filesystem::create_directory(AuctionDir);
 }
 
-bool FileManager::writeToFile(const std::string &filename, const std::string &data, const std::string &directory)
-{
+bool FileManager::writeToFile(const std::string &filename,
+                              const std::string &data,
+                              const std::string &directory) {
 
-    std::ofstream file(std::string(BASE_DIR) + std::string("/") + directory + std::string("/") + filename);
+  std::ofstream file(std::string(BASE_DIR) + std::string("/") + directory +
+                     std::string("/") + filename);
 
-    if (!file.is_open())
-    {
-        throw FileOpenException(filename);
-        return false;
-    }
+  if (!file.is_open()) {
+    throw FileOpenException(filename);
+    return false;
+  }
 
-    file << data;
+  file << data;
 
-    if (!file.good())
-    {
-        throw FileWriteException(filename);
-        return false;
-    }
+  if (!file.good()) {
+    throw FileWriteException(filename);
+    return false;
+  }
 
-    file.close();
+  file.close();
 
-    return true;
+  return true;
 }
 
-std::string FileManager::readFromFile(const std::string &filename, const std::string &directory)
-{
-    std::ifstream file(std::string(BASE_DIR) + std::string("/") + directory + std::string("/") + filename);
-    std::string data;
+std::string FileManager::readFromFile(const std::string &filename,
+                                      const std::string &directory) {
+  std::ifstream file(std::string(BASE_DIR) + std::string("/") + directory +
+                     std::string("/") + filename);
+  std::string data;
 
-    if (!file.is_open())
-    {
-        throw FileOpenException(filename);
-        return "";
-    }
-
-    std::getline(file, data, '\0');
-    file.close();
-
-    if (data.empty())
-    {
-        throw FileReadException(filename);
-        return "";
-    }
-
-    return data;
-}
-
-void FileManager::safeLockUser(const std::string &userId, std::function<void()> func)
-{
-    try
-    {
-        std::lock_guard<std::mutex> lock(userMutexes[userId]);
-        func();
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "An exception occurred: " << e.what() << '\n';
-    }
-    catch (...)
-    {
-        std::cerr << "An unknown exception occurred.\n";
-    }
-}
-
-void FileManager::safeLockAuction(const std::string &auctionId, std::function<void()> func)
-{
-    try
-    {
-        std::lock_guard<std::mutex> lock(auctionMutexes[auctionId]);
-        func();
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "An exception occurred: " << e.what() << '\n';
-    }
-    catch (...)
-    {
-        std::cerr << "An unknown exception occurred.\n";
-    }
-}
-
-void FileManager::createUserDirectory(const std::string &userId)
-{
-    std::string UserDir = std::string(BASE_DIR) + "/" + std::string(USER_DIR) + "/" + userId;
-    std::filesystem::create_directory(UserDir);
-    std::filesystem::create_directory(UserDir + "/HOSTED");
-    std::filesystem::create_directory(UserDir + "/BIDDED");
-}
-
-void FileManager::createUserPassFile(const std::string &userId, const std::string &password)
-{
-    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_pass.txt");
-    file << password;
-    if (!file.good())
-    {
-        throw FileWriteException(userId + "_pass.txt");
-    }
-    file.close();
-}
-
-void FileManager::createUserLoginFile(const std::string &userId)
-{
-    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
-    file.close();
-}
-
-void FileManager::removeUserLoginFile(const std::string &userId)
-{
-    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
-}
-
-void FileManager::removeUserFiles(const std::string &userId)
-{
-    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
-    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_pass.txt");
-}
-
-void FileManager::createAuctionDirectory(const std::string &auctionId)
-{
-    std::filesystem::create_directory(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId);
-}
-
-void FileManager::createUserAuctionFile(const std::string &userId, const std::string &auctionId, const std::string &directory)
-{
-    std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + std::string("/") + directory + std::string("/") + auctionId);
-    file.close();
-}
-
-void FileManager::removeUserAuctionFile(const std::string &userId, const std::string &auctionId, const std::string &directory)
-{
-    std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + std::string("/") + directory + std::string("/") + auctionId);
-}
-
-void FileManager::createAuctionStartFile(const std::string &auctionId, const AuctionData &data)
-{
-    if (!writeToFile("START (" + auctionId + ").txt", data.toString(), AUCTION_DIR + std::string("/") + auctionId))
-    {
-        std::cerr << "Unable to create START file for auction: " << auctionId << std::endl;
-    }
-}
-
-void FileManager::createAuctionAssetFile(const std::string &auctionId, const std::string &assetFname)
-{
-    /* The file was created when we read the socket */
-    std::filesystem::path destination_filePath = std::filesystem::path(BASE_DIR) / AUCTION_DIR / auctionId / assetFname;
-    try
-    {
-        // Check if the source file exists and is a regular file
-        if (std::filesystem::exists(assetFname) && std::filesystem::is_regular_file(assetFname))
-        {
-            // Move the file to the destination directory
-            std::filesystem::rename(assetFname, destination_filePath);
-        }
-        else
-        {
-            std::cerr << "Source file does not exist or is not a regular file." << std::endl;
-        }
-    }
-    catch (const std::filesystem::filesystem_error &e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-}
-
-void FileManager::createAuctionEndFile(const std::string &auctionId, const std::string &endTime, const uint32_t &activeSeconds)
-{
-    std::stringstream ss;
-    ss << endTime << " " << activeSeconds;
-    if (!writeToFile("END (" + auctionId + ").txt", ss.str(), AUCTION_DIR + std::string("/") + auctionId))
-    {
-        throw FileWriteException("END (" + auctionId + ").txt");
-    }
-}
-
-void FileManager::createBidsDirectory(const std::string &auctionId)
-{
-    std::filesystem::create_directory(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS");
-}
-
-void FileManager::createBidFile(const std::string &auctionId, const std::string &userId, const std::string &bidValue, std::time_t startTime)
-{
-    std::string bidFileName = std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/BIDS/" + bidValue + ".txt";
-    std::ofstream file(bidFileName);
-
-    // get date of now in format YYYY-MM-DD HH:MM:SS
-    std::time_t bidDateTime = time(0);
-
-    // calculate the number of seconds elapsed since the start of the auction
-    std::time_t bidSecTime = bidDateTime - startTime;
-
-    if (file.is_open())
-    {
-        file << userId << " " << bidValue << " " << std::put_time(std::gmtime(&bidDateTime), "%Y-%m-%d %H:%M:%S") << " " << bidSecTime;
-        file.close();
-    }
-    else
-    {
-        throw FileOpenException(bidFileName);
-    }
-}
-
-std::string FileManager::getUserPassword(const std::string &userId)
-{
-    if (UserRegistered(userId))
-    {
-        return readFromFile(userId + "_pass.txt", USER_DIR + std::string("/") + std::string(userId));
-    }
-    throw UserNotRegisteredException(userId);
+  if (!file.is_open()) {
+    throw FileOpenException(filename);
     return "";
+  }
+
+  std::getline(file, data, '\0');
+  file.close();
+
+  if (data.empty()) {
+    throw FileReadException(filename);
+    return "";
+  }
+
+  return data;
 }
 
-bool FileManager::UserLoggedIn(const std::string &userId)
-{
-    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_login.txt");
+void FileManager::safeLockUser(const std::string &userId,
+                               std::function<void()> func) {
+  try {
+    std::lock_guard<std::mutex> lock(userMutexes[userId]);
+    func();
+  } catch (const std::exception &e) {
+    std::cerr << "An exception occurred: " << e.what() << '\n';
+  } catch (...) {
+    std::cerr << "An unknown exception occurred.\n";
+  }
 }
 
-bool FileManager::UserRegistered(const std::string &userId)
-{
-    return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId + "/" + userId + "_pass.txt");
+void FileManager::safeLockAuction(const std::string &auctionId,
+                                  std::function<void()> func) {
+  try {
+    std::lock_guard<std::mutex> lock(auctionMutexes[auctionId]);
+    func();
+  } catch (const std::exception &e) {
+    std::cerr << "An exception occurred: " << e.what() << '\n';
+  } catch (...) {
+    std::cerr << "An unknown exception occurred.\n";
+  }
+}
+
+void FileManager::createUserDirectory(const std::string &userId) {
+  std::string UserDir =
+      std::string(BASE_DIR) + "/" + std::string(USER_DIR) + "/" + userId;
+  std::filesystem::create_directory(UserDir);
+  std::filesystem::create_directory(UserDir + "/HOSTED");
+  std::filesystem::create_directory(UserDir + "/BIDDED");
+}
+
+void FileManager::createUserPassFile(const std::string &userId,
+                                     const std::string &password) {
+  std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId +
+                     "/" + userId + "_pass.txt");
+  file << password;
+  if (!file.good()) {
+    throw FileWriteException(userId + "_pass.txt");
+  }
+  file.close();
+}
+
+void FileManager::createUserLoginFile(const std::string &userId) {
+  std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + "/" + userId +
+                     "/" + userId + "_login.txt");
+  file.close();
+}
+
+void FileManager::removeUserLoginFile(const std::string &userId) {
+  std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" +
+                          userId + "/" + userId + "_login.txt");
+}
+
+void FileManager::removeUserFiles(const std::string &userId) {
+  std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" +
+                          userId + "/" + userId + "_login.txt");
+  std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR + "/" +
+                          userId + "/" + userId + "_pass.txt");
+}
+
+void FileManager::createAuctionDirectory(const std::string &auctionId) {
+  std::filesystem::create_directory(std::string(BASE_DIR) + "/" + AUCTION_DIR +
+                                    std::string("/") + auctionId);
+}
+
+void FileManager::createUserAuctionFile(const std::string &userId,
+                                        const std::string &auctionId,
+                                        const std::string &directory) {
+  std::ofstream file(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") +
+                     userId + std::string("/") + directory + std::string("/") +
+                     auctionId);
+  file.close();
+}
+
+void FileManager::removeUserAuctionFile(const std::string &userId,
+                                        const std::string &auctionId,
+                                        const std::string &directory) {
+  std::filesystem::remove(std::string(BASE_DIR) + "/" + USER_DIR +
+                          std::string("/") + userId + std::string("/") +
+                          directory + std::string("/") + auctionId);
+}
+
+void FileManager::createAuctionStartFile(const std::string &auctionId,
+                                         const AuctionData &data) {
+  if (!writeToFile("START (" + auctionId + ").txt", data.toString(),
+                   AUCTION_DIR + std::string("/") + auctionId)) {
+    std::cerr << "Unable to create START file for auction: " << auctionId
+              << std::endl;
+  }
+}
+
+void FileManager::createAuctionAssetFile(const std::string &auctionId,
+                                         const std::string &assetFname) {
+  /* The file was created when we read the socket */
+  std::filesystem::path destination_filePath =
+      std::filesystem::path(BASE_DIR) / AUCTION_DIR / auctionId / assetFname;
+  try {
+    // Check if the source file exists and is a regular file
+    if (std::filesystem::exists(assetFname) &&
+        std::filesystem::is_regular_file(assetFname)) {
+      // Move the file to the destination directory
+      std::filesystem::rename(assetFname, destination_filePath);
+    } else {
+      std::cerr << "Source file does not exist or is not a regular file."
+                << std::endl;
+    }
+  } catch (const std::filesystem::filesystem_error &e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+  }
+}
+
+void FileManager::createAuctionEndFile(const std::string &auctionId,
+                                       const std::string &endTime,
+                                       const uint32_t &activeSeconds) {
+  std::stringstream ss;
+  ss << endTime << " " << activeSeconds;
+  if (!writeToFile("END (" + auctionId + ").txt", ss.str(),
+                   AUCTION_DIR + std::string("/") + auctionId)) {
+    throw FileWriteException("END (" + auctionId + ").txt");
+  }
+}
+
+void FileManager::createBidsDirectory(const std::string &auctionId) {
+  std::filesystem::create_directory(std::string(BASE_DIR) + "/" + AUCTION_DIR +
+                                    std::string("/") + auctionId + "/BIDS");
+}
+
+void FileManager::createBidFile(const std::string &auctionId,
+                                const std::string &userId,
+                                const std::string &bidValue,
+                                std::time_t startTime) {
+  std::string bidFileName = std::string(BASE_DIR) + "/" + AUCTION_DIR +
+                            std::string("/") + auctionId + "/BIDS/" + bidValue +
+                            ".txt";
+  std::ofstream file(bidFileName);
+
+  // get date of now in format YYYY-MM-DD HH:MM:SS
+  std::time_t bidDateTime = time(0);
+
+  // calculate the number of seconds elapsed since the start of the auction
+  std::time_t bidSecTime = bidDateTime - startTime;
+
+  if (file.is_open()) {
+    file << userId << " " << bidValue << " "
+         << std::put_time(std::gmtime(&bidDateTime), "%Y-%m-%d %H:%M:%S") << " "
+         << bidSecTime;
+    file.close();
+  } else {
+    throw FileOpenException(bidFileName);
+  }
+}
+
+std::string FileManager::getUserPassword(const std::string &userId) {
+  if (UserRegistered(userId)) {
+    return readFromFile(userId + "_pass.txt",
+                        USER_DIR + std::string("/") + std::string(userId));
+  }
+  throw UserNotRegisteredException(userId);
+  return "";
+}
+
+bool FileManager::UserLoggedIn(const std::string &userId) {
+  return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + "/" +
+                                 userId + "/" + userId + "_login.txt");
+}
+
+bool FileManager::UserRegistered(const std::string &userId) {
+  return std::filesystem::exists(std::string(BASE_DIR) + "/" + USER_DIR + "/" +
+                                 userId + "/" + userId + "_pass.txt");
 }
 
 /*Returns True if END file does not exist and therefore auction is active*/
-bool FileManager::auctionIsActive(const std::string &auctionId)
-{
+bool FileManager::auctionIsActive(const std::string &auctionId) {
 
-    return !std::filesystem::exists(std::string(BASE_DIR) + "/" + AUCTION_DIR + std::string("/") + auctionId + "/END (" + auctionId + ").txt");
+  return !std::filesystem::exists(std::string(BASE_DIR) + "/" + AUCTION_DIR +
+                                  std::string("/") + auctionId + "/END (" +
+                                  auctionId + ").txt");
 }
 
-void FileManager::loginUser(const std::string &userId)
-{
-    safeLockUser(userId, [&]()
-                 { createUserLoginFile(userId); });
+void FileManager::loginUser(const std::string &userId) {
+  safeLockUser(userId, [&]() { createUserLoginFile(userId); });
 }
 
-void FileManager::logoutUser(const std::string &userId)
-{
-    safeLockUser(userId, [&]()
-                 { removeUserLoginFile(userId); });
+void FileManager::logoutUser(const std::string &userId) {
+  safeLockUser(userId, [&]() { removeUserLoginFile(userId); });
 }
 
-void FileManager::registerUser(const std::string &userId, const std::string &password)
-{
+void FileManager::registerUser(const std::string &userId,
+                               const std::string &password) {
 
-    safeLockUser(userId, [&]()
-                 { createUserDirectory(userId); });
+  safeLockUser(userId, [&]() { createUserDirectory(userId); });
 
-    safeLockUser(userId, [&]()
-                 { createUserPassFile(userId, password); });
+  safeLockUser(userId, [&]() { createUserPassFile(userId, password); });
 }
 
-void FileManager::unregisterUser(const std::string &userId)
-{
-    safeLockUser(userId, [&]()
-                 { removeUserFiles(userId); });
+void FileManager::unregisterUser(const std::string &userId) {
+  safeLockUser(userId, [&]() { removeUserFiles(userId); });
 }
 
-std::vector<std::pair<uint32_t, bool>> FileManager::getUserAuctions(const std::string &userId, const std::string &directory)
-{
-    std::vector<std::pair<uint32_t, bool>> auctionList;
-    for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId + std::string("/") + directory))
-    {
-        std::string auctionId = entry.path().filename().string();
+std::vector<std::pair<uint32_t, bool>>
+FileManager::getUserAuctions(const std::string &userId,
+                             const std::string &directory) {
+  std::vector<std::pair<uint32_t, bool>> auctionList;
+  for (const auto &entry : std::filesystem::directory_iterator(
+           std::string(BASE_DIR) + "/" + USER_DIR + std::string("/") + userId +
+           std::string("/") + directory)) {
+    std::string auctionId = entry.path().filename().string();
 
         safeLockAuction(auctionId, [&]()
                         {
             // update auction in case it ended
             UpdateAuction(auctionId);
 
-            // check if auction is active
-            bool isActive = auctionIsActive(auctionId);
-            uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
+      // check if auction is active
+      bool isActive = auctionIsActive(auctionId);
+      uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
 
-            // add to list
-            auctionList.push_back(std::make_pair(intAuctionId, isActive)); });
-    }
+      // add to list
+      auctionList.push_back(std::make_pair(intAuctionId, isActive));
+    });
+  }
 
-    std::sort(auctionList.begin(), auctionList.end());
+  std::sort(auctionList.begin(), auctionList.end());
 
-    return auctionList;
+  return auctionList;
 }
 
-std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions()
-{
-    std::vector<std::pair<uint32_t, bool>> auctionList;
-    for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + AUCTION_DIR))
-    {
-        if (std::filesystem::is_directory(entry.status()))
-        {
-            // update auction
-            std::string auctionId = entry.path().filename().string();
-            safeLockAuction(auctionId, [&]()
-                            {
-                        
-                    UpdateAuction(auctionId);
-                    bool isActive = auctionIsActive(auctionId); 
-                    uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
+std::vector<std::pair<uint32_t, bool>> FileManager::getAllAuctions() {
+  std::vector<std::pair<uint32_t, bool>> auctionList;
+  for (const auto &entry : std::filesystem::directory_iterator(
+           std::string(BASE_DIR) + "/" + AUCTION_DIR)) {
+    if (std::filesystem::is_directory(entry.status())) {
+      // update auction
+      std::string auctionId = entry.path().filename().string();
+      safeLockAuction(auctionId, [&]() {
+        UpdateAuction(auctionId);
+        bool isActive = auctionIsActive(auctionId);
+        uint32_t intAuctionId = static_cast<uint32_t>(std::stoi(auctionId));
 
-                auctionList.push_back(std::make_pair(intAuctionId, isActive)); });
-        }
-    }
-
-    if (auctionList.empty())
-    {
-        throw NoAuctionsException();
-    }
-
-    //sort auctions by auctionID
-
-    std::sort(auctionList.begin(), auctionList.end());
-
-    return auctionList;
-}
-
-AuctionData FileManager::getAuction(const uint32_t auctionIdInt)
-{
-    AuctionData data;
-
-    std::string auctionId = AuctionData::idToString(auctionIdInt);
-    // check if start file exists
-    if (!std::filesystem::exists(std::string(BASE_DIR) + std::string(AUCTION_DIR) + auctionId + "/START (" + auctionId + ").txt"))
-    {
-        throw AuctionDoesNotExistException(auctionId);
+        auctionList.push_back(std::make_pair(intAuctionId, isActive));
+      });
     }
 
     safeLockAuction(auctionId, [&]()
@@ -468,101 +434,96 @@ void FileManager::UpdateAuction(const std::string &auctionId)
     } else {
         return;
     }
+  } else {
+    return;
+  }
 }
 
-void FileManager::closeAuction(AuctionData &auction)
-{
+void FileManager::closeAuction(AuctionData &auction) {
 
-    std::time_t now = std::time(nullptr);
+  std::time_t now = std::time(nullptr);
 
-    // get string in format YYYY-MM-DD HH:MM:SS for now
-    std::ostringstream oss;
-    oss << std::put_time(std::gmtime(&now), "%Y-%m-%d %H:%M:%S");
-    std::string endTimeDate = oss.str();
+  // get string in format YYYY-MM-DD HH:MM:SS for now
+  std::ostringstream oss;
+  oss << std::put_time(std::gmtime(&now), "%Y-%m-%d %H:%M:%S");
+  std::string endTimeDate = oss.str();
 
     uint32_t durationSeconds = static_cast<uint32_t>(now - auction.getStartTime());
 
-    safeLockAuction(auction.getIdString(), [&]()
-                    {
-        if (auctionIsActive(auction.getIdString())) {
-            createAuctionEndFile(auction.getIdString(), endTimeDate, durationSeconds);
-        }
-        else {
-            throw AuctionNotActiveException(auction.getIdString());
-        } });
+  safeLockAuction(auction.getIdString(), [&]() {
+    if (auctionIsActive(auction.getIdString())) {
+      createAuctionEndFile(auction.getIdString(), endTimeDate, durationSeconds);
+    } else {
+      throw AuctionNotActiveException(auction.getIdString());
+    }
+  });
 }
 
-std::filesystem::path FileManager::showAsset(AuctionData &auction)
-{
-    std::filesystem::path assetPath;
+std::filesystem::path FileManager::showAsset(AuctionData &auction) {
+  std::filesystem::path assetPath;
 
     safeLockAuction(auction.getIdString(), [&]()
                     {
         UpdateAuction(auction.getIdString());
 
-        assetPath = std::filesystem::path(BASE_DIR) / AUCTION_DIR / auction.getIdString() / auction.getAssetFname();
-        if (assetPath.empty())
-        {
-            throw InvalidFilePathException(assetPath);
-        }
+    assetPath = std::filesystem::path(BASE_DIR) / AUCTION_DIR /
+                auction.getIdString() / auction.getAssetFname();
+    if (assetPath.empty()) {
+      throw InvalidFilePathException(assetPath);
+    }
 
-        if (std::filesystem::exists(assetPath))
-        {
-            return assetPath;
-        }
+    if (std::filesystem::exists(assetPath)) {
+      return assetPath;
+    }
 
-        throw AssetDoesNotExistException(assetPath);
-        return std::filesystem::path(); });
+    throw AssetDoesNotExistException(assetPath);
+    return std::filesystem::path();
+  });
 
-    return assetPath;
+  return assetPath;
 }
 
-void FileManager::bid(AuctionData &auction, uint32_t bidValue, const std::string &userId)
-{
+void FileManager::bid(AuctionData &auction, uint32_t bidValue,
+                      const std::string &userId) {
 
-    if (auctionIsActive(auction.getIdString()))
-    {
-        // bid value string must be a 6 digit number so fill with 0's
-        std::string bidValueString = std::to_string(bidValue);
-        while (bidValueString.length() < 6)
-        {
-            bidValueString = "0" + bidValueString;
-        }
-
-        safeLockAuction(auction.getIdString(), [&]()
-                        { createBidFile(auction.getIdString(), userId, bidValueString, auction.getStartTime()); });
-
-        safeLockUser(userId, [&]()
-                     {createUserAuctionFile(userId, auction.getIdString(), "BIDDED"); });
+  if (auctionIsActive(auction.getIdString())) {
+    // bid value string must be a 6 digit number so fill with 0's
+    std::string bidValueString = std::to_string(bidValue);
+    while (bidValueString.length() < 6) {
+      bidValueString = "0" + bidValueString;
     }
-    else
-    {
-        throw AuctionNotActiveException(auction.getIdString());
-    }
+
+    safeLockAuction(auction.getIdString(), [&]() {
+      createBidFile(auction.getIdString(), userId, bidValueString,
+                    auction.getStartTime());
+    });
+
+    safeLockUser(userId, [&]() {
+      createUserAuctionFile(userId, auction.getIdString(), "BIDDED");
+    });
+  } else {
+    throw AuctionNotActiveException(auction.getIdString());
+  }
 }
 
-uint32_t FileManager::getAuctionsCount()
-{
-    uint32_t count = 1;
-    for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + AUCTION_DIR))
-    {
-        if (std::filesystem::is_directory(entry.status()))
-        {
-            count++;
-        }
+uint32_t FileManager::getAuctionsCount() {
+  uint32_t count = 1;
+  for (const auto &entry : std::filesystem::directory_iterator(
+           std::string(BASE_DIR) + "/" + AUCTION_DIR)) {
+    if (std::filesystem::is_directory(entry.status())) {
+      count++;
     }
-    return count;
+  }
+  return count;
 }
 
-void FileManager::shutdown()
-{
-    // logout all users
-    for (const auto &entry : std::filesystem::directory_iterator(std::string(BASE_DIR) + "/" + USER_DIR))
-    {
-        if (std::filesystem::is_directory(entry.status()))
-        {
-            std::string userId = entry.path().filename().string();
-            logoutUser(userId);
-        }
+void FileManager::shutdown() {
+  // logout all users
+  for (const auto &entry : std::filesystem::directory_iterator(
+           std::string(BASE_DIR) + "/" + USER_DIR)) {
+    if (std::filesystem::is_directory(entry.status())) {
+      std::string userId = entry.path().filename().string();
+      logoutUser(userId);
     }
+  }
 }

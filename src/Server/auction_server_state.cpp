@@ -11,13 +11,14 @@
 #include "../common/protocol.hpp"
 #include "packet_handlers.hpp"
 
-AuctionServerState::AuctionServerState(std::string &port, bool __verbose, FileManager& fileManager, uint32_t __auctionsCount)
-    : cdebug{DebugStream(__verbose)} , file_manager{fileManager} { 
+AuctionServerState::AuctionServerState(std::string &port, bool __verbose,
+                                       FileManager &fileManager,
+                                       uint32_t __auctionsCount)
+    : cdebug{DebugStream(__verbose)}, file_manager{fileManager} {
   this->setup_sockets();
   this->resolveServerAddress(port);
   this->registerPacketHandlers();
   this->auctionsCount = __auctionsCount;
-  
 }
 
 AuctionServerState::~AuctionServerState() {
@@ -39,18 +40,21 @@ void AuctionServerState::registerPacketHandlers() {
   // UDP
   udp_packet_handlers.insert({LoginServerbound::ID, handle_login_user});
   udp_packet_handlers.insert({LogoutServerbound::ID, handle_logout_user});
-  udp_packet_handlers.insert({UnregisterServerbound::ID, handle_unregister_user});
-  udp_packet_handlers.insert({ListMyAuctionsServerbound::ID, handle_list_myauctions});
+  udp_packet_handlers.insert(
+      {UnregisterServerbound::ID, handle_unregister_user});
+  udp_packet_handlers.insert(
+      {ListMyAuctionsServerbound::ID, handle_list_myauctions});
   udp_packet_handlers.insert({MyBidsServerbound::ID, handle_list_mybids});
-  udp_packet_handlers.insert({ListAuctionsServerbound::ID, handle_list_auctions});
+  udp_packet_handlers.insert(
+      {ListAuctionsServerbound::ID, handle_list_auctions});
   udp_packet_handlers.insert({ShowRecordServerbound::ID, handle_show_record});
 
   // TCP
   tcp_packet_handlers.insert({OpenAuctionServerbound::ID, handle_open_auction});
-  tcp_packet_handlers.insert({CloseAuctionServerbound::ID, handle_close_auction});
+  tcp_packet_handlers.insert(
+      {CloseAuctionServerbound::ID, handle_close_auction});
   tcp_packet_handlers.insert({ShowAssetServerbound::ID, handle_show_asset});
   tcp_packet_handlers.insert({BidServerbound::ID, handle_bid});
-
 }
 
 void AuctionServerState::setup_sockets() {
@@ -101,9 +105,9 @@ void AuctionServerState::resolveServerAddress(std::string &port) {
   const char *port_str = port.c_str();
   // Get UDP address
   memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_INET;       // IPv4
-  hints.ai_socktype = SOCK_DGRAM;  // UDP socket
-  hints.ai_flags = AI_PASSIVE;     // Listen on 0.0.0.0
+  hints.ai_family = AF_INET;      // IPv4
+  hints.ai_socktype = SOCK_DGRAM; // UDP socket
+  hints.ai_flags = AI_PASSIVE;    // Listen on 0.0.0.0
   if ((addr_res =
            getaddrinfo(NULL, port_str, &hints, &this->server_udp_addr)) != 0) {
     throw UnrecoverableError(
@@ -118,9 +122,9 @@ void AuctionServerState::resolveServerAddress(std::string &port) {
 
   // Get TCP address
   memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_INET;        // IPv4
-  hints.ai_socktype = SOCK_STREAM;  // TCP socket
-  hints.ai_flags = AI_PASSIVE;      // Listen on 0.0.0.0
+  hints.ai_family = AF_INET;       // IPv4
+  hints.ai_socktype = SOCK_STREAM; // TCP socket
+  hints.ai_flags = AI_PASSIVE;     // Listen on 0.0.0.0
   if ((addr_res = getaddrinfo(NULL, port.c_str(), &hints,
                               &this->server_tcp_addr)) != 0) {
     throw UnrecoverableError(
@@ -136,10 +140,9 @@ void AuctionServerState::resolveServerAddress(std::string &port) {
   std::cout << "Listening for connections on port " << port << std::endl;
 }
 
-
 void AuctionServerState::callUdpPacketHandler(std::string packet_id,
-                                           std::stringstream &stream,
-                                           Address &addr_from) {
+                                              std::stringstream &stream,
+                                              Address &addr_from) {
   auto handler = this->udp_packet_handlers.find(packet_id);
   if (handler == this->udp_packet_handlers.end()) {
     cdebug << "Received unknown Packet ID" << std::endl;
@@ -150,7 +153,7 @@ void AuctionServerState::callUdpPacketHandler(std::string packet_id,
 }
 
 void AuctionServerState::callTcpPacketHandler(std::string packet_id,
-                                           int connection_fd) {
+                                              int connection_fd) {
   auto handler = this->tcp_packet_handlers.find(packet_id);
   if (handler == this->tcp_packet_handlers.end()) {
     cdebug << "Received unknown Packet ID" << std::endl;

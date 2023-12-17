@@ -11,12 +11,12 @@
 #include <stdexcept>
 #include <vector>
 
-#include "file_manager.hpp"
 #include "auction_data.hpp"
+#include "file_manager.hpp"
 
 // Thrown when the PacketID does not match what was expected
 class UnexpectedPacketException : public std::runtime_error {
- public:
+public:
   UnexpectedPacketException()
       : std::runtime_error(
             "The server did not reply with the expected response, so it was "
@@ -26,16 +26,17 @@ class UnexpectedPacketException : public std::runtime_error {
 
 // Thrown when the PacketID is correct, but the schema is wrong
 class InvalidPacketException : public std::runtime_error {
- public:
+public:
   InvalidPacketException()
       : std::runtime_error(
             "The response given by the server is not correctly structured, so "
-            "it was ignored. Please try again or connect to a different Auction "
+            "it was ignored. Please try again or connect to a different "
+            "Auction "
             "server.") {}
 };
 
 class ErrorUdpPacketException : public std::runtime_error {
- public:
+public:
   ErrorUdpPacketException()
       : std::runtime_error(
             "The server detected an error in the command sent by this user, so "
@@ -44,7 +45,7 @@ class ErrorUdpPacketException : public std::runtime_error {
 };
 
 class ErrorTcpPacketException : public std::runtime_error {
- public:
+public:
   ErrorTcpPacketException()
       : std::runtime_error(
             "The server detected an error in the command sent by this user, so "
@@ -54,7 +55,7 @@ class ErrorTcpPacketException : public std::runtime_error {
 
 // Thrown when serialization error occurs
 class PacketSerializationException : public std::runtime_error {
- public:
+public:
   PacketSerializationException()
       : std::runtime_error(
             "There was an error while preparing a request, "
@@ -64,16 +65,16 @@ class PacketSerializationException : public std::runtime_error {
 
 // Thrown when timeout for reading/writing packet occurs
 class ConnectionTimeoutException : public std::runtime_error {
- public:
+public:
   ConnectionTimeoutException()
-      : std::runtime_error(
-            "Could not connect to the Auction server, please check your internet "
-            "connection and try again.") {}
+      : std::runtime_error("Could not connect to the Auction server, please "
+                           "check your internet "
+                           "connection and try again.") {}
 };
 
 // Thrown when an error related to I/O occurs
 class IOException : public std::runtime_error {
- public:
+public:
   IOException()
       : std::runtime_error(
             "IO error while reading/writting from/to filesystem") {}
@@ -81,41 +82,38 @@ class IOException : public std::runtime_error {
 
 // Thrown when an error related to I/O occurs
 class OperationCancelledException : public std::runtime_error {
- public:
+public:
   OperationCancelledException()
       : std::runtime_error("Operation cancelled by user") {}
 };
 
 class UdpPacket {
- private:
+private:
   void readChar(std::stringstream &buffer, char chr);
 
- protected:
+protected:
   void readPacketId(std::stringstream &buffer, const char *id);
   void readSpace(std::stringstream &buffer);
   char readChar(std::stringstream &buffer);
   char readAlphabeticalChar(std::stringstream &buffer);
   void readPacketDelimiter(std::stringstream &buffer);
   std::string readString(std::stringstream &buffer, uint32_t max_len);
-  std::string readAlphabeticalString(std::stringstream &buffer,
-                                     uint32_t max_len);
   uint32_t readInt(std::stringstream &buffer);
   uint32_t readUserId(std::stringstream &buffer);
   uint32_t readAuctionId(std::stringstream &buffer);
   Bid readBid(std::stringstream &buffer);
-  std::vector<std::pair<uint32_t, bool>> readAuctions(std::stringstream& buffer);
+  std::vector<std::pair<uint32_t, bool>> readAuctions(std::stringstream &buffer);
 
- public:
+public:
   virtual std::stringstream serialize() = 0;
   virtual void deserialize(std::stringstream &buffer) = 0;
 
   virtual ~UdpPacket() = default;
 };
 
-
 // Start New Auction Packet (LIN)
 class LoginServerbound : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "LIN";
   uint32_t user_id;
   std::string password;
@@ -126,8 +124,8 @@ class LoginServerbound : public UdpPacket {
 
 // Reply to Start Auction Packet (RLI)
 class ReplyLoginClientbound : public UdpPacket {
- public:
-  enum status { OK, NOK, REG, ERR};
+public:
+  enum status { OK, NOK, REG, ERR };
   static constexpr const char *ID = "RLI";
   status status;
   std::stringstream serialize();
@@ -136,7 +134,7 @@ class ReplyLoginClientbound : public UdpPacket {
 
 // Logout Packet (LOU)
 class LogoutServerbound : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "LOU";
   uint32_t user_id;
   std::string password;
@@ -147,8 +145,8 @@ class LogoutServerbound : public UdpPacket {
 
 // Reply to Logout Packet (RLO)
 class ReplyLogoutClientbound : public UdpPacket {
- public:
-  enum status { OK, NOK, UNR, ERR};
+public:
+  enum status { OK, NOK, UNR, ERR };
   static constexpr const char *ID = "RLO";
   status status;
   std::stringstream serialize();
@@ -157,7 +155,7 @@ class ReplyLogoutClientbound : public UdpPacket {
 
 // Unregister Packet (UNR)
 class UnregisterServerbound : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "UNR";
   uint32_t user_id;
   std::string password;
@@ -168,8 +166,8 @@ class UnregisterServerbound : public UdpPacket {
 
 // Reply to Unregister Packet (RUN)
 class ReplyUnregisterClientbound : public UdpPacket {
- public:
-  enum status { OK, NOK, UNR, ERR};
+public:
+  enum status { OK, NOK, UNR, ERR };
   static constexpr const char *ID = "RUR";
   status status;
   std::stringstream serialize();
@@ -179,7 +177,7 @@ class ReplyUnregisterClientbound : public UdpPacket {
 // List MyAuctions Packet (LMA)
 
 class ListMyAuctionsServerbound : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "LMA";
   uint32_t user_id;
 
@@ -190,8 +188,8 @@ class ListMyAuctionsServerbound : public UdpPacket {
 // Reply to List MyAuctions Packet (RLM)
 
 class ReplyListMyAuctionsClientbound : public UdpPacket {
- public:
-  enum status { OK, NLG, NOK, ERR};
+public:
+  enum status { OK, NLG, NOK, ERR };
   static constexpr const char *ID = "RMA";
   std::vector<std::pair<uint32_t, bool>> auctions;
 
@@ -203,7 +201,7 @@ class ReplyListMyAuctionsClientbound : public UdpPacket {
 // List my bids Packet (LMB)
 
 class MyBidsServerbound : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "LMB";
   uint32_t user_id;
 
@@ -214,7 +212,7 @@ class MyBidsServerbound : public UdpPacket {
 // Reply to List my bids Packet (RMB)
 
 class ReplyMyBidsClientbound : public UdpPacket {
- public:
+public:
   enum status { OK, NOK, NLG, ERR };
   static constexpr const char *ID = "RMB";
   status status;
@@ -227,9 +225,8 @@ class ReplyMyBidsClientbound : public UdpPacket {
 // List Auctions Packet (LST)
 
 class ListAuctionsServerbound : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "LST";
-  
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
@@ -238,7 +235,7 @@ class ListAuctionsServerbound : public UdpPacket {
 // Reply to List Auctions Packet (RLS)
 
 class ReplyListAuctionsClientbound : public UdpPacket {
- public:
+public:
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RLS";
   status status;
@@ -248,19 +245,16 @@ class ReplyListAuctionsClientbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-
 class ErrorUdpPacket : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "ERR";
 
   std::stringstream serialize();
   void deserialize(std::stringstream &buffer);
 };
 
-
-
 class ShowRecordServerbound : public UdpPacket {
- public:
+public:
   static constexpr const char *ID = "SRC";
   uint32_t auction_id;
 
@@ -268,9 +262,8 @@ class ShowRecordServerbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-
 class ReplyShowRecordClientbound : public UdpPacket {
- public:
+public:
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RRC";
   status status;
@@ -283,14 +276,13 @@ class ReplyShowRecordClientbound : public UdpPacket {
   void deserialize(std::stringstream &buffer);
 };
 
-
 class TcpPacket {
- private:
+private:
   char delimiter = 0;
 
   void readChar(int fd, char chr);
 
- protected:
+protected:
   void writeString(int fd, const std::string &str);
   void readPacketId(int fd, const char *id);
   void readSpace(int fd);
@@ -305,7 +297,7 @@ class TcpPacket {
   void readAndSaveToFile(const int fd, const std::string &file_name,
                          const size_t file_size, const bool cancellable);
 
- public:
+public:
   virtual void send(int fd) = 0;
   virtual void receive(int fd) = 0;
 
@@ -313,7 +305,7 @@ class TcpPacket {
 };
 
 class OpenAuctionServerbound : public TcpPacket {
- public:
+public:
   static constexpr const char *ID = "OPA";
   uint32_t user_id;
   std::string password;
@@ -323,26 +315,24 @@ class OpenAuctionServerbound : public TcpPacket {
   std::string file_name;
   uint32_t file_size;
   std::filesystem::path file_path;
-  
 
   void send(int fd);
   void receive(int fd);
 };
 
 class ReplyOpenAuctionClientbound : public TcpPacket {
- public:
+public:
   enum status { OK, NOK, NLG, ERR };
   static constexpr const char *ID = "ROA";
   status status;
-  uint32_t auction_id; 
-  
+  uint32_t auction_id;
 
   void send(int fd);
   void receive(int fd);
 };
 
 class CloseAuctionServerbound : public TcpPacket {
- public:
+public:
   static constexpr const char *ID = "CLS";
   uint32_t user_id;
   std::string password;
@@ -353,8 +343,8 @@ class CloseAuctionServerbound : public TcpPacket {
 };
 
 class ReplyCloseAuctionClientbound : public TcpPacket {
- public:
-  enum status { OK, EAU, EOW, END, NLG, ERR};
+public:
+  enum status { OK, EAU, EOW, END, NLG, ERR };
   static constexpr const char *ID = "RCL";
   status status;
 
@@ -362,9 +352,8 @@ class ReplyCloseAuctionClientbound : public TcpPacket {
   void receive(int fd);
 };
 
-
 class ShowAssetServerbound : public TcpPacket {
- public:
+public:
   static constexpr const char *ID = "SAS";
   uint32_t auction_id;
 
@@ -373,7 +362,7 @@ class ShowAssetServerbound : public TcpPacket {
 };
 
 class ReplyShowAssetClientbound : public TcpPacket {
- public:
+public:
   enum status { OK, NOK, ERR };
   static constexpr const char *ID = "RSA";
   status status;
@@ -386,7 +375,7 @@ class ReplyShowAssetClientbound : public TcpPacket {
 };
 
 class BidServerbound : public TcpPacket {
- public:
+public:
   static constexpr const char *ID = "BID";
   uint32_t user_id;
   std::string password;
@@ -398,19 +387,17 @@ class BidServerbound : public TcpPacket {
 };
 
 class ReplyBidClientbound : public TcpPacket {
- public:
+public:
   enum status { ACC, NOK, NLG, ILG, REF, ERR };
   static constexpr const char *ID = "RBD";
   status status;
-
 
   void send(int fd);
   void receive(int fd);
 };
 
-
 class ErrorTcpPacket : public TcpPacket {
- public:
+public:
   static constexpr const char *ID = "ERR";
 
   void send(int fd);
@@ -438,11 +425,12 @@ void sendFile(int connection_fd, std::filesystem::path image_path);
 
 uint32_t getFileSize(std::filesystem::path file_path);
 
-std::string auctionsToString(const std::vector<std::pair<uint32_t, bool>>& auctions);
+std::string
+auctionsToString(const std::vector<std::pair<uint32_t, bool>> &auctions);
 
 std::string fillZeros(uint32_t number, int length);
 
-void readBid(std::stringstream &buffer, AuctionData& auction);
+void readBid(std::stringstream &buffer, AuctionData &auction);
 
 std::string auctionID_ToString(uint32_t auction_id);
 

@@ -23,19 +23,20 @@ void UdpPacket::readPacketId(std::stringstream &buffer, const char *packet_id) {
     if (!buffer.good() || current_char != *packet_id) {
       // Check if the unexpected packet is an error packet
       if (current_char != errorID[errorID_counter]) {
-        
+
         // If it is not an error packet, throw an exception
         throw UnexpectedPacketException();
       } else {
-        
+
         // While the packet seems to be an error packet, keep reading
         errorID_counter++;
       }
-      
-      // If it's confirmed that the packet is an error packet, throw an exception
+
+      // If it's confirmed that the packet is an error packet, throw an
+      // exception
       if (errorID_counter == 3) {
-        // Without the packet delimiter, the error packet would invalid
-        readPacketDelimiter(buffer); 
+        // Without the packet delimiter, the error packet would be invalid
+        readPacketDelimiter(buffer);
         throw ErrorUdpPacketException();
       }
     }
@@ -68,14 +69,13 @@ char UdpPacket::readAlphabeticalChar(std::stringstream &buffer) {
   return (char)tolower((unsigned char)c);
 }
 
-void UdpPacket::readSpace(std::stringstream &buffer) {
-  readChar(buffer, ' ');
-}
+void UdpPacket::readSpace(std::stringstream &buffer) { readChar(buffer, ' '); }
 
 void UdpPacket::readPacketDelimiter(std::stringstream &buffer) {
   readChar(buffer, '\n');
   buffer.peek();
-  if (!buffer.eof()) { // If there is more data in the buffer, the packet is invalid
+  if (!buffer.eof()) { // If there is more data in the buffer, the packet is
+                       // invalid
     throw InvalidPacketException();
   }
 }
@@ -94,19 +94,6 @@ std::string UdpPacket::readString(std::stringstream &buffer, uint32_t max_len) {
     }
     str += c;
     ++i;
-  }
-  return str;
-};
-
-std::string UdpPacket::readAlphabeticalString(std::stringstream &buffer,
-                                              uint32_t max_len) {
-  auto str = readString(buffer, max_len);
-  for (uint32_t i = 0; i < str.length(); ++i) {
-    if (!isalpha((unsigned char)str[i])) {
-      throw InvalidPacketException();
-    }
-
-    str[i] = (char)tolower((unsigned char)str[i]);
   }
   return str;
 };
@@ -130,7 +117,7 @@ uint32_t UdpPacket::readAuctionId(std::stringstream &buffer) {
   return parse_packet_auction_id(id_str);
 };
 
-// Packet type seriliazation and deserialization methods
+// ----- Packet type seriliazation and deserialization methods -----
 std::stringstream LoginServerbound::serialize() {
   std::stringstream buffer;
   buffer << LoginServerbound::ID << " ";
@@ -150,8 +137,6 @@ void LoginServerbound::deserialize(std::stringstream &buffer) {
   readPacketDelimiter(buffer);
 };
 
-
-
 std::stringstream ReplyLoginClientbound::serialize() {
   std::stringstream buffer;
   buffer << ReplyLoginClientbound::ID << " ";
@@ -169,7 +154,6 @@ std::stringstream ReplyLoginClientbound::serialize() {
   buffer << std::endl;
   return buffer;
 }
-
 
 void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   buffer >> std::noskipws;
@@ -189,7 +173,6 @@ void ReplyLoginClientbound::deserialize(std::stringstream &buffer) {
   }
   readPacketDelimiter(buffer);
 };
-
 
 std::stringstream LogoutServerbound::serialize() {
   std::stringstream buffer;
@@ -219,7 +202,7 @@ std::stringstream ReplyLogoutClientbound::serialize() {
     buffer << "NOK";
   } else if (status == ReplyLogoutClientbound::status::UNR) {
     buffer << "UNR";
-  } else if (status == ReplyLogoutClientbound::status::ERR){
+  } else if (status == ReplyLogoutClientbound::status::ERR) {
     buffer << "ERR";
   } else {
     throw PacketSerializationException();
@@ -483,24 +466,24 @@ std::stringstream ReplyShowRecordClientbound::serialize() {
     buffer << " " << auction.getInitialBid() << " ";
     buffer << auction.getStartTimeString() << " ";
     buffer << auction.getDurationSeconds();
+
     if (auction.hasBids()) {
-      const std::vector<Bid>& bids = auction.getBids();
+      const std::vector<Bid> &bids = auction.getBids();
       std::vector<Bid>::size_type numBidsToRetrieve = 50;
       std::vector<Bid>::size_type totalBids = bids.size();
-      std::vector<Bid>::size_type startIndex = 
+      std::vector<Bid>::size_type startIndex =
           totalBids > numBidsToRetrieve ? totalBids - numBidsToRetrieve : 0;
 
       for (std::vector<Bid>::size_type i = startIndex; i < totalBids; ++i) {
-          // Access bids by index
-          const Bid& currentBid = bids[i];
-          // Perform operations with currentBid
-          buffer << " B ";
-          write_user_id(buffer, currentBid.bidder_user_id);
-          buffer << " " << currentBid.bid_value;
-          buffer << " " << currentBid.date_time;
-          buffer << " " << currentBid.sec_time;
+        // Access bids by index
+        const Bid &currentBid = bids[i];
+        // Perform operations with currentBid
+        buffer << " B ";
+        write_user_id(buffer, currentBid.bidder_user_id);
+        buffer << " " << currentBid.bid_value;
+        buffer << " " << currentBid.date_time;
+        buffer << " " << currentBid.sec_time;
       }
-      
     }
     if (!auction.isActive()) {
       buffer << " E ";
@@ -524,7 +507,6 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
   readSpace(buffer);
   auto status_str = readString(buffer, PACKET_ID_LEN);
 
- 
   if (status_str == "OK") {
     status = OK;
     readSpace(buffer);
@@ -538,30 +520,30 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
     auction.setInitialBid(readInt(buffer));
     readSpace(buffer);
 
-    //read date time reads space
     startTime = read_date_time(buffer);
- 
+    // Don't need to readSpace() because read date time reads an extra space
+
     auction.setDurationSeconds(readInt(buffer));
-    int bidCounter = 0;
+
     // Read bids and end time
-   if ( buffer.peek() != '\n'){ // Check if there are bids or end time
-      while (buffer.peek() == ' '){
+    int bidCounter = 0;
+    if (buffer.peek() != '\n') { // Check if there are bids or end time
+      while (buffer.peek() == ' ') {
         readSpace(buffer);
-        if (buffer.peek() == 'B'){ // Read bid
+        if (buffer.peek() == 'B') { // Read bid
           auction.addBid(readBid(buffer));
           bidCounter++;
           if (bidCounter > 50) { // You cant receive more than 50 bids
             throw InvalidPacketException();
           }
-        } else if (buffer.peek() == 'E'){ // Read end time
+        } else if (buffer.peek() == 'E') { // Read end time
           readChar(buffer);
-
           readSpace(buffer);
           endTime = read_date_time(buffer);
           auction.setEndTime(endTime);
           auction.setEndTimeSec(readInt(buffer));
           break;
-        } 
+        }
       }
     }
   } else if (status_str == "NOK") {
@@ -573,8 +555,6 @@ void ReplyShowRecordClientbound::deserialize(std::stringstream &buffer) {
   }
   readPacketDelimiter(buffer);
 };
-
-
 
 std::stringstream ErrorUdpPacket::serialize() {
   std::stringstream buffer;
@@ -609,16 +589,17 @@ void TcpPacket::readPacketId(int fd, const char *packet_id) {
     if (read(fd, &current_char, 1) != 1 || current_char != *packet_id) {
       // Check if the unexpected packet is an error packet
       if (current_char != errorID[errorID_counter]) {
-        
+
         // If it is not an error packet, throw an exception
         throw UnexpectedPacketException();
       } else { // While the packet seems to be an error packet, keep reading
         errorID_counter++;
       }
-      // If it's confirmed that the packet is an error packet, throw an exception
+      // If it's confirmed that the packet is an error packet, throw an
+      // exception
       if (errorID_counter == 3) {
-        // Without the packet delimiter, the error packet would invalid
-        readPacketDelimiter(fd); 
+        // Without the packet delimiter, the error packet would be invalid
+        readPacketDelimiter(fd);
         throw ErrorTcpPacketException();
       }
     }
@@ -646,13 +627,9 @@ char TcpPacket::readChar(int fd) {
   return c;
 }
 
-void TcpPacket::readSpace(int fd) {
-  readChar(fd, ' ');
-}
+void TcpPacket::readSpace(int fd) { readChar(fd, ' '); }
 
-void TcpPacket::readPacketDelimiter(int fd) {
-  readChar(fd, '\n');
-}
+void TcpPacket::readPacketDelimiter(int fd) { readChar(fd, '\n'); }
 
 std::string TcpPacket::readString(const int fd) {
   std::string result;
@@ -721,15 +698,15 @@ uint32_t TcpPacket::readFileSize(const int fd) {
 
 std::string TcpPacket::readFileName(const int fd) {
   std::string str = readString(fd);
-  if(str.length() > ASSET_NAME_MAX_LENGTH){
+  if (str.length() > ASSET_NAME_MAX_LENGTH) {
     throw InvalidPacketException();
   }
   for (uint32_t i = 0; i < str.length(); ++i) {
     char c = str[i];
-    if (!isalpha((unsigned char)c) && !isdigit(c) && c != '-' && c != '_' && c != '.') {
+    if (!isalpha((unsigned char)c) && !isdigit(c) && c != '-' && c != '_' &&
+        c != '.') {
       throw InvalidPacketException();
     }
-
   }
   return str;
 }
@@ -794,8 +771,8 @@ void TcpPacket::readAndSaveToFile(const int fd, const std::string &file_name,
       if (((downloaded_size - (size_t)n) * 100 / file_size) %
               PROGRESS_BAR_STEP_SIZE >
           (downloaded_size * 100 / file_size) % PROGRESS_BAR_STEP_SIZE) {
-        std::cout << "Downloading Asset: " << downloaded_size * 100 / file_size << "%"
-                  << std::endl;
+        std::cout << "Downloading Asset: " << downloaded_size * 100 / file_size
+                  << "%" << std::endl;
       }
     } else if (FD_ISSET(fileno(stdin), &file_descriptors)) {
       if (std::cin.peek() != '\n') {
@@ -817,17 +794,17 @@ void OpenAuctionServerbound::send(int fd) {
   std::stringstream stream;
   file_size = getFileSize(file_path);
 
-  stream << OpenAuctionServerbound::ID << " " ;
+  stream << OpenAuctionServerbound::ID << " ";
   write_user_id(stream, user_id);
   stream << " " << password << " " << auction_name << " ";
   stream << start_value << " " << time_active << " ";
   stream << file_name << " " << file_size << " ";
-  
+
   writeString(fd, stream.str());
 
   stream.str(std::string()); // clears the stream
-  stream.clear(); // resets any error flags
-  sendFile(fd, file_path); // Send file_data
+  stream.clear();            // resets any error flags
+  sendFile(fd, file_path);   // Send file_data
 
   writeString(fd, "\n"); // Send packet delimiter
 }
@@ -919,9 +896,9 @@ void ReplyCloseAuctionClientbound::send(int fd) {
   stream << ReplyCloseAuctionClientbound::ID << " ";
   if (status == OK) {
     stream << "OK";
-  } else if (status == EAU){
+  } else if (status == EAU) {
     stream << "EAU";
-  } else if (status == EOW){
+  } else if (status == EOW) {
     stream << "EOW";
   } else if (status == END) {
     stream << "END";
@@ -980,8 +957,8 @@ void ReplyShowAssetClientbound::send(int fd) {
     file_size = getFileSize(file_path);
     stream << "OK " << file_name << " " << file_size << " ";
     writeString(fd, stream.str());
-    stream.str(std::string());
-    stream.clear();
+    stream.str(std::string()); // clears the stream
+    stream.clear();            // resets any error flags
     sendFile(fd, file_path);
   } else if (status == NOK) {
     stream << "NOK";
@@ -1042,17 +1019,17 @@ void BidServerbound::receive(int fd) {
 void ReplyBidClientbound::send(int fd) {
   std::stringstream stream;
   stream << ReplyBidClientbound::ID << " ";
-  if (status == ACC){
+  if (status == ACC) {
     stream << "ACC";
-  } else if (status == NOK){
+  } else if (status == NOK) {
     stream << "NOK";
-  } else if (status == NLG){
+  } else if (status == NLG) {
     stream << "NLG";
-  } else if (status == ILG){
+  } else if (status == ILG) {
     stream << "ILG";
-  } else if (status == REF){
+  } else if (status == REF) {
     stream << "REF";
-  } else if (status == ERR){
+  } else if (status == ERR) {
     stream << "ERR";
   } else {
     throw PacketSerializationException();
@@ -1083,7 +1060,6 @@ void ReplyBidClientbound::receive(int fd) {
   readPacketDelimiter(fd);
 }
 
-
 void ErrorTcpPacket::send(int fd) {
   writeString(fd, ErrorTcpPacket::ID);
   writeString(fd, "\n");
@@ -1111,7 +1087,7 @@ void wait_for_packet(UdpPacket &packet, int socket) {
   FD_SET(socket, &file_descriptors);
 
   struct timeval timeout;
-  timeout.tv_sec = UDP_TIMEOUT_SECONDS;  // wait for a response before throwing
+  timeout.tv_sec = UDP_TIMEOUT_SECONDS; // wait for a response before throwing
   timeout.tv_usec = 0;
 
   int ready_fd = select(socket + 1, &file_descriptors, NULL, NULL, &timeout);
@@ -1139,20 +1115,20 @@ void wait_for_packet(UdpPacket &packet, int socket) {
 }
 
 std::string read_date_time(std::stringstream &buffer) {
-    std::string date, time;
-    std::getline(buffer, date, ' ');
-    std::getline(buffer, time, ' ');
-    return date + " " + time;
+  std::string date, time;
+  std::getline(buffer, date, ' ');
+  std::getline(buffer, time, ' ');
+  return date + " " + time;
 }
 
 void write_auction_id(std::stringstream &buffer, const uint32_t auction_id) {
   buffer << std::setfill('0') << std::setw(AUCTION_ID_MAX_LEN) << auction_id;
-  buffer.copyfmt(std::ios(NULL));  // reset formatting
+  buffer.copyfmt(std::ios(NULL)); // reset formatting
 }
 
 void write_user_id(std::stringstream &buffer, const uint32_t user_id) {
   buffer << std::setfill('0') << std::setw(USER_ID_STR_LEN) << user_id;
-  buffer.copyfmt(std::ios(NULL));  // reset formatting
+  buffer.copyfmt(std::ios(NULL)); // reset formatting
 }
 
 uint32_t parse_packet_user_id(std::string &id_str) {
@@ -1166,7 +1142,7 @@ uint32_t parse_packet_user_id(std::string &id_str) {
   }
   try {
     int i = std::stoi(id_str);
-    if (i < 0 || i > (int) USER_ID_MAX) {
+    if (i < 0 || i > (int)USER_ID_MAX) {
       throw InvalidPacketException();
     }
     return (uint32_t)i;
@@ -1218,34 +1194,34 @@ void sendFile(int connection_fd, std::filesystem::path file_path) {
   }
 }
 
-
-std::string auctionsToString(const std::vector<std::pair<uint32_t, bool>>& auctions) {
-    std::ostringstream formattedString;
-    for (size_t i = 0; i < auctions.size(); ++i) {
-        formattedString << fillZeros(auctions[i].first, AUCTION_ID_MAX_LEN) << " ";
-        formattedString << auctions[i].second;
-        if (i != auctions.size() - 1) {
-            formattedString << " ";
-        }
+std::string auctionsToString(const std::vector<std::pair<uint32_t, bool>> &auctions) {
+  std::ostringstream formattedString;
+  for (size_t i = 0; i < auctions.size(); ++i) {
+    formattedString << fillZeros(auctions[i].first, AUCTION_ID_MAX_LEN) << " ";
+    formattedString << auctions[i].second;
+    if (i != auctions.size() - 1) {
+      formattedString << " ";
     }
-    return formattedString.str();
+  }
+  return formattedString.str();
 }
 
-std::vector<std::pair<uint32_t, bool>> UdpPacket::readAuctions(std::stringstream& buffer) {
-    std::vector<std::pair<uint32_t, bool>> auctions;
+std::vector<std::pair<uint32_t, bool>>
+UdpPacket::readAuctions(std::stringstream &buffer) {
+  std::vector<std::pair<uint32_t, bool>> auctions;
 
-    uint32_t auctionId;
-    bool auctionStatus;
-    while (buffer.peek() != '\n') {
-        readSpace(buffer);
-        auctionId = readAuctionId(buffer);
-        readSpace(buffer);
-        auctionStatus = readInt(buffer);
-        // emplace_back adds element to the end of the vector
-        auctions.emplace_back(auctionId, auctionStatus);
-    }
+  uint32_t auctionId;
+  bool auctionStatus;
+  while (buffer.peek() != '\n') {
+    readSpace(buffer);
+    auctionId = readAuctionId(buffer);
+    readSpace(buffer);
+    auctionStatus = readInt(buffer);
+    // emplace_back adds element to the end of the vector
+    auctions.emplace_back(auctionId, auctionStatus);
+  }
 
-    return auctions;
+  return auctions;
 }
 
 Bid UdpPacket::readBid(std::stringstream &buffer) {
@@ -1266,12 +1242,10 @@ std::string auctionID_ToString(uint32_t auction_id) {
 }
 
 std::string fillZeros(uint32_t number, int length) {
-  //std::ostringstream oss;
-  //oss << std::setfill('0') << std::setw(length) << number;
   std::string str = std::to_string(number);
   uint32_t len = static_cast<uint32_t>(length);
   while (str.length() < len) {
-      str = '0' + str;
+    str = '0' + str;
   }
 
   return str;
