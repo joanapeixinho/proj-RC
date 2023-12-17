@@ -301,9 +301,8 @@ void handle_show_record(std::stringstream &buffer, Address &addr_from,
   ShowRecordServerbound packet;
   ReplyShowRecordClientbound response;
 
-  try
-  {
-    
+  try {
+
     packet.deserialize(buffer);
     state.cdebug << auctionTag(packet.auction_id) << "Asked to show record"
                  << std::endl;
@@ -358,10 +357,12 @@ void handle_open_auction(int connection_fd, AuctionServerState &state) {
 
     std::string endTime = " ";
 
-    AuctionData auction(state.auctionsCount++, packet.user_id, packet.auction_name, packet.start_value, packet.time_active, packet.file_name, now, endTime, 0, std::vector<Bid>());
-   
-    if (packet.file_size > ASSET_MAX_BYTES)
-    {
+    AuctionData auction(state.auctionsCount++, packet.user_id,
+                        packet.auction_name, packet.start_value,
+                        packet.time_active, packet.file_name, now, endTime, 0,
+                        std::vector<Bid>());
+
+    if (packet.file_size > ASSET_MAX_BYTES) {
       throw InvalidAuctionAssetException(packet.file_name);
     }
 
@@ -433,8 +434,7 @@ void handle_close_auction(int connection_fd, AuctionServerState &state) {
   CloseAuctionServerbound packet;
   ReplyCloseAuctionClientbound response;
 
-  try
-  {
+  try {
 
     packet.receive(connection_fd);
 
@@ -556,8 +556,7 @@ void handle_bid(int connection_fd, AuctionServerState &state) {
   BidServerbound packet;
   ReplyBidClientbound response;
 
-  try
-  {
+  try {
 
     packet.receive(connection_fd);
 

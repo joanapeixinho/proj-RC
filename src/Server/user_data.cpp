@@ -1,25 +1,20 @@
 #include "user_data.hpp"
 
+UserData::UserData(uint32_t __id, const std::string &__password,
+                   FileManager &__fileManager)
+    : id(__id), password(__password), fileManager(__fileManager) {
+  if (id > USER_ID_MAX) {
+    throw UserIdException(std::to_string(id));
+  }
+  if (password.length() != 8) {
+    throw UserPasswordException(password);
+  }
 
-UserData::UserData(uint32_t __id, const std::string &__password, FileManager &__fileManager)
-    : id(__id), password(__password), fileManager(__fileManager)
-{
-    if (id > USER_ID_MAX)
-    {
-        throw UserIdException(std::to_string(id));
+  for (char c : password) {
+    if (!std::isalnum(c)) {
+      throw UserPasswordException(password);
     }
-    if (password.length() != 8)
-    {
-        throw UserPasswordException(password);
-    }
-
-    for (char c : password)
-    {
-        if (!std::isalnum(c))
-        {
-            throw UserPasswordException(password);
-        }
-    }
+  }
 }
 
 UserData::UserData(uint32_t __id, FileManager &__fileManager)
