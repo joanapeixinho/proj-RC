@@ -96,5 +96,4 @@ clean-asdir:
 	rm -rf $(ASDIR)/*
 
 package:
-	cp readme.txt
-	zip project.zip $(SOURCES) $(HEADERS) Makefile .clang-format readme.txt *.xlsx
+	zip project.zip $(SOURCES) $(HEADERS) Makefile .clang-format README.txt *.xlsx
